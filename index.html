@@ -2,13 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <link rel="icon" type="image/png" href="icon.png">
-    <title>lambda1224 - био</title>
-    <!-- Material Symbols & Inter font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material-Symbols-Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0,0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>lambda1224 · био</title>
     <style>
+        /* БАЗОВЫЕ СБРОСЫ */
         * {
             margin: 0;
             padding: 0;
@@ -16,808 +13,467 @@
         }
 
         body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #eef2f6;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             padding: 16px;
-            transition: background 0.3s ease;
+            transition: background 0.2s;
         }
 
-        /* светлая тема (по умолчанию) */
-        body.light-theme {
-            background: #e9eef4;
-            background: linear-gradient(145deg, #ecf2fa 0%, #dee5f0 100%);
+        /* ТЁМНАЯ ТЕМА */
+        body.dark {
+            background: #1a1e2a;
         }
 
-        /* тёмная тема */
-        body.dark-theme {
-            background: #1a1f2b;
-            background: linear-gradient(145deg, #1e2432 0%, #151a24 100%);
-        }
-
-        /* главная карточка — material you */
-        .bio-card {
-            max-width: 820px;
+        /* КАРТОЧКА */
+        .card {
+            max-width: 700px;
             width: 100%;
-            border-radius: 44px;
-            padding: 32px 28px;
-            border: 1px solid;
-            transition: all 0.3s ease;
-            position: relative;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 32px;
+            box-shadow: 0 20px 40px rgba(0, 20, 40, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: 0.2s;
         }
 
-        /* светлая карточка */
-        .light-theme .bio-card {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(32px);
-            -webkit-backdrop-filter: blur(32px);
-            box-shadow: 0 20px 40px -8px rgba(0, 35, 70, 0.15),
-                        0 0 0 1px rgba(255, 255, 255, 0.6) inset,
-                        0 8px 20px rgba(0, 32, 64, 0.08);
-            border-color: rgba(255,255,255,0.5);
+        body.dark .card {
+            background: rgba(30, 35, 48, 0.85);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
-        /* тёмная карточка */
-        .dark-theme .bio-card {
-            background: rgba(30, 35, 45, 0.8);
-            backdrop-filter: blur(32px);
-            -webkit-backdrop-filter: blur(32px);
-            box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.5),
-                        0 0 0 1px rgba(255, 255, 255, 0.1) inset,
-                        0 8px 20px rgba(0, 0, 0, 0.3);
-            border-color: rgba(255,255,255,0.1);
-        }
-
-        /* шапка профиля */
-        .profile-header {
+        /* ШАПКА С КНОПКОЙ */
+        .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        /* ПРОФИЛЬ */
+        .profile {
+            display: flex;
+            align-items: center;
             gap: 16px;
         }
 
-        .profile-row {
+        .avatar {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(145deg, #c0d0e8, #a0b8d4);
+            border-radius: 27px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        body.dark .avatar {
+            background: linear-gradient(145deg, #2d354a, #1f2638);
+            color: #d0e0ff;
+        }
+
+        .name h1 {
+            font-size: 2rem;
+            font-weight: 650;
+            color: #001d35;
+            line-height: 1.1;
+        }
+
+        body.dark .name h1 {
+            color: #f0f4ff;
+        }
+
+        .handle {
+            background: rgba(200, 220, 250, 0.5);
+            padding: 5px 15px;
+            border-radius: 40px;
+            font-size: 1rem;
+            color: #1a3855;
+            display: inline-block;
+            margin-top: 5px;
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+
+        body.dark .handle {
+            background: rgba(50, 60, 85, 0.6);
+            color: #b8d0f0;
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        /* КНОПКА ТЕМЫ */
+        .theme-btn {
+            width: 72px;
+            height: 72px;
+            border-radius: 27px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        body.dark .theme-btn {
+            background: rgba(50, 58, 80, 0.8);
+            border-color: rgba(255,255,255,0.1);
+            color: #ffd;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.05);
+            background: white;
+        }
+
+        body.dark .theme-btn:hover {
+            background: #404a68;
+        }
+
+        /* ЧИПСЫ */
+        .chips {
+            background: rgba(210, 225, 250, 0.4);
+            border-radius: 30px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        body.dark .chips {
+            background: rgba(40, 48, 70, 0.5);
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        .chip-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .chip {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            color: #113355;
+            border: 1px solid rgba(255,255,255,0.9);
+            box-shadow: 0 2px 6px rgba(0,30,60,0.08);
+            font-size: 1.05rem;
+        }
+
+        body.dark .chip {
+            background: #2f3855;
+            color: #e0ecff;
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        .quote {
+            font-size: 1.05rem;
+            color: #124267;
+            border-left: 4px solid #6080b0;
+            padding-left: 16px;
+            margin-top: 8px;
+        }
+
+        body.dark .quote {
+            color: #b0caf0;
+            border-left-color: #6080b0;
+        }
+
+        /* РАЗДЕЛИТЕЛЬ */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 30px 0 20px;
+            color: #346090;
+        }
+
+        body.dark .divider {
+            color: #90b0e0;
+        }
+
+        .line {
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #809ac0, #809ac0, #809ac0, transparent);
+        }
+
+        .divider span {
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        /* ТАЙМЕР */
+        .timer {
+            background: rgba(200, 220, 250, 0.4);
+            border-radius: 30px;
+            padding: 24px;
+            margin: 20px 0;
+            border: 1px solid rgba(255,255,255,0.8);
             display: flex;
             align-items: center;
             gap: 20px;
             flex-wrap: wrap;
         }
 
-        .avatar-large {
-            width: 80px;
-            height: 80px;
-            border-radius: 30px;
+        body.dark .timer {
+            background: rgba(45, 55, 80, 0.5);
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        .timer-icon {
+            background: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 42px;
-            flex-shrink: 0;
-            transition: all 0.3s ease;
+            font-size: 30px;
         }
 
-        .light-theme .avatar-large {
-            background: linear-gradient(135deg, #c2d1e6, #a5bbd6);
-            box-shadow: 0 10px 18px -6px rgba(0,40,80,0.2), 0 0 0 2px rgba(255,255,255,0.8) inset;
-            color: #1f2a3c;
+        body.dark .timer-icon {
+            background: #303c60;
         }
 
-        .dark-theme .avatar-large {
-            background: linear-gradient(135deg, #2a3347, #1f2738);
-            box-shadow: 0 10px 18px -6px rgba(0,0,0,0.5), 0 0 0 2px rgba(255,255,255,0.1) inset;
-            color: #b5c9f0;
+        .timer-info {
+            flex: 1;
         }
 
-        .name-section h1 {
+        .timer-label {
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            opacity: 0.7;
+            color: #1b3f60;
+            margin-bottom: 4px;
+        }
+
+        body.dark .timer-label {
+            color: #b0c8f0;
+        }
+
+        .timer-numbers {
             font-size: 2.2rem;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            line-height: 1.1;
-            transition: color 0.3s ease;
+            font-weight: 700;
+            color: #003366;
+            line-height: 1.2;
         }
 
-        .light-theme .name-section h1 {
-            color: #001d33;
-            text-shadow: 0 1px 3px rgba(255,255,255,0.5);
+        body.dark .timer-numbers {
+            color: #d0e8ff;
         }
 
-        .dark-theme .name-section h1 {
-            color: #e5ecf5;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-
-        .name-section .handle {
-            font-size: 1.1rem;
-            padding: 6px 16px;
-            border-radius: 60px;
-            display: inline-block;
-            margin-top: 6px;
-            backdrop-filter: blur(10px);
-            border: 1px solid;
-            transition: all 0.3s ease;
-        }
-
-        .light-theme .name-section .handle {
-            color: #2c3f5c;
-            background: rgba(210, 225, 245, 0.6);
-            border-color: rgba(255,255,255,0.7);
-        }
-
-        .dark-theme .name-section .handle {
-            color: #b0c6e0;
-            background: rgba(40, 50, 70, 0.6);
-            border-color: rgba(255,255,255,0.1);
-        }
-
-        /* кнопка переключения темы - теперь на одной высоте с аватаром */
-        .theme-toggle {
-            width: 80px;
-            height: 80px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid;
-            font-size: 42px; /* такой же размер, как эмодзи кота */
-            flex-shrink: 0;
-        }
-
-        .light-theme .theme-toggle {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border-color: rgba(255,255,255,0.9);
-            box-shadow: 0 4px 12px rgba(0,20,40,0.1);
-        }
-
-        .dark-theme .theme-toggle {
-            background: rgba(50, 55, 70, 0.8);
-            backdrop-filter: blur(12px);
-            border-color: rgba(255,255,255,0.1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.05);
-        }
-
-        .light-theme .theme-toggle:hover {
-            background: white;
-        }
-
-        .dark-theme .theme-toggle:hover {
-            background: rgba(70, 75, 90, 0.9);
-        }
-
-        /* секция вайб / чипсы */
-        .vibe-section {
-            border-radius: 30px;
-            padding: 22px 24px;
-            margin: 24px 0 28px 0;
-            backdrop-filter: blur(8px);
-            border: 1px solid;
-            transition: all 0.3s ease;
-        }
-
-        .light-theme .vibe-section {
-            background: rgba(210, 225, 250, 0.4);
-            border-color: rgba(255,255,255,0.75);
-        }
-
-        .dark-theme .vibe-section {
-            background: rgba(40, 48, 65, 0.5);
-            border-color: rgba(255,255,255,0.1);
-        }
-
-        .vibe-section p {
-            font-size: 1.15rem;
-            line-height: 1.5;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 8px 12px;
-            transition: color 0.3s ease;
-        }
-
-        .light-theme .vibe-section p {
-            color: #002242;
-        }
-
-        .dark-theme .vibe-section p {
-            color: #c0d0e8;
-        }
-
-        .chip {
-            padding: 8px 18px;
-            border-radius: 40px;
+        .timer-numbers small {
             font-size: 1rem;
-            font-weight: 500;
-            border: 1px solid;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            backdrop-filter: blur(4px);
-            transition: all 0.3s ease;
+            font-weight: 400;
+            margin-left: 5px;
+            color: #446688;
         }
 
-        .light-theme .chip {
-            background: white;
-            color: #102b44;
-            box-shadow: 0 2px 8px rgba(0,35,70,0.08);
-            border-color: rgba(255,255,255,0.8);
+        body.dark .timer-numbers small {
+            color: #90b0d0;
         }
 
-        .dark-theme .chip {
-            background: #2a3245;
-            color: #c8d6f0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            border-color: rgba(255,255,255,0.1);
-        }
-
-        .chip .material-symbols-rounded {
-            font-size: 20px;
-            transition: color 0.3s ease;
-        }
-
-        .light-theme .chip .material-symbols-rounded {
-            color: #2f5a8c;
-        }
-
-        .dark-theme .chip .material-symbols-rounded {
-            color: #7a9bcb;
-        }
-
-        .vibe-section p:last-child {
-            margin-top: 16px;
-            font-size: 1rem;
-            transition: color 0.3s ease;
-        }
-
-        .light-theme .vibe-section p:last-child {
-            color: #0b3455;
-        }
-
-        .dark-theme .vibe-section p:last-child {
-            color: #90a9cc;
-        }
-
-        /* заголовки */
-        .links-title {
+        /* ССЫЛКИ */
+        .section-title {
             font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 18px;
-            padding-left: 8px;
+            color: #123a5a;
+            margin: 25px 0 15px;
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: color 0.3s ease;
         }
 
-        .light-theme .links-title {
-            color: #012845;
+        body.dark .section-title {
+            color: #c0d8ff;
         }
 
-        .dark-theme .links-title {
-            color: #b8cff0;
-        }
-
-        /* кнопки соц сетей */
-        .social-links {
-            display: flex;
-            flex-flow: row wrap;
-            gap: 14px;
-            margin-top: 18px;
-        }
-
-        .social-btn {
-            backdrop-filter: blur(20px);
-            padding: 14px 28px;
-            border-radius: 60px;
-            font-size: 1.05rem;
-            font-weight: 530;
-            display: inline-flex;
-            align-items: center;
-            gap: 14px;
-            transition: all 0.18s ease;
-            text-decoration: none;
-            border: 1px solid;
-        }
-
-        .light-theme .social-btn {
+        .social {
+            display: inline-block;
             background: rgba(240, 245, 255, 0.7);
-            border-color: rgba(255,255,255,0.9);
-            box-shadow: 0 4px 12px -8px #10203040, 0 0 0 1px rgba(255,255,255,0.6) inset;
-            color: #002c4d;
+            padding: 14px 30px;
+            border-radius: 60px;
+            text-decoration: none;
+            color: #003366;
+            font-weight: 530;
+            border: 1px solid rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
         }
 
-        .dark-theme .social-btn {
-            background: rgba(45, 52, 70, 0.7);
+        body.dark .social {
+            background: rgba(55, 65, 95, 0.7);
+            color: #d0e8ff;
             border-color: rgba(255,255,255,0.1);
-            box-shadow: 0 4px 12px -8px #00000080, 0 0 0 1px rgba(255,255,255,0.1) inset;
-            color: #d0e0ff;
-        }
-
-        .social-btn .material-symbols-rounded {
-            font-size: 24px;
-            transition: color 0.3s ease;
-        }
-
-        .light-theme .social-btn .material-symbols-rounded {
-            color: #0e3d60;
-        }
-
-        .dark-theme .social-btn .material-symbols-rounded {
-            color: #7a9fd0;
-        }
-
-        .social-btn:hover {
-            transform: scale(1.02);
-        }
-
-        .light-theme .social-btn:hover {
-            background: white;
-            box-shadow: 0 10px 22px -12px #0f2f50, 0 0 0 1px #ffffff inset;
-        }
-
-        .dark-theme .social-btn:hover {
-            background: #3a445c;
-            box-shadow: 0 10px 22px -12px #000000, 0 0 0 1px rgba(255,255,255,0.2) inset;
-        }
-
-        /* адаптация */
-        @media (max-width: 700px) {
-            .profile-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .theme-toggle {
-                align-self: flex-end;
-                margin-top: -60px; /* поднимаем кнопку чтобы визуально была на уровне */
-            }
-        }
-
-        @media (max-width: 520px) {
-            .bio-card {
-                padding: 24px 18px;
-                border-radius: 32px;
-            }
-            .profile-row {
-                gap: 14px;
-            }
-            .avatar-large {
-                width: 68px;
-                height: 68px;
-                font-size: 34px;
-                border-radius: 24px;
-            }
-            .theme-toggle {
-                width: 68px;
-                height: 68px;
-                font-size: 34px;
-                border-radius: 24px;
-            }
-            .name-section h1 {
-                font-size: 1.8rem;
-            }
-            .chip {
-                padding: 6px 14px;
-            }
-            .social-btn {
-                padding: 12px 22px;
-                flex: 1 1 auto;
-            }
-            
-            @media (max-width: 520px) and (max-width: 700px) {
-                .theme-toggle {
-                    margin-top: -50px;
-                }
-            }
-        }
-
-        .material-symbols-rounded {
-            font-variation-settings: 'FILL' 0, 'wght' 420, 'GRAD' 0, 'opsz' 24;
         }
 
         hr {
             border: none;
             height: 1px;
-            margin: 20px 0 12px;
-            transition: background 0.3s ease;
-        }
-
-        .light-theme hr {
             background: rgba(120, 150, 190, 0.3);
+            margin: 20px 0 15px;
         }
 
-        .dark-theme hr {
-            background: rgba(255, 255, 255, 0.1);
+        body.dark hr {
+            background: rgba(255,255,255,0.1);
         }
 
-        .footnote {
-            font-size: 0.9rem;
+        .footer {
             text-align: center;
-            opacity: 0.7;
-            transition: color 0.3s ease;
+            color: #446688;
+            font-size: 0.95rem;
         }
 
-        .light-theme .footnote {
-            color: #2d4a6b;
+        body.dark .footer {
+            color: #90a8d0;
         }
 
-        .dark-theme .footnote {
-            color: #8a9fc0;
-        }
-
-        /* ======= РАЗДЕЛИТЕЛЬ ======= */
-        .section-divider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 28px 0 18px;
-            transition: color 0.3s ease;
-        }
-
-        .light-theme .section-divider {
-            color: #234e72;
-        }
-
-        .dark-theme .section-divider {
-            color: #8aa5d0;
-        }
-
-        .divider-line {
-            flex: 1;
-            height: 2px;
-            transition: background 0.3s ease;
-        }
-
-        .light-theme .divider-line {
-            background: linear-gradient(90deg, transparent, rgba(70, 120, 180, 0.3), rgba(70, 120, 180, 0.5), rgba(70, 120, 180, 0.3), transparent);
-        }
-
-        .dark-theme .divider-line {
-            background: linear-gradient(90deg, transparent, rgba(100, 150, 220, 0.2), rgba(100, 150, 220, 0.4), rgba(100, 150, 220, 0.2), transparent);
-        }
-
-        .divider-icon {
+        /* ссылка на сайт */
+        .site-link {
+            font-family: monospace;
+            background: rgba(255,255,255,0.5);
+            padding: 8px 16px;
             border-radius: 40px;
-            padding: 8px 20px;
-            backdrop-filter: blur(8px);
-            font-size: 1rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid;
-            transition: all 0.3s ease;
+            display: inline-block;
+            margin-top: 5px;
         }
 
-        .light-theme .divider-icon {
-            background: rgba(255,255,255,0.6);
-            color: #103a5c;
-            border-color: rgba(255,255,255,0.8);
-            box-shadow: 0 2px 8px rgba(0,30,60,0.05);
-        }
-
-        .dark-theme .divider-icon {
-            background: rgba(40, 48, 65, 0.6);
-            color: #b0c8f0;
-            border-color: rgba(255,255,255,0.1);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-
-        .divider-icon .material-symbols-rounded {
-            font-size: 22px;
-        }
-
-        /* ======= БЛОК ТАЙМЕРА ======= */
-        .timer-block {
-            backdrop-filter: blur(16px);
-            border-radius: 40px;
-            padding: 20px 24px;
-            margin: 16px 0 24px;
-            border: 1px solid;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .light-theme .timer-block {
-            background: rgba(200, 215, 240, 0.4);
-            border-color: rgba(255,255,255,0.8);
-        }
-
-        .dark-theme .timer-block {
-            background: rgba(40, 48, 68, 0.5);
-            border-color: rgba(255,255,255,0.1);
-        }
-
-        .timer-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .light-theme .timer-icon {
-            background: white;
-            box-shadow: 0 4px 12px rgba(0,30,60,0.1);
-        }
-
-        .dark-theme .timer-icon {
-            background: #2a334a;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .timer-icon .material-symbols-rounded {
-            font-size: 32px;
-            transition: color 0.3s ease;
-        }
-
-        .light-theme .timer-icon .material-symbols-rounded {
-            color: #0f4a7a;
-        }
-
-        .dark-theme .timer-icon .material-symbols-rounded {
-            color: #7a9fd0;
-        }
-
-        .timer-info {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .timer-label {
-            font-size: 1rem;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-            opacity: 0.8;
-            transition: color 0.3s ease;
-        }
-
-        .light-theme .timer-label {
-            color: #113753;
-        }
-
-        .dark-theme .timer-label {
-            color: #a0b8e0;
-        }
-
-        .timer-value {
-            font-size: 2rem;
-            font-weight: 620;
-            line-height: 1.2;
-            letter-spacing: -0.02em;
-            transition: color 0.3s ease;
-        }
-
-        .light-theme .timer-value {
-            color: #002c4f;
-        }
-
-        .dark-theme .timer-value {
-            color: #d0e5ff;
-        }
-
-        .timer-unit {
-            font-size: 1rem;
-            font-weight: 500;
-            margin-left: 6px;
-            transition: color 0.3s ease;
-        }
-
-        .light-theme .timer-unit {
-            color: #1d4465;
-        }
-
-        .dark-theme .timer-unit {
-            color: #90a9d0;
-        }
-
-        @media (max-width: 480px) {
-            .timer-block {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .timer-value {
-                font-size: 1.8rem;
-            }
+        /* для мобилок */
+        @media (max-width: 550px) {
+            .card { padding: 24px; }
+            .avatar, .theme-btn { width: 60px; height: 60px; font-size: 32px; }
+            .name h1 { font-size: 1.8rem; }
+            .timer-numbers { font-size: 1.8rem; }
         }
     </style>
 </head>
-<body class="light-theme">
-    <div class="bio-card">
-        <!-- шапка с аватаром и кнопкой темы на одном уровне -->
-        <div class="profile-header">
-            <div class="profile-row">
-                <div class="avatar-large">😼</div>
-                <div class="name-section">
+<body>
+    <div class="card">
+        <!-- шапка с кнопкой -->
+        <div class="header">
+            <div class="profile">
+                <div class="avatar">😼</div>
+                <div class="name">
                     <h1>lambda1224</h1>
-                    <div class="handle">@lambda1224 ✦ просто лямбда</div>
+                    <div class="handle">@lambda1224 🔖 просто ляг</div>
                 </div>
             </div>
-            
-            <!-- кнопка переключения темы с эмодзи 🌙 / ☀️ -->
-            <div class="theme-toggle" id="themeToggle">
-                <span id="themeEmoji">🌙</span>
+            <div class="theme-btn" id="themeToggle" onclick="toggleTheme()">🌙</div>
+        </div>
+
+        <!-- чипсы -->
+        <div class="chips">
+            <div class="chip-grid">
+                <span class="chip">(вайб)кодинг</span>
+                <span class="chip">python</span>
+                <span class="chip">боты</span>
+                <span class="chip">дизайн</span>
+            </div>
+            <div class="quote">
+                🔴 мне нравится делать разные вещи вроде простых штучек, возможно работающих
             </div>
         </div>
 
-        <!-- vibe / chip section -->
-        <div class="vibe-section">
-            <p>
-                <span class="chip"><span class="material-symbols-rounded">💻</span> (вайб)кодинг</span>
-                <span class="chip"><span class="material-symbols-rounded">🐍</span> python</span>
-                <span class="chip"><span class="material-symbols-rounded">🤖</span> боты</span>
-                <span class="chip"><span class="material-symbols-rounded">🎨</span> дизайн</span>
-            </p>
-            <p style="margin-top: 16px; font-size: 1rem;">
-                ⚡ мне нравится делать разные вещи вроде простых штучек, возможно работающих
-            </p>
+        <!-- разделитель -->
+        <div class="divider">
+            <span class="line"></span>
+            <span>📅 отсчет до лета/нг</span>
+            <span class="line"></span>
         </div>
 
-        <!-- ========== РАЗДЕЛИТЕЛЬ ========== -->
-        <div class="section-divider">
-            <span class="divider-line"></span>
-            <span class="divider-icon">
-                <span class="material-symbols-rounded">⏱️</span> отсчет до лета/нг
-            </span>
-            <span class="divider-line"></span>
-        </div>
-
-        <!-- ========== ТАЙМЕР ДО ЛЕТА / НОВОГО ГОДА ========== -->
-        <div class="timer-block" id="timerBlock">
-            <div class="timer-icon">
-                <span class="material-symbols-rounded" id="timerIcon">🍉</span>
-            </div>
+        <!-- таймер -->
+        <div class="timer" id="timerBlock">
+            <div class="timer-icon" id="timerIcon">🌤️</div>
             <div class="timer-info">
                 <div class="timer-label" id="timerLabel">до лета осталось</div>
-                <div>
-                    <span class="timer-value" id="timerDays">0</span>
-                    <span class="timer-unit">дней</span>
-                    <span class="timer-value" id="timerHours" style="font-size:1.6rem;">00</span>
-                    <span class="timer-unit">ч</span>
-                    <span class="timer-value" id="timerMinutes" style="font-size:1.6rem;">00</span>
-                    <span class="timer-unit">мин</span>
-                </div>
+                <div class="timer-numbers" id="timerDisplay">0 дней 00:00</div>
             </div>
         </div>
 
-        <!-- СОЦ ССЫЛКИ (только GitHub) -->
-        <h2 class="links-title">
-            <span class="material-symbols-rounded">⁉️</span> мои ссылки
-        </h2>
-        <div class="social-links">
-            <a href="https://github.com/lambda1224" class="social-btn" target="_blank" rel="noopener">
-                <span class="material-symbols-rounded"></span> GitHub
-            </a>
-        </div>
+        <!-- ссылки -->
+        <div class="section-title">🔗 мои ссылки</div>
+        <a href="https://github.com/lambda1224" class="social" target="_blank">GitHub</a>
 
         <hr>
-        <div class="footnote">
-            I'm a furry btw :3
+
+        <div class="footer">
+            <div>I'm a furry btw :3</div>
+            <div class="site-link">lambda1224.github.io</div>
         </div>
     </div>
 
     <script>
-        (function() {
-            // ТАЙМЕР ДО ЛЕТА / НОВОГО ГОДА
-            function updateTimer() {
-                const now = new Date();
-                const currentYear = now.getFullYear();
-
-                // Даты: лето (1 июня) и следующий Новый год (1 января следующего года)
-                let summerDate = new Date(currentYear, 5, 1); // 1 июня
-                let newYearDate = new Date(currentYear + 1, 0, 1); // 1 января следующего
-
-                // Если сейчас уже после 1 июня, берём лето следующего года
-                if (now > summerDate) {
-                    summerDate = new Date(currentYear + 1, 5, 1);
-                }
-
-                // Определяем период
-                const juneFirst = new Date(currentYear, 5, 1);
-                const janFirstNext = new Date(currentYear + 1, 0, 1);
-                const janFirstThis = new Date(currentYear, 0, 1);
-
-                let targetDate;
-                let label;
-                let icon;
-
-                if (now >= juneFirst && now < janFirstNext) {
-                    // лето/осень → Новый год
-                    targetDate = janFirstNext;
-                    label = 'до Нового года осталось';
-                    icon = '🎄';
-                } else {
-                    // зима/весна → лето (текущее или следующее)
-                    if (now < juneFirst) {
-                        targetDate = juneFirst; // лето этого года
-                    } else {
-                        targetDate = new Date(currentYear + 1, 5, 1); // подстраховка
-                    }
-                    label = 'до лета осталось';
-                    icon = '☀️';
-                }
-
-                // Коррекция для января-мая
-                if (now >= janFirstThis && now < juneFirst) {
-                    targetDate = juneFirst;
-                    label = 'до лета осталось';
-                    icon = '☀️';
-                }
-
-                // Финальная страховка для лета
-                if (now >= juneFirst && now < janFirstNext) {
-                    targetDate = janFirstNext;
-                    label = 'до Нового года осталось';
-                    icon = '🎄';
-                }
-
-                const diff = targetDate - now;
-                if (diff <= 0) {
-                    location.reload(); // на всякий случай
-                    return;
-                }
-
-                const totalSeconds = Math.floor(diff / 1000);
-                const days = Math.floor(totalSeconds / 86400);
-                const hours = Math.floor((totalSeconds % 86400) / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-
-                document.getElementById('timerDays').textContent = days;
-                document.getElementById('timerHours').textContent = hours.toString().padStart(2, '0');
-                document.getElementById('timerMinutes').textContent = minutes.toString().padStart(2, '0');
-                document.getElementById('timerLabel').textContent = label;
-                document.getElementById('timerIcon').textContent = icon;
-            }
-
-            updateTimer();
-            setInterval(updateTimer, 60000); // обновление каждую минуту
-
-            // ПЕРЕКЛЮЧЕНИЕ ТЕМЫ с эмодзи 🌙 и ☀️
-            const themeToggle = document.getElementById('themeToggle');
-            const body = document.body;
-            const themeEmoji = document.getElementById('themeEmoji');
-
-            // Проверяем сохранённую тему в localStorage
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                body.classList.remove('light-theme');
-                body.classList.add('dark-theme');
-                themeEmoji.textContent = '☀️';
+        // ТАЙМЕР
+        function updateTimer() {
+            const now = new Date();
+            const year = now.getFullYear();
+            
+            // 1 июня этого года
+            let june1 = new Date(year, 5, 1);
+            // 1 января следующего года
+            let jan1 = new Date(year + 1, 0, 1);
+            
+            let target, label, icon;
+            
+            if (now >= june1) {
+                // после 1 июня - считаем до НГ
+                target = jan1;
+                label = 'до Нового года осталось';
+                icon = '🎄';
             } else {
-                themeEmoji.textContent = '🌙';
+                // до 1 июня - считаем до лета
+                target = june1;
+                label = 'до лета осталось';
+                icon = '☀️';
             }
+            
+            let diff = target - now;
+            let days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            let hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            document.getElementById('timerLabel').textContent = label;
+            document.getElementById('timerIcon').textContent = icon;
+            document.getElementById('timerDisplay').innerHTML = 
+                `${days} дн ${hours.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}`;
+        }
+        
+        updateTimer();
+        setInterval(updateTimer, 60000);
 
-            themeToggle.addEventListener('click', () => {
-                if (body.classList.contains('light-theme')) {
-                    // переключаем на тёмную
-                    body.classList.remove('light-theme');
-                    body.classList.add('dark-theme');
-                    themeEmoji.textContent = '☀️';
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    // переключаем на светлую
-                    body.classList.remove('dark-theme');
-                    body.classList.add('light-theme');
-                    themeEmoji.textContent = '🌙';
-                    localStorage.setItem('theme', 'light');
-                }
-            });
-        })();
+        // ТЕМА
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('themeToggle');
+            
+            if (body.classList.contains('dark')) {
+                body.classList.remove('dark');
+                btn.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.add('dark');
+                btn.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        // загружаем сохранённую тему
+        const saved = localStorage.getItem('theme');
+        if (saved === 'dark') {
+            document.body.classList.add('dark');
+            document.getElementById('themeToggle').textContent = '☀️';
+        }
     </script>
 </body>
 </html>
