@@ -70,63 +70,20 @@
             border-color: rgba(255,255,255,0.1);
         }
 
-        /* кнопка переключения темы */
-        .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 24px;
-            width: 48px;
-            height: 48px;
-            border-radius: 30px;
+        /* шапка профиля */
+        .profile-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            z-index: 10;
-            border: 1px solid;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
-        .light-theme .theme-toggle {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border-color: rgba(255,255,255,0.9);
-            box-shadow: 0 4px 12px rgba(0,20,40,0.1);
-            color: #1f2a3c;
-        }
-
-        .dark-theme .theme-toggle {
-            background: rgba(50, 55, 70, 0.8);
-            backdrop-filter: blur(12px);
-            border-color: rgba(255,255,255,0.1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            color: #e0e5f0;
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.05);
-        }
-
-        .light-theme .theme-toggle:hover {
-            background: white;
-        }
-
-        .dark-theme .theme-toggle:hover {
-            background: rgba(70, 75, 90, 0.9);
-        }
-
-        .theme-toggle .material-symbols-rounded {
-            font-size: 28px;
-            font-variation-settings: 'FILL' 1, 'wght' 400;
-        }
-
-        /* шапка профиля */
         .profile-row {
             display: flex;
             align-items: center;
             gap: 20px;
-            margin-bottom: 20px;
-            margin-top: 30px;
             flex-wrap: wrap;
         }
 
@@ -193,6 +150,47 @@
             color: #b0c6e0;
             background: rgba(40, 50, 70, 0.6);
             border-color: rgba(255,255,255,0.1);
+        }
+
+        /* кнопка переключения темы - теперь на одной высоте с аватаром */
+        .theme-toggle {
+            width: 80px;
+            height: 80px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid;
+            font-size: 42px; /* такой же размер, как эмодзи кота */
+            flex-shrink: 0;
+        }
+
+        .light-theme .theme-toggle {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-color: rgba(255,255,255,0.9);
+            box-shadow: 0 4px 12px rgba(0,20,40,0.1);
+        }
+
+        .dark-theme .theme-toggle {
+            background: rgba(50, 55, 70, 0.8);
+            backdrop-filter: blur(12px);
+            border-color: rgba(255,255,255,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        .light-theme .theme-toggle:hover {
+            background: white;
+        }
+
+        .dark-theme .theme-toggle:hover {
+            background: rgba(70, 75, 90, 0.9);
         }
 
         /* секция вайб / чипсы */
@@ -371,6 +369,18 @@
         }
 
         /* адаптация */
+        @media (max-width: 700px) {
+            .profile-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .theme-toggle {
+                align-self: flex-end;
+                margin-top: -60px; /* поднимаем кнопку чтобы визуально была на уровне */
+            }
+        }
+
         @media (max-width: 520px) {
             .bio-card {
                 padding: 24px 18px;
@@ -378,9 +388,14 @@
             }
             .profile-row {
                 gap: 14px;
-                margin-top: 40px;
             }
             .avatar-large {
+                width: 68px;
+                height: 68px;
+                font-size: 34px;
+                border-radius: 24px;
+            }
+            .theme-toggle {
                 width: 68px;
                 height: 68px;
                 font-size: 34px;
@@ -396,11 +411,11 @@
                 padding: 12px 22px;
                 flex: 1 1 auto;
             }
-            .theme-toggle {
-                top: 16px;
-                right: 18px;
-                width: 42px;
-                height: 42px;
+            
+            @media (max-width: 520px) and (max-width: 700px) {
+                .theme-toggle {
+                    margin-top: -50px;
+                }
             }
         }
 
@@ -624,17 +639,19 @@
 </head>
 <body class="light-theme">
     <div class="bio-card">
-        <!-- кнопка переключения темы -->
-        <div class="theme-toggle" id="themeToggle">
-            <span class="material-symbols-rounded">dark_mode</span>
-        </div>
-
-        <!-- шапка -->
-        <div class="profile-row">
-            <div class="avatar-large">😼</div>
-            <div class="name-section">
-                <h1>lambda1224</h1>
-                <div class="handle">@lambda1224 ✦ просто лямбда</div>
+        <!-- шапка с аватаром и кнопкой темы на одном уровне -->
+        <div class="profile-header">
+            <div class="profile-row">
+                <div class="avatar-large">😼</div>
+                <div class="name-section">
+                    <h1>lambda1224</h1>
+                    <div class="handle">@lambda1224 ✦ просто лямбда</div>
+                </div>
+            </div>
+            
+            <!-- кнопка переключения темы с эмодзи 🌙 / ☀️ -->
+            <div class="theme-toggle" id="themeToggle">
+                <span id="themeEmoji">🌙</span>
             </div>
         </div>
 
@@ -770,19 +787,19 @@
             updateTimer();
             setInterval(updateTimer, 60000); // обновление каждую минуту
 
-            // ПЕРЕКЛЮЧЕНИЕ ТЕМЫ
+            // ПЕРЕКЛЮЧЕНИЕ ТЕМЫ с эмодзи 🌙 и ☀️
             const themeToggle = document.getElementById('themeToggle');
             const body = document.body;
-            const themeIcon = themeToggle.querySelector('.material-symbols-rounded');
+            const themeEmoji = document.getElementById('themeEmoji');
 
             // Проверяем сохранённую тему в localStorage
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark') {
                 body.classList.remove('light-theme');
                 body.classList.add('dark-theme');
-                themeIcon.textContent = 'light_mode';
+                themeEmoji.textContent = '☀️';
             } else {
-                themeIcon.textContent = 'dark_mode';
+                themeEmoji.textContent = '🌙';
             }
 
             themeToggle.addEventListener('click', () => {
@@ -790,13 +807,13 @@
                     // переключаем на тёмную
                     body.classList.remove('light-theme');
                     body.classList.add('dark-theme');
-                    themeIcon.textContent = 'light_mode';
+                    themeEmoji.textContent = '☀️';
                     localStorage.setItem('theme', 'dark');
                 } else {
                     // переключаем на светлую
                     body.classList.remove('dark-theme');
                     body.classList.add('light-theme');
-                    themeIcon.textContent = 'dark_mode';
+                    themeEmoji.textContent = '🌙';
                     localStorage.setItem('theme', 'light');
                 }
             });
