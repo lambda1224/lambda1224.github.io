@@ -125,8 +125,8 @@
             color: #2f5a8c;
         }
 
-        /* навигация */
-        .projects h2, .links-title, .nav-title {
+        /* заголовки */
+        .links-title {
             font-size: 1.3rem;
             font-weight: 600;
             color: #012845;
@@ -135,52 +135,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        /* канал удалён */
-
-        /* ======= НАВИГАЦИЯ ПО СТРАНИЧКАМ ======= */
-        .nav-grid {
-            display: flex;
-            flex-flow: row wrap;
-            gap: 16px;
-            margin: 18px 0 24px;
-        }
-
-        .nav-item {
-            flex: 1 1 calc(33.333% - 16px); 
-            min-width: 150px;
-            background: rgba(245, 248, 255, 0.7);
-            backdrop-filter: blur(16px);
-            border-radius: 36px;
-            padding: 18px 10px;
-            border: 1px solid rgba(255,255,255,0.8);
-            box-shadow: 0 8px 18px -10px #102b44;
-            text-decoration: none;
-            color: #002642;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: 0.15s;
-            gap: 10px;
-            text-align: center;
-        }
-
-        .nav-item:hover {
-            background: white;
-            transform: translateY(-4px);
-            box-shadow: 0 16px 24px -12px #102b44;
-        }
-
-        .nav-item .material-symbols-rounded {
-            font-size: 32px;
-            color: #0b3c60;
-        }
-
-        .nav-item span:last-child {
-            font-weight: 570;
-            font-size: 1.1rem;
         }
 
         /* кнопки соц сетей */
@@ -220,12 +174,6 @@
         }
 
         /* адаптация */
-        @media (max-width: 620px) {
-            .nav-item {
-                flex: 1 1 calc(50% - 16px);
-            }
-        }
-
         @media (max-width: 520px) {
             .bio-card {
                 padding: 24px 18px;
@@ -249,12 +197,6 @@
             .social-btn {
                 padding: 12px 22px;
                 flex: 1 1 auto;
-            }
-        }
-
-        @media (max-width: 420px) {
-            .nav-item {
-                flex: 1 1 100%;
             }
         }
 
@@ -392,7 +334,7 @@
             </div>
         </div>
 
-        <!-- vibe / chip section (обновлённые чипсы) -->
+        <!-- vibe / chip section -->
         <div class="vibe-section">
             <p>
                 <span class="chip"><span class="material-symbols-rounded">💻</span> (вайб)кодинг</span>
@@ -404,27 +346,6 @@
                 ⚡ мне нравится делать разные вещи вроде простых штучек, возможно работающих
             </p>
         </div>
-
-        <!-- НАВИГАЦИЯ ПО САЙТАМ (обновлённые ссылки) -->
-        <div class="nav-title">
-            <span class="material-symbols-rounded">🌐</span> навигация по сайтам
-        </div>
-        <div class="nav-grid">
-            <a href="https://lambda1224.github.io/minigames" class="nav-item" target="_blank" rel="noopener">
-                <span class="material-symbols-rounded">🎮</span>
-                <span>мини-игры</span>
-            </a>
-            <a href="https://lambda1224.github.io/dvd-rat" class="nav-item" target="_blank" rel="noopener">
-                <span class="material-symbols-rounded">🐀</span>
-                <span>DVD-крыска</span>
-            </a>
-            <a href="https://lambda1224.github.io/GUSENITSY/" class="nav-item" target="_blank" rel="noopener">
-                <span class="material-symbols-rounded">🐛</span>
-                <span>гусенички</span>
-            </a>
-        </div>
-
-        <!-- КАНАЛ УДАЛЁН ПОЛНОСТЬЮ -->
 
         <!-- ========== РАЗДЕЛИТЕЛЬ ========== -->
         <div class="section-divider">
