@@ -1,205 +1,663 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>nepetapip3 — bio</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <link rel="icon" type="image/png" href="icon.png">
+    <title>nepetapip3 - био</title>
+    <!-- Material Symbols & Inter font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material-Symbols-Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0,0" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            background: #e9eef4;
+            background: linear-gradient(145deg, #ecf2fa 0%, #dee5f0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 16px;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Sans:wght@300;400&display=swap" rel="stylesheet">
+        /* главная карточка — material you */
+        .bio-card {
+            max-width: 820px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border-radius: 44px;
+            box-shadow: 0 20px 40px -8px rgba(0, 35, 70, 0.15),
+                        0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+                        0 8px 20px rgba(0, 32, 64, 0.08);
+            padding: 32px 28px;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
 
-<style>
-body {
-    margin: 0;
-    height: 100vh;
-    background: #000;
-    color: #fff;
-    font-family: 'Share Tech Mono', monospace;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
+        /* шапка профиля */
+        .profile-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
 
-/* noise */
-.noise {
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(
-        0deg,
-        rgba(255,255,255,0.02),
-        rgba(255,255,255,0.02) 1px,
-        transparent 1px,
-        transparent 2px
-    );
-    animation: noise 0.2s infinite;
-    pointer-events: none;
-    z-index: 3;
-}
-@keyframes noise {
-    0%,100%{transform:translate(0,0)}
-    50%{transform:translate(-1px,1px)}
-}
+        .avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #c2d1e6, #a5bbd6);
+            box-shadow: 0 10px 18px -6px rgba(0,40,80,0.2), 0 0 0 2px rgba(255,255,255,0.8) inset;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1f2a3c;
+            font-size: 42px;
+            flex-shrink: 0;
+        }
 
-/* snow */
-.snow {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1;
-}
-.snow::before,
-.snow::after {
-    content:"";
-    position:absolute;
-    inset:-200%;
-    background-repeat:repeat;
-}
-.snow::before {
-    background-image:
-        radial-gradient(1px 1px at 10% 10%, rgba(255,255,255,.6), transparent),
-        radial-gradient(1px 1px at 40% 30%, rgba(255,255,255,.5), transparent),
-        radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,.6), transparent);
-    background-size:120px 120px;
-    animation:snowFast 14s linear infinite;
-}
-.snow::after {
-    background-image:
-        radial-gradient(3px 3px at 20% 20%, rgba(255,255,255,.7), transparent),
-        radial-gradient(2px 2px at 60% 50%, rgba(255,255,255,.6), transparent),
-        radial-gradient(2.5px 2.5px at 80% 90%, rgba(255,255,255,.5), transparent);
-    background-size:260px 260px;
-    animation:snowSlow 28s linear infinite;
-}
-@keyframes snowFast {
-    to { transform: translate(-80px, 400px); }
-}
-@keyframes snowSlow {
-    to { transform: translate(100px, 600px); }
-}
+        .name-section h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #001d33;
+            line-height: 1.1;
+            text-shadow: 0 1px 3px rgba(255,255,255,0.5);
+        }
 
-/* terminal */
-.terminal {
-    position: relative;
-    padding: 50px 70px 65px;
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,.7);
-    box-shadow: 0 0 15px rgba(255,255,255,.6), inset 0 0 20px rgba(255,255,255,.05);
-    text-align: center;
-    z-index: 4;
-}
+        .name-section .handle {
+            font-size: 1.1rem;
+            color: #2c3f5c;
+            background: rgba(210, 225, 245, 0.6);
+            padding: 6px 16px;
+            border-radius: 60px;
+            display: inline-block;
+            margin-top: 6px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.7);
+        }
 
-.nick {
-    font-size: 52px;
-    letter-spacing: 6px;
-    text-shadow: 0 0 10px #fff, 0 0 30px #fff;
-}
-.cursor {
-    animation: blink 1s infinite;
-}
-@keyframes blink {
-    50%{opacity:0}
-}
+        /* секция вайб / чипсы */
+        .vibe-section {
+            background: rgba(210, 225, 250, 0.4);
+            border-radius: 30px;
+            padding: 22px 24px;
+            margin: 24px 0 28px 0;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.75);
+        }
 
-.divider {
-    width: 220px;
-    height: 1px;
-    margin: 30px auto;
-    background: linear-gradient(to right, transparent, rgba(255,255,255,.9), transparent);
-}
+        .vibe-section p {
+            font-size: 1.15rem;
+            line-height: 1.5;
+            color: #002242;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 12px;
+        }
 
-.status {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 18px;
-    letter-spacing: 2px;
-    opacity: .75;
-}
+        .chip {
+            background: white;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #102b44;
+            box-shadow: 0 2px 8px rgba(0,35,70,0.08);
+            border: 1px solid rgba(255,255,255,0.8);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(4px);
+        }
 
-.tags {
-    font-family: 'IBM Plex Sans', sans-serif;
-    margin-top: 18px;
-    font-size: 16px;
-    line-height: 2.2;
-    opacity: .65;
-}
+        .chip .material-symbols-rounded {
+            font-size: 20px;
+            color: #2f5a8c;
+        }
 
-/* buttons */
-.buttons {
-    margin-top: 28px;
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-}
-.telegram-btn,
-.github-btn {
-    padding: 10px 28px;
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,.6);
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 14px;
-    letter-spacing: 1.5px;
-    color: #fff;
-    text-decoration: none;
-    transition: .25s;
-}
-.telegram-btn:hover,
-.github-btn:hover {
-    background: #fff;
-    color: #000;
-}
+        /* проекты (кликабельные карточки) */
+        .projects h2, .links-title, .nav-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #012845;
+            margin-bottom: 18px;
+            padding-left: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-/* grey links */
-.newyear-link {
-    display: block;
-    margin-top: 22px;
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 14px;
-    letter-spacing: 1.6px;
-    color: #aaa;
-    opacity: .35;
-    text-decoration: none;
-    transition: .3s;
-}
-.newyear-link:hover {
-    opacity: .7;
-    text-shadow: 0 0 8px rgba(255,255,255,.4);
-}
+        .project-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 32px;
+        }
 
-/* mobile */
-@media (max-width:600px) {
-    .terminal { width:90%; padding:36px 24px 48px; }
-    .nick { font-size:38px; }
-    .buttons { flex-direction:column; }
-}
-</style>
+        .project-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 26px;
+            padding: 18px 24px;
+            border: 1px solid rgba(255,255,255,0.9);
+            box-shadow: 0 5px 12px -6px rgba(0,30,60,0.12);
+            transition: 0.15s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 12px 24px -12px #003a6e60;
+            transform: scale(1.01) translateY(-2px);
+        }
+
+        .project-name {
+            font-size: 1.4rem;
+            font-weight: 620;
+            color: #0b2f4a;
+            letter-spacing: -0.01em;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .project-name .material-symbols-rounded {
+            font-size: 26px;
+            color: #1d4d7a;
+        }
+
+        .project-desc {
+            font-size: 1rem;
+            color: #1d3d5a;
+            margin-left: 36px;
+            line-height: 1.4;
+        }
+
+        /* канал с прошивками */
+        .channel-block {
+            background: rgba(170, 200, 240, 0.35);
+            border-radius: 28px;
+            padding: 20px 24px;
+            margin: 24px 0 28px;
+            border: 1px solid rgba(255,255,255,0.8);
+            backdrop-filter: blur(12px);
+        }
+
+        .channel-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #002642;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .channel-name span:last-child {
+            background: #ffffffc0;
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-size: 0.95rem;
+            color: #00345e;
+            border: 1px solid white;
+        }
+
+        /* ======= НАВИГАЦИЯ ПО СТРАНИЧКАМ ======= */
+        .nav-grid {
+            display: flex;
+            flex-flow: row wrap;
+            gap: 16px;
+            margin: 18px 0 24px;
+        }
+
+        .nav-item {
+            flex: 1 1 calc(33.333% - 16px); 
+            min-width: 150px;
+            background: rgba(245, 248, 255, 0.7);
+            backdrop-filter: blur(16px);
+            border-radius: 36px;
+            padding: 18px 10px;
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 8px 18px -10px #102b44;
+            text-decoration: none;
+            color: #002642;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: 0.15s;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            background: white;
+            transform: translateY(-4px);
+            box-shadow: 0 16px 24px -12px #102b44;
+        }
+
+        .nav-item .material-symbols-rounded {
+            font-size: 32px;
+            color: #0b3c60;
+        }
+
+        .nav-item span:last-child {
+            font-weight: 570;
+            font-size: 1.1rem;
+        }
+
+        /* кнопки соц сетей */
+        .social-links {
+            display: flex;
+            flex-flow: row wrap;
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .social-btn {
+            background: rgba(240, 245, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.9);
+            padding: 14px 28px;
+            border-radius: 60px;
+            font-size: 1.05rem;
+            font-weight: 530;
+            color: #002c4d;
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 4px 12px -8px #10203040, 0 0 0 1px rgba(255,255,255,0.6) inset;
+            transition: 0.18s;
+            text-decoration: none;
+        }
+
+        .social-btn .material-symbols-rounded {
+            font-size: 24px;
+            color: #0e3d60;
+        }
+
+        .social-btn:hover {
+            background: white;
+            box-shadow: 0 10px 22px -12px #0f2f50, 0 0 0 1px #ffffff inset;
+            transform: scale(1.02);
+        }
+
+        /* адаптация */
+        @media (max-width: 620px) {
+            .nav-item {
+                flex: 1 1 calc(50% - 16px);
+            }
+        }
+
+        @media (max-width: 520px) {
+            .bio-card {
+                padding: 24px 18px;
+                border-radius: 32px;
+            }
+            .profile-row {
+                gap: 14px;
+            }
+            .avatar-large {
+                width: 68px;
+                height: 68px;
+                font-size: 34px;
+                border-radius: 24px;
+            }
+            .name-section h1 {
+                font-size: 1.8rem;
+            }
+            .chip {
+                padding: 6px 14px;
+            }
+            .social-btn {
+                padding: 12px 22px;
+                flex: 1 1 auto;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .nav-item {
+                flex: 1 1 100%;
+            }
+            .project-name {
+                font-size: 1.2rem;
+            }
+        }
+
+        .material-symbols-rounded {
+            font-variation-settings: 'FILL' 0, 'wght' 420, 'GRAD' 0, 'opsz' 24;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background: rgba(120, 150, 190, 0.3);
+            margin: 20px 0 12px;
+        }
+
+        .footnote {
+            font-size: 0.9rem;
+            color: #2d4a6b;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        /* ======= РАЗДЕЛИТЕЛЬ ======= */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 28px 0 18px;
+            color: #234e72;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(70, 120, 180, 0.3), rgba(70, 120, 180, 0.5), rgba(70, 120, 180, 0.3), transparent);
+        }
+
+        .divider-icon {
+            background: rgba(255,255,255,0.6);
+            border-radius: 40px;
+            padding: 8px 20px;
+            backdrop-filter: blur(8px);
+            font-size: 1rem;
+            font-weight: 500;
+            color: #103a5c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 2px 8px rgba(0,30,60,0.05);
+        }
+
+        .divider-icon .material-symbols-rounded {
+            font-size: 22px;
+        }
+
+        /* ======= БЛОК ТАЙМЕРА (НЕ ПРОЕКТ) ======= */
+        .timer-block {
+            background: rgba(200, 215, 240, 0.4);
+            backdrop-filter: blur(16px);
+            border-radius: 40px;
+            padding: 20px 24px;
+            margin: 16px 0 24px;
+            border: 1px solid rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .timer-icon {
+            background: white;
+            width: 52px;
+            height: 52px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,30,60,0.1);
+        }
+
+        .timer-icon .material-symbols-rounded {
+            font-size: 32px;
+            color: #0f4a7a;
+        }
+
+        .timer-info {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .timer-label {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #113753;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .timer-value {
+            font-size: 2rem;
+            font-weight: 620;
+            color: #002c4f;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .timer-unit {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1d4465;
+            margin-left: 6px;
+        }
+
+        @media (max-width: 480px) {
+            .timer-block {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .timer-value {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="bio-card">
+        <!-- шапка -->
+        <div class="profile-row">
+            <div class="avatar-large">😼</div>
+            <div class="name-section">
+                <h1>nepetapip3</h1>
+                <div class="handle">@nepetapip3 ✦ просто непетка</div>
+            </div>
+        </div>
 
-<div class="snow"></div>
-<div class="noise"></div>
+        <!-- vibe / chip section (твои эмодзи) -->
+        <div class="vibe-section">
+            <p>
+                <span class="chip"><span class="material-symbols-rounded">💻</span> (вайб)кодинг</span>
+                <span class="chip"><span class="material-symbols-rounded">🪛</span> arduino</span>
+                <span class="chip"><span class="material-symbols-rounded">📱</span> прошивки</span>
+                <span class="chip"><span class="material-symbols-rounded">🌐</span> простенькие сайты</span>
+                <span class="chip"><span class="material-symbols-rounded">📦</span> tg боты</span>
+            </p>
+            <p style="margin-top: 16px; font-size: 1rem; color: #0b3455;">
+                ⚡️ люблю создавать простые штуки, которые работают (наверное)
+            </p>
+        </div>
 
-<div class="terminal">
-    <div class="nick">nepetapip3<span class="cursor">_</span></div>
-    <div class="divider"></div>
+        <!-- НАВИГАЦИЯ ПО САЙТАМ -->
+        <div class="nav-title">
+            <span class="material-symbols-rounded">🌐</span> навигация по сайтам
+        </div>
+        <div class="nav-grid">
+            <a href="https://nepetapip3.github.io/minigames" class="nav-item" target="_blank" rel="noopener">
+                <span class="material-symbols-rounded">🎮</span>
+                <span>мини-игры</span>
+            </a>
+            <a href="https://nepetapip3.github.io/dvd-rat" class="nav-item" target="_blank" rel="noopener">
+                <span class="material-symbols-rounded">🐀</span>
+                <span>DVD-крыска</span>
+            </a>
+            <a href="https://nepetapip3.github.io/GUSENITSY/" class="nav-item" target="_blank" rel="noopener">
+                <span class="material-symbols-rounded">🐛</span>
+                <span>гусенички</span>
+            </a>
+        </div>
 
-    <div class="status">Приветик.</div>
+        <!-- ПРОЕКТЫ -->
+        <div class="projects">
+            <h2>
+                <span class="material-symbols-rounded">👨‍💻</span> мои проекты:
+            </h2>
+            <div class="project-grid">
+                <a href="t.me/TeeUtils_Bot" class="project-card" id="project-teeutils" target="_blank" rel="noopener">
+                    <div class="project-name">
+                        <span class="material-symbols-rounded">🤖</span> TeeUtils
+                    </div>
+                    <div class="project-desc">
+                        простой телеграм бот с парой мини-игр и полезными командами.
+                    </div>
+                </a>
+            </div>
+        </div>
 
-    <div class="tags">
-        Я nepetapip3 или просто непета<br>
-        Увлекаюсь (вайб)кодингом, занимаюсь arduino, прошивом телефонов...<br>
-        Люблю создавать простенькие сайты и тг ботов
+        <!-- КАНАЛ С ПРОШИВКАМИ -->
+        <div class="channel-block">
+            <div class="channel-name">
+                <span class="material-symbols-rounded">📦</span> @shitsbynepeta
+                <span>скоро</span>
+            </div>
+            <div style="margin-top: 12px; color: #023255; font-size: 1.05rem;">
+                📲 телеграм канал с прошивками для Redmi 13C / POCO C65 (gale/gust). скоро...
+            </div>
+        </div>
+
+        <!-- ========== РАЗДЕЛИТЕЛЬ ========== -->
+        <div class="section-divider">
+            <span class="divider-line"></span>
+            <span class="divider-icon">
+                <span class="material-symbols-rounded">⏱️</span> отсчет до лета/нг
+            </span>
+            <span class="divider-line"></span>
+        </div>
+
+        <!-- ========== ТАЙМЕР ДО ЛЕТА / НОВОГО ГОДА (ЦИКЛИЧНО) ========== -->
+        <div class="timer-block" id="timerBlock">
+            <div class="timer-icon">
+                <span class="material-symbols-rounded" id="timerIcon">🍉</span>
+            </div>
+            <div class="timer-info">
+                <div class="timer-label" id="timerLabel">до лета осталось</div>
+                <div>
+                    <span class="timer-value" id="timerDays">0</span>
+                    <span class="timer-unit">дней</span>
+                    <span class="timer-value" id="timerHours" style="font-size:1.6rem;">00</span>
+                    <span class="timer-unit">ч</span>
+                    <span class="timer-value" id="timerMinutes" style="font-size:1.6rem;">00</span>
+                    <span class="timer-unit">мин</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- СОЦ ССЫЛКИ -->
+        <h2 class="links-title">
+            <span class="material-symbols-rounded">⁉️</span> мои ссылки
+        </h2>
+        <div class="social-links">
+            <a href="https://4pda.to/forum/index.php?showuser=12169012" class="social-btn" target="_blank" rel="noopener">
+                <span class="material-symbols-rounded"></span> 4PDA
+            </a>
+            <a href="https://github.com/nepetapip3" class="social-btn" target="_blank" rel="noopener">
+                <span class="material-symbols-rounded"></span> GitHub
+            </a>
+            <a href="https://t.me/nepetapip3" class="social-btn" target="_blank" rel="noopener">
+                <span class="material-symbols-rounded"></span> Telegram
+            </a>
+        </div>
+
+        <hr>
+        <div class="footnote">
+            🐈 meow :3
+        </div>
     </div>
 
-    <div class="buttons">
-        <a class="telegram-btn" href="https://t.me/nepetapip3" target="_blank">TELEGRAM</a>
-        <a class="github-btn" href="https://github.com/nepetapip3" target="_blank">GITHUB</a>
-    </div>
+    <script>
+        (function() {
+            // ТАЙМЕР ДО ЛЕТА / НОВОГО ГОДА (переключение автоматическое)
+            function updateTimer() {
+                const now = new Date();
+                const currentYear = now.getFullYear();
 
-    <a class="newyear-link" href="newyear.html">отсчёт до нового года</a>
-    <a class="newyear-link" href="pages.html">доступные страницы</a>
-</div>
+                // Даты: лето (1 июня) и следующий Новый год (1 января следующего года)
+                let summerDate = new Date(currentYear, 5, 1); // 1 июня
+                let newYearDate = new Date(currentYear + 1, 0, 1); // 1 января следующего
 
+                // Если сейчас уже после 1 июня, берём лето следующего года
+                if (now > summerDate) {
+                    summerDate = new Date(currentYear + 1, 5, 1);
+                }
+
+                // Определяем период
+                const juneFirst = new Date(currentYear, 5, 1);
+                const janFirstNext = new Date(currentYear + 1, 0, 1);
+                const janFirstThis = new Date(currentYear, 0, 1);
+
+                let targetDate;
+                let label;
+                let icon;
+
+                if (now >= juneFirst && now < janFirstNext) {
+                    // лето/осень → Новый год
+                    targetDate = janFirstNext;
+                    label = 'до Нового года осталось';
+                    icon = '🎄';
+                } else {
+                    // зима/весна → лето (текущее или следующее)
+                    if (now < juneFirst) {
+                        targetDate = juneFirst; // лето этого года
+                    } else {
+                        targetDate = new Date(currentYear + 1, 5, 1); // подстраховка
+                    }
+                    label = 'до лета осталось';
+                    icon = '☀️';
+                }
+
+                // Коррекция для января-мая
+                if (now >= janFirstThis && now < juneFirst) {
+                    targetDate = juneFirst;
+                    label = 'до лета осталось';
+                    icon = '☀️';
+                }
+
+                // Финальная страховка для лета
+                if (now >= juneFirst && now < janFirstNext) {
+                    targetDate = janFirstNext;
+                    label = 'до Нового года осталось';
+                    icon = '🎄';
+                }
+
+                const diff = targetDate - now;
+                if (diff <= 0) {
+                    location.reload(); // на всякий случай
+                    return;
+                }
+
+                const totalSeconds = Math.floor(diff / 1000);
+                const days = Math.floor(totalSeconds / 86400);
+                const hours = Math.floor((totalSeconds % 86400) / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+                document.getElementById('timerDays').textContent = days;
+                document.getElementById('timerHours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('timerMinutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('timerLabel').textContent = label;
+                document.getElementById('timerIcon').textContent = icon;
+            }
+
+            updateTimer();
+            setInterval(updateTimer, 60000); // обновление каждую минуту
+        })();
+    </script>
 </body>
 </html>
