@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
 <link rel="icon" type="image/png" href="icon.png">
-    <title>nepetapip3 - био</title>
+    <title>lambda1224 - био</title>
     <!-- Material Symbols & Inter font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material-Symbols-Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0,0" />
@@ -125,7 +125,7 @@
             color: #2f5a8c;
         }
 
-        /* проекты (кликабельные карточки) */
+        /* навигация */
         .projects h2, .links-title, .nav-title {
             font-size: 1.3rem;
             font-weight: 600;
@@ -137,84 +137,7 @@
             gap: 8px;
         }
 
-        .project-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            margin-bottom: 32px;
-        }
-
-        .project-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            border-radius: 26px;
-            padding: 18px 24px;
-            border: 1px solid rgba(255,255,255,0.9);
-            box-shadow: 0 5px 12px -6px rgba(0,30,60,0.12);
-            transition: 0.15s;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-            cursor: pointer;
-        }
-
-        .project-card:hover {
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 12px 24px -12px #003a6e60;
-            transform: scale(1.01) translateY(-2px);
-        }
-
-        .project-name {
-            font-size: 1.4rem;
-            font-weight: 620;
-            color: #0b2f4a;
-            letter-spacing: -0.01em;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .project-name .material-symbols-rounded {
-            font-size: 26px;
-            color: #1d4d7a;
-        }
-
-        .project-desc {
-            font-size: 1rem;
-            color: #1d3d5a;
-            margin-left: 36px;
-            line-height: 1.4;
-        }
-
-        /* канал с прошивками */
-        .channel-block {
-            background: rgba(170, 200, 240, 0.35);
-            border-radius: 28px;
-            padding: 20px 24px;
-            margin: 24px 0 28px;
-            border: 1px solid rgba(255,255,255,0.8);
-            backdrop-filter: blur(12px);
-        }
-
-        .channel-name {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #002642;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .channel-name span:last-child {
-            background: #ffffffc0;
-            border-radius: 40px;
-            padding: 6px 18px;
-            font-size: 0.95rem;
-            color: #00345e;
-            border: 1px solid white;
-        }
+        /* канал удалён */
 
         /* ======= НАВИГАЦИЯ ПО СТРАНИЧКАМ ======= */
         .nav-grid {
@@ -333,9 +256,6 @@
             .nav-item {
                 flex: 1 1 100%;
             }
-            .project-name {
-                font-size: 1.2rem;
-            }
         }
 
         .material-symbols-rounded {
@@ -390,7 +310,7 @@
             font-size: 22px;
         }
 
-        /* ======= БЛОК ТАЙМЕРА (НЕ ПРОЕКТ) ======= */
+        /* ======= БЛОК ТАЙМЕРА ======= */
         .timer-block {
             background: rgba(200, 215, 240, 0.4);
             backdrop-filter: blur(16px);
@@ -467,71 +387,44 @@
         <div class="profile-row">
             <div class="avatar-large">😼</div>
             <div class="name-section">
-                <h1>nepetapip3</h1>
-                <div class="handle">@nepetapip3 ✦ просто непетка</div>
+                <h1>lambda1224</h1>
+                <div class="handle">@lambda1224 ✦ просто лямбда</div>
             </div>
         </div>
 
-        <!-- vibe / chip section (твои эмодзи) -->
+        <!-- vibe / chip section (обновлённые чипсы) -->
         <div class="vibe-section">
             <p>
                 <span class="chip"><span class="material-symbols-rounded">💻</span> (вайб)кодинг</span>
-                <span class="chip"><span class="material-symbols-rounded">🪛</span> arduino</span>
-                <span class="chip"><span class="material-symbols-rounded">📱</span> прошивки</span>
-                <span class="chip"><span class="material-symbols-rounded">🌐</span> простенькие сайты</span>
-                <span class="chip"><span class="material-symbols-rounded">📦</span> tg боты</span>
+                <span class="chip"><span class="material-symbols-rounded">🐍</span> python</span>
+                <span class="chip"><span class="material-symbols-rounded">🤖</span> боты</span>
+                <span class="chip"><span class="material-symbols-rounded">🎨</span> дизайн</span>
             </p>
             <p style="margin-top: 16px; font-size: 1rem; color: #0b3455;">
-                ⚡️ люблю создавать простые штуки, которые работают (наверное)
+                ⚡ мне нравится делать разные вещи вроде простых штучек, возможно работающих
             </p>
         </div>
 
-        <!-- НАВИГАЦИЯ ПО САЙТАМ -->
+        <!-- НАВИГАЦИЯ ПО САЙТАМ (обновлённые ссылки) -->
         <div class="nav-title">
             <span class="material-symbols-rounded">🌐</span> навигация по сайтам
         </div>
         <div class="nav-grid">
-            <a href="https://nepetapip3.github.io/minigames" class="nav-item" target="_blank" rel="noopener">
+            <a href="https://lambda1224.github.io/minigames" class="nav-item" target="_blank" rel="noopener">
                 <span class="material-symbols-rounded">🎮</span>
                 <span>мини-игры</span>
             </a>
-            <a href="https://nepetapip3.github.io/dvd-rat" class="nav-item" target="_blank" rel="noopener">
+            <a href="https://lambda1224.github.io/dvd-rat" class="nav-item" target="_blank" rel="noopener">
                 <span class="material-symbols-rounded">🐀</span>
                 <span>DVD-крыска</span>
             </a>
-            <a href="https://nepetapip3.github.io/GUSENITSY/" class="nav-item" target="_blank" rel="noopener">
+            <a href="https://lambda1224.github.io/GUSENITSY/" class="nav-item" target="_blank" rel="noopener">
                 <span class="material-symbols-rounded">🐛</span>
                 <span>гусенички</span>
             </a>
         </div>
 
-        <!-- ПРОЕКТЫ -->
-        <div class="projects">
-            <h2>
-                <span class="material-symbols-rounded">👨‍💻</span> мои проекты:
-            </h2>
-            <div class="project-grid">
-                <a href="t.me/TeeUtils_Bot" class="project-card" id="project-teeutils" target="_blank" rel="noopener">
-                    <div class="project-name">
-                        <span class="material-symbols-rounded">🤖</span> TeeUtils
-                    </div>
-                    <div class="project-desc">
-                        простой телеграм бот с парой мини-игр и полезными командами.
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <!-- КАНАЛ С ПРОШИВКАМИ -->
-        <div class="channel-block">
-            <div class="channel-name">
-                <span class="material-symbols-rounded">📦</span> @shitsbynepeta
-                <span>скоро</span>
-            </div>
-            <div style="margin-top: 12px; color: #023255; font-size: 1.05rem;">
-                📲 телеграм канал с прошивками для Redmi 13C / POCO C65 (gale/gust). скоро...
-            </div>
-        </div>
+        <!-- КАНАЛ УДАЛЁН ПОЛНОСТЬЮ -->
 
         <!-- ========== РАЗДЕЛИТЕЛЬ ========== -->
         <div class="section-divider">
@@ -542,7 +435,7 @@
             <span class="divider-line"></span>
         </div>
 
-        <!-- ========== ТАЙМЕР ДО ЛЕТА / НОВОГО ГОДА (ЦИКЛИЧНО) ========== -->
+        <!-- ========== ТАЙМЕР ДО ЛЕТА / НОВОГО ГОДА ========== -->
         <div class="timer-block" id="timerBlock">
             <div class="timer-icon">
                 <span class="material-symbols-rounded" id="timerIcon">🍉</span>
@@ -560,25 +453,19 @@
             </div>
         </div>
 
-        <!-- СОЦ ССЫЛКИ -->
+        <!-- СОЦ ССЫЛКИ (только GitHub) -->
         <h2 class="links-title">
             <span class="material-symbols-rounded">⁉️</span> мои ссылки
         </h2>
         <div class="social-links">
-            <a href="https://4pda.to/forum/index.php?showuser=12169012" class="social-btn" target="_blank" rel="noopener">
-                <span class="material-symbols-rounded"></span> 4PDA
-            </a>
-            <a href="https://github.com/nepetapip3" class="social-btn" target="_blank" rel="noopener">
+            <a href="https://github.com/lambda1224" class="social-btn" target="_blank" rel="noopener">
                 <span class="material-symbols-rounded"></span> GitHub
-            </a>
-            <a href="https://t.me/nepetapip3" class="social-btn" target="_blank" rel="noopener">
-                <span class="material-symbols-rounded"></span> Telegram
             </a>
         </div>
 
         <hr>
         <div class="footnote">
-            🐈 meow :3
+            I'm a furry btw :3
         </div>
     </div>
 
