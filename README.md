@@ -1,0 +1,35 @@
+# 🐱 nepetapip3 / personal bio
+
+<div align="center">
+  <img src="https://img.shields.io/badge/Material%20You-3F51B5?style=for-the-badge&logo=material-design&logoColor=white" alt="Material You">
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5">
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3">
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
+</div>
+
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=24&duration=3000&pause=500&color=1E4F7A&center=true&vCenter=true&width=435&lines=%D0%BF%D1%80%D0%BE%D1%81%D1%82%D0%BE+%D0%BD%D0%B5%D0%BF%D0%B5%D1%82%D0%BA%D0%B0;%D0%B2%D0%B0%D0%B9%D0%B1%2D%D0%BA%D0%BE%D0%B4%D0%B5%D1%80;%D0%BB%D1%8E%D0%B1%D0%BB%D1%8E+%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D0%B2%D0%B0%D1%82%D1%8C+%D0%BF%D1%80%D0%BE%D1%81%D1%82%D1%8B%D0%B5+%D1%88%D1%82%D1%83%D0%BA%D0%B8" alt="Typing SVG">
+</p>
+
+## 🌸 О проекте
+
+Персональная страница-био в стиле **Material You** с моими проектами, увлечениями и навигацией по сайтам. Всё в одном месте, красиво и современно.
+
+### ✨ Особенности
+
+- 🎨 **Material You дизайн** — размытия, полупрозрачность, мягкие тени
+- 📱 **Адаптивность** — отлично смотрится на телефонах и ПК
+- 🧭 **Навигация** — быстрые ссылки на мои другие проекты
+- ⏳ **Циклический таймер** — автоматически переключается между отсчётом до лета и Нового года
+- 🔗 **Социальные кнопки** — 4PDA, GitHub, Telegram
+
+## 🚀 Быстрый старт
+
+### Вариант 1: Открыть в браузере
+Просто перейди по ссылке:  
+👉 **[nepetapip3.github.io](https://nepetapip3.github.io)** (если настроено)
+
+### Вариант 2: Запустить локально
+1. Склонируй репозиторий:
+   ```bash
+   git clone https://github.com/nepetapip3/nepetapip3.github.io.git
