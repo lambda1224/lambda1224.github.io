@@ -1,4 +1,4 @@
-# 🐱 nepetapip3 / мое био
+# 🐱 lambda1224 / мое био
 
 <div align="center">
   <img src="https://img.shields.io/badge/Material%20You-3F51B5?style=for-the-badge&logo=material-design&logoColor=white" alt="Material You">
@@ -16,9 +16,9 @@
 
 ### Вариант 1: Открыть в браузере
 Просто перейди по ссылке:  
-👉 **[nepetapip3.github.io](https://nepetapip3.github.io)** (если настроено)
+👉 **[lambda1224.github.io](https://lambda1224.github.io)** (если настроено)
 
 ### Вариант 2: Запустить локально
 1. Склонируй репозиторий:
    ```bash
-   git clone https://github.com/nepetapip3/nepetapip3.github.io.git
+   git clone https://github.com/lambda1224/lambda1224.github.io.git
