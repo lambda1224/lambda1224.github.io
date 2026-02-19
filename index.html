@@ -83,21 +83,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            background-image: url('fonts/user.bmp');
+            background-image: url('fonts/user.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            /* убираем текст, если фон загрузится */
-            color: transparent;
-            /* на случай, если bmp не поддерживается */
-            background-color: #2d9cdb;
-        }
-
-        /* если браузер не поддерживает bmp, покажется эмодзи */
-        .user-avatar span {
-            display: none;
+            /* убираем фон, если картинка загрузится */
+            background-color: transparent;
         }
 
         .user-name {
@@ -233,7 +225,7 @@
     <div class="win81-container">
         <div class="top-bar">
             <div class="user-info">
-                <div class="user-avatar"><span>😼</span></div>
+                <div class="user-avatar"></div>
                 <div>
                     <div class="user-name">lambda1224</div>
                     <div class="user-handle">@lambda1224 · просто лямбда</div>
