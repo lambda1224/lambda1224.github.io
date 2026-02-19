@@ -197,35 +197,6 @@
             margin: 0;
         }
 
-        .taskbar {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: white;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 0;
-        }
-
-        .start-button {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.2rem;
-            padding: 5px 15px;
-            background: rgba(255,255,255,0.1);
-            cursor: default;
-            border-radius: 0;
-        }
-
-        .time {
-            font-size: 1.1rem;
-            font-weight: 300;
-        }
-
         @media (max-width: 600px) {
             .tile-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -308,13 +279,6 @@
                 <span class="tile-title" style="font-size: 1.3rem;">Telegram</span>
             </a>
         </div>
-
-        <div class="taskbar">
-            <div class="start-button">
-                <span>🪟</span> Пуск
-            </div>
-            <div class="time" id="taskbarTime">22:15</div>
-        </div>
     </div>
 
     <script>
@@ -349,16 +313,8 @@
             document.getElementById('timerMinutes').textContent = mins.toString().padStart(2, '0');
         }
 
-        function updateTime() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('taskbarTime').textContent = timeStr;
-        }
-
         updateTimer();
-        updateTime();
         setInterval(updateTimer, 60000);
-        setInterval(updateTime, 1000);
     </script>
 </body>
 </html>
