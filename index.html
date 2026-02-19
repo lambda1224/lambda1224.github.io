@@ -3,389 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>lambda1224 · Windows 8.1</title>
+    <title>В разработке · Material You</title>
+    <!-- Google Fonts: Roboto (акцент как у Google Sans) и иконочный шрифт для материального символа -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0,1" />
     <style>
-        /* Подключение Segoe UI с Microsoft CDN */
-        @font-face {
-            font-family: 'Segoe UI';
-            src:
-                local("Segoe UI Light"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/light/latest.woff2) format("woff2"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/light/latest.woff) format("woff"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/light/latest.ttf) format("truetype");
-            font-weight: 100 300;
-            font-style: normal;
-        }
-
-        @font-face {
-            font-family: 'Segoe UI';
-            src:
-                local("Segoe UI Semilight"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semilight/latest.woff2) format("woff2"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semilight/latest.woff) format("woff"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semilight/latest.ttf) format("truetype");
-            font-weight: 200 300;
-            font-style: normal;
-        }
-
-        @font-face {
-            font-family: 'Segoe UI';
-            src:
-                local("Segoe UI"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/normal/latest.woff2) format("woff2"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/normal/latest.woff) format("woff"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/normal/latest.ttf) format("truetype");
-            font-weight: 400;
-            font-style: normal;
-        }
-
-        @font-face {
-            font-family: 'Segoe UI';
-            src:
-                local("Segoe UI Semibold"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semibold/latest.woff2) format("woff2"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semibold/latest.woff) format("woff"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semibold/latest.ttf) format("truetype");
-            font-weight: 600;
-            font-style: normal;
-        }
-
-        @font-face {
-            font-family: 'Segoe UI';
-            src:
-                local("Segoe UI Bold"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/bold/latest.woff2) format("woff2"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/bold/latest.woff) format("woff"),
-                url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/bold/latest.ttf) format("truetype");
-            font-weight: 700;
-            font-style: normal;
-        }
-
+        /* Сброс и базовые настройки */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Segoe WP', 'Helvetica Neue', sans-serif;
         }
 
         body {
             min-height: 100vh;
-            background: #1b2a3f;
-            background: linear-gradient(145deg, #1f3348, #142433);
-            padding: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: #f5f5f5; /* fallback, но ниже будет градиент в духе Material You */
+            font-family: 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 1rem;
+            /* Динамический фон с мягким градиентом и акцентными бликами — стиль Material You */
+            background: radial-gradient(circle at 100% 20%, #ffe9f2, #f0f2fe 70%);
         }
 
-        .win81-container {
-            max-width: 900px;
+        /* Главный контейнер — большая карточка с крупным элементом */
+        .container {
+            max-width: 700px;
             width: 100%;
+        }
+
+        /* Карточка Material You с большим скруглением, тенями и вложенным морфизмом */
+        .material-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 20px 40px -10px rgba(0, 80, 120, 0.25),
+                        0 8px 20px -6px rgba(0, 40, 60, 0.1),
+                        inset 0 1px 2px rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.2s ease;
+        }
+
+        /* Флекс для выравнивания иконки и текста */
+        .status-block {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            align-items: center;
+            text-align: center;
+            gap: 1.75rem;
         }
 
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.4);
-            color: white;
+        /* Огромная, характерная для Material You иконка-символ */
+        .material-symbols-rounded {
+            font-size: 8rem;
+            font-weight: 300;
+            color: #006874;        /* глубокий бирюзовый — из динамической палитры */
+            font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 48;
+            background: linear-gradient(145deg, #d0e4ff, #ffffff);
+            padding: 0.3em;
+            border-radius: 999px;
+            box-shadow: 0 16px 30px -10px #97b9d4,
+                        0 4px 12px rgba(0,70,90,0.1);
+            transition: transform 0.25s ease;
+            user-select: none;
+        }
+
+        /* Текст "в разработке" — именно гугловский роботовский стиль, крупный */
+        .main-message {
+            font-size: clamp(2.8rem, 15vw, 5rem);
+            font-weight: 500;          /* medium — как у Google Sans/Product Sans */
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            color: #1f2a3a;
+            text-shadow: 0 4px 8px rgba(0, 50, 70, 0.08);
+            word-break: break-word;
+        }
+
+        /* Дополнительный микро-текст для ясности и стиля */
+        .sub-message {
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: #3f4a5c;
+            background: rgba(210, 230, 250, 0.5);
+            padding: 0.6rem 1.6rem;
+            border-radius: 100px;
             backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .user-info {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 15px;
+            gap: 0.6rem;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            margin-top: 0.5rem;
         }
 
-        .user-avatar {
-            width: 48px;
-            height: 48px;
-            background: #2d9cdb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-
-        .user-name {
-            font-size: 1.5rem;
-            font-weight: 300;
-        }
-
-        .user-handle {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            font-weight: 300;
-        }
-
-        .tile-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 15px;
-            margin: 10px 0;
-        }
-
-        .tile {
-            background: #2d9cdb;
-            padding: 20px 15px;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            transition: 0.1s ease;
-            min-height: 120px;
-            border: none;
-            position: relative;
-            overflow: hidden;
-            border-radius: 0;
-        }
-
-        .tile.blue { background: #2d9cdb; }
-        .tile.green { background: #27ae60; }
-        .tile.purple { background: #9b59b6; }
-        .tile.orange { background: #e67e22; }
-        .tile.red { background: #e74c3c; }
-        .tile.teal { background: #1abc9c; }
-        .tile.dark { background: #34495e; }
-
-        .tile:hover {
-            transform: scale(0.98);
-            opacity: 0.9;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
-        }
-
-        .tile-icon {
-            font-size: 2.2rem;
-            margin-bottom: 5px;
-        }
-
-        .tile-title {
-            font-size: 1rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .tile-value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            line-height: 1.2;
-        }
-
-        .tile-small {
-            font-size: 0.8rem;
-            opacity: 0.8;
-        }
-
-        .tile.wide {
-            grid-column: span 2;
-        }
-
-        .section-title {
-            color: white;
+        /* маленькая иконка внутри саб-текста */
+        .sub-message .material-symbols-rounded {
             font-size: 1.8rem;
-            font-weight: 300;
-            margin: 20px 0 10px 0;
-            padding-left: 10px;
-            letter-spacing: -0.5px;
+            background: transparent;
+            box-shadow: none;
+            padding: 0;
+            color: #007c8f;
+            font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 24;
         }
 
-        .quote-tile {
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-            grid-column: span 2;
-            font-size: 1.2rem;
-            font-weight: 300;
-            padding: 25px 20px;
-        }
-
-        .social-tile {
-            background: #2c3e50;
-            text-decoration: none;
-            color: white;
-            flex-direction: row;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 15px;
-            min-height: 70px;
-        }
-
-        .social-tile .tile-icon {
-            font-size: 1.8rem;
-            margin: 0;
-        }
-
-        .taskbar {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: white;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 0;
-        }
-
-        .start-button {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.2rem;
-            padding: 5px 15px;
-            background: rgba(255,255,255,0.1);
-            cursor: default;
-            border-radius: 0;
-        }
-
-        .time {
-            font-size: 1.1rem;
-            font-weight: 300;
-        }
-
-        @media (max-width: 600px) {
-            .tile-grid {
-                grid-template-columns: repeat(2, 1fr);
+        /* адаптивность */
+        @media (max-width: 480px) {
+            .material-card {
+                padding: 2rem 1.5rem;
+                border-radius: 32px;
             }
-            .user-name {
-                font-size: 1.2rem;
+            .main-message {
+                font-size: 3.6rem;
             }
-            .section-title {
-                font-size: 1.5rem;
+            .material-symbols-rounded {
+                font-size: 6rem;
             }
         }
 
-        @media (max-width: 400px) {
-            .tile-grid {
-                grid-template-columns: 1fr;
-            }
+        /* необязательный декоративный элемент — мелкие цветные пятна на фоне */
+        .dynamic-blob {
+            position: fixed;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle at 30% 30%, #ffb3d0, #b2d9ff);
+            border-radius: 50%;
+            filter: blur(70px);
+            opacity: 0.25;
+            z-index: -1;
+            bottom: 10px;
+            left: 10px;
+        }
+        .dynamic-blob2 {
+            position: fixed;
+            width: 350px;
+            height: 350px;
+            background: #bde1ff;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.2;
+            z-index: -1;
+            top: -50px;
+            right: -50px;
         }
     </style>
 </head>
 <body>
-    <div class="win81-container">
-        <div class="top-bar">
-            <div class="user-info">
-                <div class="user-avatar">😼</div>
-                <div>
-                    <div class="user-name">lambda1224</div>
-                    <div class="user-handle">@lambda1224 · просто лямбда</div>
+    <!-- Фоновые динамические "кляксы" для передачи материальной глубины -->
+    <div class="dynamic-blob"></div>
+    <div class="dynamic-blob2"></div>
+
+    <div class="container">
+        <div class="material-card">
+            <div class="status-block">
+                <!-- характерный иконографический символ Material You: "progress_activity" или "construction" — но более дружелюбно "pending" -->
+                <span class="material-symbols-rounded">pending</span>
+                
+                <!-- главный текст: гугловским шрифтом "в разработке" (кириллица прекрасно смотрится через Roboto) -->
+                <div class="main-message">
+                    в разработке
+                </div>
+
+                <!-- небольшой поясняющий контекст с дополнительной иконкой -->
+                <div class="sub-message">
+                    <span class="material-symbols-rounded">construction</span>
+                    <span>скоро здесь что‑то появится</span>
                 </div>
             </div>
-        </div>
-
-        <div class="section-title">⚡ умею в</div>
-        <div class="tile-grid">
-            <div class="tile blue">
-                <div class="tile-icon">💻</div>
-                <div class="tile-value">вайбкодинг</div>
-            </div>
-            <div class="tile green">
-                <div class="tile-icon">🐍</div>
-                <div class="tile-value">python</div>
-            </div>
-            <div class="tile purple">
-                <div class="tile-icon">🤖</div>
-                <div class="tile-value">боты</div>
-            </div>
-            <div class="tile orange">
-                <div class="tile-icon">🎨</div>
-                <div class="tile-value">дизайн</div>
-            </div>
-            <div class="tile teal wide quote-tile">
-                ⚡ мне нравится делать разные вещи вроде простых штучек, возможно работающих
-            </div>
-        </div>
-
-        <div class="section-title">⌛ обратный отсчет</div>
-        <div class="tile-grid">
-            <div class="tile red" id="timerBlock" style="grid-column: span 2; min-height: 150px;">
-                <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                    <div class="tile-icon" id="timerIcon" style="font-size: 3rem;">☀️</div>
-                    <div>
-                        <div class="tile-title" id="timerLabel" style="font-size: 1.2rem;">до лета</div>
-                        <div style="display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap;">
-                            <div><span class="tile-value" id="timerDays" style="font-size: 2.5rem;">0</span> <span class="tile-small">дней</span></div>
-                            <div><span class="tile-value" id="timerHours" style="font-size: 2.5rem;">00</span> <span class="tile-small">ч</span></div>
-                            <div><span class="tile-value" id="timerMinutes" style="font-size: 2.5rem;">00</span> <span class="tile-small">мин</span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="section-title">🔗 ссылки</div>
-        <div class="tile-grid">
-            <a href="https://github.com/lambda1224" class="tile dark social-tile" target="_blank">
-                <span class="tile-icon">🐙</span>
-                <span class="tile-title" style="font-size: 1.3rem;">GitHub</span>
-            </a>
-            <a href="https://t.me/lambda1224" class="tile blue social-tile" target="_blank">
-                <span class="tile-icon">✈️</span>
-                <span class="tile-title" style="font-size: 1.3rem;">Telegram</span>
-            </a>
-        </div>
-
-        <div class="taskbar">
-            <div class="start-button">
-                <span>🪟</span> Пуск
-            </div>
-            <div class="time" id="taskbarTime">22:15</div>
         </div>
     </div>
 
-    <script>
-        function updateTimer() {
-            const now = new Date();
-            const year = now.getFullYear();
-            
-            const june1 = new Date(year, 5, 1);
-            const jan1 = new Date(year + 1, 0, 1);
-            
-            let target, label, icon;
-            
-            if (now >= june1) {
-                target = jan1;
-                label = 'до Нового года';
-                icon = '🎄';
-            } else {
-                target = june1;
-                label = 'до лета';
-                icon = '☀️';
-            }
-            
-            let diff = target - now;
-            let days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            let hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            let mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            
-            document.getElementById('timerLabel').textContent = label;
-            document.getElementById('timerIcon').textContent = icon;
-            document.getElementById('timerDays').textContent = days;
-            document.getElementById('timerHours').textContent = hours.toString().padStart(2, '0');
-            document.getElementById('timerMinutes').textContent = mins.toString().padStart(2, '0');
-        }
-
-        function updateTime() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('taskbarTime').textContent = timeStr;
-        }
-
-        updateTimer();
-        updateTime();
-        setInterval(updateTimer, 60000);
-        setInterval(updateTime, 1000);
-    </script>
+    <!-- маленький бонус: плашка в правом нижнем углу (опционально, но не ломает стиль) -->
+    <div style="position: fixed; bottom: 16px; right: 16px; background: rgba(255,255,255,0.3); backdrop-filter: blur(12px); padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.9rem; color: #1f2a3a; border: 1px solid rgba(255,255,255,0.6);">
+        <span class="material-symbols-rounded" style="font-size: 1.2rem; vertical-align: middle; margin-right: 6px; color: #006874;">flutter</span>
+        <span style="vertical-align: middle; font-weight: 400;">material you · WIP</span>
+    </div>
 </body>
 </html>
