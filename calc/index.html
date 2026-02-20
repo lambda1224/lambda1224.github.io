@@ -164,14 +164,14 @@
         }
 
         .calc-btn {
-            background: #2d9cdb;
+            background: #1a2a3a;  /* Темнее чем фон калькулятора */
             color: white;
             border: none;
-            padding: 18px 5px;
-            font-size: 1.3rem;
+            padding: 15px 5px;  /* Немного уменьшил паддинг */
+            font-size: 1.6rem;  /* Увеличил размер цифр */
             font-weight: 400;
             cursor: pointer;
-            box-shadow: 0 4px 0 #1a5a8a;
+            box-shadow: 0 4px 0 #0f1a24;
             transition: 0.05s ease;
             display: flex;
             align-items: center;
@@ -179,14 +179,35 @@
             font-family: 'Segoe UI', sans-serif;
         }
 
-        /* Цвета как в плитках био */
-        .calc-btn.blue { background: #2d9cdb; box-shadow: 0 4px 0 #1a5a8a; }
-        .calc-btn.green { background: #27ae60; box-shadow: 0 4px 0 #1b7943; }
-        .calc-btn.purple { background: #9b59b6; box-shadow: 0 4px 0 #6f3f8a; }
-        .calc-btn.orange { background: #e67e22; box-shadow: 0 4px 0 #b85e1a; }
-        .calc-btn.red { background: #e74c3c; box-shadow: 0 4px 0 #b53b2e; }
-        .calc-btn.teal { background: #1abc9c; box-shadow: 0 4px 0 #13987e; }
-        .calc-btn.dark { background: #34495e; box-shadow: 0 4px 0 #1f2f3f; }
+        /* Специально для не-цифр делаем шрифт меньше */
+        .calc-btn:not(.number) {
+            font-size: 1.3rem;
+        }
+
+        /* Класс для цифр */
+        .calc-btn.number {
+            font-size: 1.8rem;  /* Цифры ещё крупнее */
+            font-weight: 500;
+        }
+
+        /* Цвета как в плитках био - но теперь все перекрашены в тёмный */
+        .calc-btn.blue, 
+        .calc-btn.green, 
+        .calc-btn.purple, 
+        .calc-btn.orange, 
+        .calc-btn.red, 
+        .calc-btn.teal, 
+        .calc-btn.dark {
+            background: #1a2a3a;
+            box-shadow: 0 4px 0 #0f1a24;
+        }
+
+        /* Кнопка равно остаётся зелёной */
+        .calc-btn.green.equals {
+            background: #27ae60;
+            box-shadow: 0 4px 0 #1b7943;
+            font-size: 2rem;
+        }
 
         .calc-btn.wide {
             grid-column: span 2;
@@ -194,7 +215,13 @@
 
         .calc-btn:active {
             transform: translateY(4px);
-            box-shadow: 0 0px 0 #1a5a8a;
+            box-shadow: 0 0px 0 #0f1a24;
+        }
+
+        .calc-btn.green.equals:active {
+            background: #27ae60;
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #1b7943;
         }
 
         .calc-btn i {
@@ -205,7 +232,10 @@
         /* Адаптация */
         @media (max-width: 450px) {
             .calculator-card { padding: 15px; }
-            .calc-btn { padding: 15px 3px; font-size: 1.1rem; }
+            .calc-btn { padding: 12px 3px; }
+            .calc-btn.number { font-size: 1.6rem; }
+            .calc-btn:not(.number) { font-size: 1.2rem; }
+            .calc-btn.green.equals { font-size: 1.8rem; }
             .result { font-size: 2.2rem; }
         }
     </style>
@@ -239,38 +269,38 @@
             <!-- Кнопки как плитки -->
             <div class="button-grid">
                 <!-- Первый ряд -->
-                <button class="calc-btn purple" onclick="appendFunction('M')">M</button>
-                <button class="calc-btn purple" onclick="clearEntry()">CE</button>
-                <button class="calc-btn purple" onclick="clearAll()">C</button>
-                <button class="calc-btn purple" onclick="backspace()"><i class="fas fa-backspace"></i></button>
-                <button class="calc-btn orange" onclick="appendOperator('/')">÷</button>
+                <button class="calc-btn" onclick="appendFunction('M')">M</button>
+                <button class="calc-btn" onclick="clearEntry()">CE</button>
+                <button class="calc-btn" onclick="clearAll()">C</button>
+                <button class="calc-btn" onclick="backspace()"><i class="fas fa-backspace"></i></button>
+                <button class="calc-btn" onclick="appendOperator('/')">÷</button>
 
                 <!-- Второй ряд -->
-                <button class="calc-btn dark" onclick="toggleSign()">±</button>
-                <button class="calc-btn blue" onclick="appendNumber('7')">7</button>
-                <button class="calc-btn blue" onclick="appendNumber('8')">8</button>
-                <button class="calc-btn blue" onclick="appendNumber('9')">9</button>
-                <button class="calc-btn orange" onclick="appendOperator('*')">×</button>
+                <button class="calc-btn" onclick="toggleSign()">±</button>
+                <button class="calc-btn number" onclick="appendNumber('7')">7</button>
+                <button class="calc-btn number" onclick="appendNumber('8')">8</button>
+                <button class="calc-btn number" onclick="appendNumber('9')">9</button>
+                <button class="calc-btn" onclick="appendOperator('*')">×</button>
 
                 <!-- Третий ряд -->
-                <button class="calc-btn dark" onclick="sqrt()">√</button>
-                <button class="calc-btn blue" onclick="appendNumber('4')">4</button>
-                <button class="calc-btn blue" onclick="appendNumber('5')">5</button>
-                <button class="calc-btn blue" onclick="appendNumber('6')">6</button>
-                <button class="calc-btn orange" onclick="appendOperator('-')">−</button>
+                <button class="calc-btn" onclick="sqrt()">√</button>
+                <button class="calc-btn number" onclick="appendNumber('4')">4</button>
+                <button class="calc-btn number" onclick="appendNumber('5')">5</button>
+                <button class="calc-btn number" onclick="appendNumber('6')">6</button>
+                <button class="calc-btn" onclick="appendOperator('-')">−</button>
 
                 <!-- Четвертый ряд -->
-                <button class="calc-btn dark" onclick="percentage()">%</button>
-                <button class="calc-btn blue" onclick="appendNumber('1')">1</button>
-                <button class="calc-btn blue" onclick="appendNumber('2')">2</button>
-                <button class="calc-btn blue" onclick="appendNumber('3')">3</button>
-                <button class="calc-btn orange" onclick="appendOperator('+')">+</button>
+                <button class="calc-btn" onclick="percentage()">%</button>
+                <button class="calc-btn number" onclick="appendNumber('1')">1</button>
+                <button class="calc-btn number" onclick="appendNumber('2')">2</button>
+                <button class="calc-btn number" onclick="appendNumber('3')">3</button>
+                <button class="calc-btn" onclick="appendOperator('+')">+</button>
 
                 <!-- Пятый ряд -->
-                <button class="calc-btn dark" onclick="reciprocal()">1/x</button>
-                <button class="calc-btn blue wide" onclick="appendNumber('0')" style="grid-column: span 2;">0</button>
-                <button class="calc-btn blue" onclick="appendDecimal()">,</button>
-                <button class="calc-btn green wide" onclick="calculate()" style="grid-column: span 2;">=</button>
+                <button class="calc-btn" onclick="reciprocal()">1/x</button>
+                <button class="calc-btn number wide" onclick="appendNumber('0')" style="grid-column: span 2;">0</button>
+                <button class="calc-btn number" onclick="appendDecimal()">,</button>
+                <button class="calc-btn green equals" onclick="calculate()">=</button>
             </div>
         </div>
     </div>
