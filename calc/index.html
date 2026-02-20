@@ -202,34 +202,6 @@
             pointer-events: none;
         }
 
-        /* Нижняя панель как в био (но без времени) */
-        .bottom-bar {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            color: white;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.1);
-            gap: 15px;
-        }
-
-        .start-button {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1rem;
-            padding: 5px 15px;
-            background: rgba(255,255,255,0.1);
-            cursor: default;
-        }
-
-        .start-button i {
-            color: #2d9cdb;
-        }
-
         /* Адаптация */
         @media (max-width: 450px) {
             .calculator-card { padding: 15px; }
@@ -300,15 +272,6 @@
                 <button class="calc-btn blue" onclick="appendDecimal()">,</button>
                 <button class="calc-btn green wide" onclick="calculate()" style="grid-column: span 2;">=</button>
             </div>
-        </div>
-
-        <!-- Нижняя панель как в био -->
-        <div class="bottom-bar">
-            <div class="start-button">
-                <i class="fas fa-windows"></i>
-                <span>Пуск</span>
-            </div>
-            <span>Калькулятор</span>
         </div>
     </div>
 
@@ -449,7 +412,7 @@
         }
 
         function appendFunction(func) {
-            // Заглушка для M (память) - можно добавить функционал позже
+            // Заглушка для M (память)
             console.log('Memory function:', func);
         }
 
@@ -457,4 +420,4 @@
         updateDisplay();
     </script>
 </body>
-  </html>
+</html>
