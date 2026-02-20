@@ -9,149 +9,213 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none;
+            font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
         }
 
         body {
-            min-height: 100vh;
             background: #1b2a3f;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
             padding: 20px;
         }
 
-        .calculator {
-            width: 340px;
-            background: #f0f0f0;
+        /* ТОЧНАЯ КОПИЯ КАЛЬКУЛЯТОРА ИЗ WINDOWS 8.1 */
+        .calc {
+            width: 342px;
+            background-color: #ece9e0;
             border: 2px solid #7a7a7a;
-            box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.4);
+            border-radius: 0;
         }
 
-        /* Верхняя панель */
+        /* Заголовок */
         .title-bar {
-            background: #e3e3e3;
-            padding: 6px 8px;
+            background: linear-gradient(to bottom, #f3f1ea 0%, #d9d6cb 100%);
+            padding: 6px 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #a0a0a0;
-            font-size: 14px;
+            border-bottom: 2px solid #7a7a7a;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1e1e1e;
         }
 
         .modes {
             display: flex;
-            gap: 15px;
+            gap: 16px;
         }
 
-        .window-controls {
+        .modes span {
+            cursor: default;
+        }
+
+        .window-buttons {
             display: flex;
             gap: 12px;
         }
 
+        .window-buttons span {
+            font-size: 15px;
+            cursor: default;
+            line-height: 1;
+        }
+
         /* Дисплей */
         .display {
-            background: #d4d4d4;
-            padding: 12px 10px;
+            background-color: #f3f1ea;
+            padding: 12px 10px 8px 10px;
+            border-bottom: 2px solid #b9b5a8;
             text-align: right;
-            border-bottom: 2px solid #a0a0a0;
-            min-height: 80px;
         }
 
         .history {
-            color: #2d2d2d;
-            font-size: 14px;
+            color: #3b3b3b;
+            font-size: 13px;
             min-height: 20px;
+            font-weight: 400;
         }
 
-        .current {
-            color: #000;
-            font-size: 36px;
-            font-weight: 300;
-            border: none;
-            outline: none;
-            background: transparent;
+        .current-value {
             width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 42px;
+            font-weight: 300;
             text-align: right;
+            color: #000;
+            outline: none;
+            font-family: 'Segoe UI', 'Tahoma', sans-serif;
         }
 
-        /* Сетка кнопок */
+        /* Панель с тремя режимами */
+        .mode-tabs {
+            display: flex;
+            background: linear-gradient(to bottom, #d9d6cb 0%, #c0bbb0 100%);
+            border-bottom: 2px solid #7a7a7a;
+        }
+
+        .mode-tab {
+            flex: 1;
+            text-align: center;
+            padding: 7px 0;
+            font-size: 13px;
+            color: #1e1e1e;
+            border-right: 2px solid #7a7a7a;
+            background: linear-gradient(to bottom, #e5e2d9 0%, #c9c4b8 100%);
+            cursor: default;
+        }
+
+        .mode-tab:last-child {
+            border-right: none;
+        }
+
+        .mode-tab.active {
+            background: linear-gradient(to bottom, #f3f1ea 0%, #d9d6cb 100%);
+            border-bottom: none;
+            padding-bottom: 8px;
+            margin-bottom: -1px;
+        }
+
+        /* Кнопки */
         .buttons {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            background: #c0c0c0;
             gap: 2px;
             padding: 2px;
+            background-color: #b9b5a8;
         }
 
         .btn {
-            background: #e3e3e3;
-            border: none;
-            padding: 15px 0;
-            font-size: 18px;
-            cursor: pointer;
+            background: linear-gradient(to bottom, #f3f1ea 0%, #ded9ce 100%);
+            border: 1px solid #8e8e8e;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 45px;
-            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.8), inset -1px -1px 2px rgba(0,0,0,0.2);
+            font-size: 16px;
+            font-weight: 400;
+            color: #1e1e1e;
+            cursor: default;
+            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.9), inset -1px -1px 2px rgba(0,0,0,0.1);
         }
 
-        .btn-memory {
-            background: #d1d1d1;
+        .btn.memory {
+            background: linear-gradient(to bottom, #e5e2d9 0%, #d1cbbd 100%);
+            font-size: 15px;
         }
 
-        .btn-operator {
-            background: #d1d1d1;
+        .btn.operator {
+            background: linear-gradient(to bottom, #e5e2d9 0%, #d1cbbd 100%);
+            font-size: 18px;
         }
 
-        .btn-equals {
-            background: #4a8fe0;
+        .btn.number {
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        .btn.equals {
+            background: linear-gradient(to bottom, #6d9ee0 0%, #3a6fc8 100%);
             color: white;
-            font-size: 24px;
+            font-size: 22px;
+            border: 1px solid #1e4b8c;
             grid-row: span 2;
+            height: 98px;
         }
 
-        .btn-zero {
+        .btn.zero {
             grid-column: span 2;
         }
 
         .btn:active {
-            background: #b5b5b5;
-            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.2), inset -1px -1px 2px rgba(255,255,255,0.8);
+            background: linear-gradient(to bottom, #c9c4b8 0%, #b9b0a0 100%);
+            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.2), inset -1px -1px 2px rgba(255,255,255,0.5);
         }
 
-        .btn-equals:active {
-            background: #2d6fc0;
+        .btn.equals:active {
+            background: linear-gradient(to bottom, #3a6fc8 0%, #1e4b8c 100%);
         }
 
-        /* Нижняя панель */
-        .bottom-bar {
-            background: #e3e3e3;
-            padding: 5px 8px;
+        /* Нижняя строка */
+        .bottom {
+            background: linear-gradient(to bottom, #d9d6cb 0%, #c0bbb0 100%);
+            padding: 5px 10px;
             display: flex;
-            gap: 15px;
-            border-top: 2px solid #a0a0a0;
-            font-size: 13px;
+            gap: 20px;
+            border-top: 2px solid #7a7a7a;
+            font-size: 12px;
+            color: #1e1e1e;
         }
 
         .indicators {
             display: flex;
-            gap: 15px;
+            gap: 20px;
+        }
+
+        .circle {
+            margin-left: auto;
+        }
+
+        /* Ровно как на скриншоте */
+        .btn sup {
+            font-size: 10px;
+            margin-left: 2px;
         }
     </style>
 </head>
 <body>
-    <div class="calculator">
-        <!-- Верхняя панель -->
+    <div class="calc">
+        <!-- Верхняя полоса -->
         <div class="title-bar">
             <div class="modes">
                 <span>Стандартный</span>
                 <span>Инженерный</span>
                 <span>Преобразователь</span>
             </div>
-            <div class="window-controls">
+            <div class="window-buttons">
                 <span>−</span>
                 <span>□</span>
                 <span>✕</span>
@@ -160,62 +224,69 @@
 
         <!-- Дисплей -->
         <div class="display">
-            <div class="history" id="history">10 + 10 =</div>
-            <input type="text" class="current" id="display" value="20" readonly>
+            <div class="history" id="history"></div>
+            <input type="text" class="current-value" id="result" value="0" readonly>
+        </div>
+
+        <!-- Вкладки режимов -->
+        <div class="mode-tabs">
+            <div class="mode-tab active">Стандартный</div>
+            <div class="mode-tab">Инженерный</div>
+            <div class="mode-tab">Преобразователь</div>
         </div>
 
         <!-- Кнопки -->
         <div class="buttons">
-            <!-- 1 ряд -->
-            <button class="btn btn-memory" onclick="press('M')">M</button>
-            <button class="btn btn-memory" onclick="press('CE')">CE</button>
-            <button class="btn btn-memory" onclick="press('C')">C</button>
-            <button class="btn btn-memory" onclick="press('⌫')">⌫</button>
-            <button class="btn btn-operator" onclick="press('/')">÷</button>
+            <!-- 1 строка -->
+            <button class="btn memory" onclick="press('M')">M</button>
+            <button class="btn memory" onclick="press('CE')">CE</button>
+            <button class="btn memory" onclick="press('C')">C</button>
+            <button class="btn memory" onclick="press('⌫')">⌫</button>
+            <button class="btn operator" onclick="press('/')">÷</button>
 
-            <!-- 2 ряд -->
-            <button class="btn btn-operator" onclick="press('±')">±</button>
-            <button class="btn" onclick="press('7')">7</button>
-            <button class="btn" onclick="press('8')">8</button>
-            <button class="btn" onclick="press('9')">9</button>
-            <button class="btn btn-operator" onclick="press('*')">×</button>
+            <!-- 2 строка -->
+            <button class="btn operator" onclick="press('±')">±</button>
+            <button class="btn number" onclick="press('7')">7</button>
+            <button class="btn number" onclick="press('8')">8</button>
+            <button class="btn number" onclick="press('9')">9</button>
+            <button class="btn operator" onclick="press('*')">×</button>
 
-            <!-- 3 ряд -->
-            <button class="btn btn-operator" onclick="press('√')">√</button>
-            <button class="btn" onclick="press('4')">4</button>
-            <button class="btn" onclick="press('5')">5</button>
-            <button class="btn" onclick="press('6')">6</button>
-            <button class="btn btn-operator" onclick="press('-')">−</button>
+            <!-- 3 строка -->
+            <button class="btn operator" onclick="press('√')">√</button>
+            <button class="btn number" onclick="press('4')">4</button>
+            <button class="btn number" onclick="press('5')">5</button>
+            <button class="btn number" onclick="press('6')">6</button>
+            <button class="btn operator" onclick="press('-')">−</button>
 
-            <!-- 4 ряд -->
-            <button class="btn btn-operator" onclick="press('%')">%</button>
-            <button class="btn" onclick="press('1')">1</button>
-            <button class="btn" onclick="press('2')">2</button>
-            <button class="btn" onclick="press('3')">3</button>
-            <button class="btn btn-operator" onclick="press('+')">+</button>
+            <!-- 4 строка -->
+            <button class="btn operator" onclick="press('%')">%</button>
+            <button class="btn number" onclick="press('1')">1</button>
+            <button class="btn number" onclick="press('2')">2</button>
+            <button class="btn number" onclick="press('3')">3</button>
+            <button class="btn operator" onclick="press('+')">+</button>
 
-            <!-- 5 ряд -->
-            <button class="btn btn-operator" onclick="press('1/x')">1/x</button>
-            <button class="btn btn-zero" onclick="press('0')">0</button>
-            <button class="btn" onclick="press(',')">,</button>
-            <button class="btn btn-equals" onclick="press('=')">=</button>
+            <!-- 5 строка -->
+            <button class="btn operator" onclick="press('1/x')">1/x</button>
+            <button class="btn number zero" onclick="press('0')">0</button>
+            <button class="btn number" onclick="press(',')">,</button>
+            <button class="btn equals" onclick="press('=')">=</button>
         </div>
 
         <!-- Нижняя панель -->
-        <div class="bottom-bar">
+        <div class="bottom">
             <div class="indicators">
                 <span>M</span>
                 <span>Inv</span>
                 <span>Hyp</span>
             </div>
-            <div>○</div>
+            <div class="circle">○</div>
         </div>
     </div>
 
     <script>
+        // Заглушка для кнопок
         function press(key) {
             console.log('Pressed:', key);
-            // Сюда потом добавишь логику
         }
     </script>
 </body>
