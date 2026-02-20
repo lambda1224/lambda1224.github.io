@@ -3,133 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Калькулятор · Windows 8.1</title>
-    <!-- Font Awesome 6 для иконок -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Калькулятор</title>
     <style>
-        /* Подключение локальных шрифтов из папки /fonts (те же, что в био) */
-        @font-face {
-            font-family: 'Segoe UI';
-            src: url('../fonts/SegoeUI-Light.ttf') format('truetype');
-            font-weight: 300;
-            font-style: normal;
-        }
-
-        @font-face {
-            font-family: 'Segoe UI';
-            src: url('../fonts/SegoeUI.ttf') format('truetype');
-            font-weight: 400;
-            font-style: normal;
-        }
-
-        @font-face {
-            font-family: 'Segoe UI';
-            src: url('../fonts/SegoeUI-SemiBold.ttf') format('truetype');
-            font-weight: 600;
-            font-style: normal;
-        }
-
-        @font-face {
-            font-family: 'Segoe UI';
-            src: url('../fonts/SegoeUI-Bold.ttf') format('truetype');
-            font-weight: 700;
-            font-style: normal;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Segoe WP', 'Helvetica Neue', sans-serif;
+            user-select: none;
         }
 
         body {
             min-height: 100vh;
             background: #1b2a3f;
-            background: linear-gradient(145deg, #1f3348, #142433);
-            padding: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-family: 'Segoe UI', 'Segoe WP', 'Helvetica Neue', sans-serif;
+            padding: 20px;
         }
 
-        .calculator-container {
-            max-width: 320px;
-            width: 100%;
-            background: #002b36; /* Тёмно-синий фон как в оригинальном калькуляторе */
-            border: 2px solid #1e3f5f;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.7);
+        .calculator {
+            width: 340px;
+            background: #f0f0f0;
+            border: 2px solid #7a7a7a;
+            border-radius: 0;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
         }
 
-        /* Заголовок как в оригинале */
-        .calc-header {
-            background: #1e3f5f;
-            padding: 8px 12px;
+        /* Заголовок */
+        .title-bar {
+            background: #e3e3e3;
+            padding: 5px 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: white;
-            font-size: 0.9rem;
-            font-weight: 400;
-            border-bottom: 2px solid #0f2a3a;
+            border-bottom: 2px solid #a0a0a0;
+            font-size: 14px;
         }
 
-        .calc-header-left {
+        .title-left {
             display: flex;
             gap: 15px;
         }
 
-        .calc-header-left span {
-            cursor: default;
-            opacity: 0.9;
+        .title-left span {
+            color: #1e1e1e;
         }
 
-        .calc-header-left span:hover {
-            opacity: 1;
-            background: rgba(255,255,255,0.1);
-        }
-
-        .calc-header-right {
+        .title-right {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
-        .calc-header-right i {
-            cursor: pointer;
-            opacity: 0.7;
-            font-size: 0.9rem;
-        }
-
-        .calc-header-right i:hover {
-            opacity: 1;
+        .title-right span {
+            color: #1e1e1e;
+            cursor: default;
+            font-size: 16px;
+            line-height: 1;
         }
 
         /* Дисплей */
-        .calc-display {
-            background: #003d4d;
-            padding: 15px 12px;
+        .display {
+            background: #d4d4d4;
+            padding: 12px 10px;
             text-align: right;
-            border-bottom: 2px solid #1e3f5f;
-            min-height: 80px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
+            border-bottom: 2px solid #a0a0a0;
+            min-height: 70px;
         }
 
-        .history-display {
-            color: #5f9ea0;
-            font-size: 0.9rem;
+        .history-line {
+            color: #2d2d2d;
+            font-size: 14px;
             min-height: 20px;
-            font-weight: 300;
-            word-wrap: break-word;
         }
 
-        .main-display {
-            color: white;
-            font-size: 2.5rem;
+        .main-line {
+            color: #000;
+            font-size: 36px;
             font-weight: 300;
-            line-height: 1.2;
-            word-wrap: break-word;
             border: none;
             outline: none;
             background: transparent;
@@ -137,278 +88,229 @@
             text-align: right;
         }
 
-        /* Панель режимов */
-        .mode-bar {
-            display: flex;
-            background: #1e3f5f;
-            border-bottom: 2px solid #0f2a3a;
-        }
-
-        .mode-btn {
-            flex: 1;
-            padding: 8px 0;
-            text-align: center;
-            color: white;
-            font-size: 0.9rem;
-            cursor: pointer;
-            border-right: 1px solid #0f2a3a;
-            background: #1e3f5f;
-        }
-
-        .mode-btn:last-child {
-            border-right: none;
-        }
-
-        .mode-btn.active {
-            background: #002b36;
-            border-bottom: 2px solid #2d9cdb;
-        }
-
-        /* Кнопки калькулятора */
-        .calc-buttons {
+        /* Кнопки */
+        .buttons {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 1px;
-            background: #0f2a3a;
-            padding: 1px;
+            background: #c0c0c0;
+            gap: 2px;
+            padding: 2px;
         }
 
-        .calc-btn {
-            background: #002b36;
-            color: white;
+        .btn {
+            background: #e3e3e3;
             border: none;
-            padding: 15px 5px;
-            font-size: 1.2rem;
+            padding: 15px 0;
+            font-size: 18px;
             font-weight: 400;
+            color: #1e1e1e;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: 0.05s ease;
-            min-height: 50px;
+            min-height: 45px;
+            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.8), inset -1px -1px 2px rgba(0,0,0,0.2);
         }
 
-        /* Стили для разных типов кнопок как в оригинале */
-        .calc-btn.memory {
-            background: #1e3f5f;
-            color: #b0e0e6;
-            font-size: 1rem;
+        /* Цвета кнопок как на фото */
+        .btn-memory {
+            background: #d1d1d1;
+            font-weight: 500;
         }
 
-        .calc-btn.operator {
-            background: #1e3f5f;
-            color: #b0e0e6;
-            font-size: 1.3rem;
+        .btn-operator {
+            background: #d1d1d1;
+            font-size: 20px;
         }
 
-        .calc-btn.number {
-            background: #002b36;
-            font-size: 1.3rem;
+        .btn-number {
+            background: #e3e3e3;
         }
 
-        .calc-btn.function {
-            background: #1e3f5f;
-            color: #b0e0e6;
-        }
-
-        .calc-btn.equals {
-            background: #2d9cdb;
+        .btn-equals {
+            background: #4a8fe0;
             color: white;
-            font-size: 1.5rem;
+            font-size: 24px;
             grid-row: span 2;
+            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.4), inset -1px -1px 2px rgba(0,0,0,0.3);
         }
 
-        .calc-btn.zero {
+        .btn-zero {
             grid-column: span 2;
         }
 
-        .calc-btn:active {
-            background: #2d9cdb;
+        .btn:active {
+            background: #b5b5b5;
+            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.2), inset -1px -1px 2px rgba(255,255,255,0.8);
         }
 
-        .calc-btn.operator:active,
-        .calc-btn.memory:active,
-        .calc-btn.function:active {
-            background: #2d9cdb;
-            color: white;
+        .btn-equals:active {
+            background: #2d6fc0;
         }
 
-        .calc-btn.equals:active {
-            background: #1e6f9f;
-        }
-
-        /* Нижняя панель */
-        .calc-footer {
-            background: #1e3f5f;
-            padding: 5px 12px;
+        /* Нижняя строка */
+        .bottom-bar {
+            background: #e3e3e3;
+            padding: 5px 8px;
             display: flex;
-            justify-content: space-between;
-            color: #8cb4ff;
-            font-size: 0.8rem;
-            border-top: 2px solid #0f2a3a;
+            gap: 15px;
+            border-top: 2px solid #a0a0a0;
+            font-size: 13px;
+            color: #1e1e1e;
         }
 
-        .footer-left {
+        .bottom-left {
             display: flex;
             gap: 15px;
         }
 
-        .footer-right {
-            opacity: 0.7;
+        .bottom-right {
+            margin-left: auto;
         }
 
-        /* Адаптация */
-        @media (max-width: 350px) {
-            .calculator-container { max-width: 280px; }
-            .calc-btn { padding: 12px 3px; font-size: 1rem; }
-            .main-display { font-size: 2rem; }
+        /* Для отображения знаков */
+        .material-symbols-outlined {
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="calculator-container">
-        <!-- Верхний заголовок как в Windows 8.1 калькуляторе -->
-        <div class="calc-header">
-            <div class="calc-header-left">
+    <div class="calculator">
+        <!-- Верхняя панель -->
+        <div class="title-bar">
+            <div class="title-left">
                 <span>Стандартный</span>
                 <span>Инженерный</span>
                 <span>Преобразователь</span>
             </div>
-            <div class="calc-header-right">
-                <i class="fas fa-minus"></i>
-                <i class="far fa-square"></i>
-                <i class="fas fa-times"></i>
+            <div class="title-right">
+                <span>−</span>
+                <span>□</span>
+                <span>✕</span>
             </div>
         </div>
 
         <!-- Дисплей -->
-        <div class="calc-display">
-            <div class="history-display" id="history"></div>
-            <input type="text" class="main-display" id="display" value="0" readonly>
-        </div>
-
-        <!-- Панель режимов -->
-        <div class="mode-bar">
-            <div class="mode-btn active">Стандартный</div>
-            <div class="mode-btn">Инженерный</div>
-            <div class="mode-btn">Преобразователь</div>
+        <div class="display">
+            <div class="history-line" id="history"></div>
+            <input type="text" class="main-line" id="display" value="0" readonly>
         </div>
 
         <!-- Кнопки -->
-        <div class="calc-buttons">
-            <!-- Первый ряд (память) -->
-            <button class="calc-btn memory" onclick="memoryFunction('M')">M</button>
-            <button class="calc-btn memory" onclick="memoryFunction('CE')">CE</button>
-            <button class="calc-btn memory" onclick="clearAll()">C</button>
-            <button class="calc-btn memory" onclick="backspace()"><i class="fas fa-backspace"></i></button>
-            <button class="calc-btn operator" onclick="appendOperator('/')">÷</button>
+        <div class="buttons">
+            <!-- Ряд 1 -->
+            <button class="btn btn-memory" onclick="memory('M')">M</button>
+            <button class="btn btn-memory" onclick="clearEntry()">CE</button>
+            <button class="btn btn-memory" onclick="clearAll()">C</button>
+            <button class="btn btn-memory" onclick="backspace()">⌫</button>
+            <button class="btn btn-operator" onclick="operator('/')">÷</button>
 
-            <!-- Второй ряд -->
-            <button class="calc-btn function" onclick="toggleSign()">±</button>
-            <button class="calc-btn number" onclick="appendNumber('7')">7</button>
-            <button class="calc-btn number" onclick="appendNumber('8')">8</button>
-            <button class="calc-btn number" onclick="appendNumber('9')">9</button>
-            <button class="calc-btn operator" onclick="appendOperator('*')">×</button>
+            <!-- Ряд 2 -->
+            <button class="btn btn-operator" onclick="plusMinus()">±</button>
+            <button class="btn btn-number" onclick="number('7')">7</button>
+            <button class="btn btn-number" onclick="number('8')">8</button>
+            <button class="btn btn-number" onclick="number('9')">9</button>
+            <button class="btn btn-operator" onclick="operator('*')">×</button>
 
-            <!-- Третий ряд -->
-            <button class="calc-btn function" onclick="sqrt()">√</button>
-            <button class="calc-btn number" onclick="appendNumber('4')">4</button>
-            <button class="calc-btn number" onclick="appendNumber('5')">5</button>
-            <button class="calc-btn number" onclick="appendNumber('6')">6</button>
-            <button class="calc-btn operator" onclick="appendOperator('-')">−</button>
+            <!-- Ряд 3 -->
+            <button class="btn btn-operator" onclick="sqrt()">√</button>
+            <button class="btn btn-number" onclick="number('4')">4</button>
+            <button class="btn btn-number" onclick="number('5')">5</button>
+            <button class="btn btn-number" onclick="number('6')">6</button>
+            <button class="btn btn-operator" onclick="operator('-')">−</button>
 
-            <!-- Четвертый ряд -->
-            <button class="calc-btn function" onclick="percentage()">%</button>
-            <button class="calc-btn number" onclick="appendNumber('1')">1</button>
-            <button class="calc-btn number" onclick="appendNumber('2')">2</button>
-            <button class="calc-btn number" onclick="appendNumber('3')">3</button>
-            <button class="calc-btn operator" onclick="appendOperator('+')">+</button>
+            <!-- Ряд 4 -->
+            <button class="btn btn-operator" onclick="percent()">%</button>
+            <button class="btn btn-number" onclick="number('1')">1</button>
+            <button class="btn btn-number" onclick="number('2')">2</button>
+            <button class="btn btn-number" onclick="number('3')">3</button>
+            <button class="btn btn-operator" onclick="operator('+')">+</button>
 
-            <!-- Пятый ряд -->
-            <button class="calc-btn function" onclick="reciprocal()">1/x</button>
-            <button class="calc-btn number zero" onclick="appendNumber('0')" style="grid-column: span 2;">0</button>
-            <button class="calc-btn number" onclick="appendDecimal()">,</button>
-            <button class="calc-btn equals" onclick="calculate()" style="grid-row: span 2;">=</button>
+            <!-- Ряд 5 -->
+            <button class="btn btn-operator" onclick="reciprocal()">1/x</button>
+            <button class="btn btn-number btn-zero" onclick="number('0')" style="grid-column: span 2;">0</button>
+            <button class="btn btn-number" onclick="decimal()">,</button>
+            <button class="btn btn-equals" onclick="calculate()" style="grid-row: span 2;">=</button>
         </div>
 
-        <!-- Нижняя панель (индикаторы) -->
-        <div class="calc-footer">
-            <div class="footer-left">
+        <!-- Нижняя панель -->
+        <div class="bottom-bar">
+            <div class="bottom-left">
                 <span>M</span>
                 <span>Inv</span>
                 <span>Hyp</span>
             </div>
-            <div class="footer-right">
+            <div class="bottom-right">
                 <span>○</span>
             </div>
         </div>
     </div>
 
     <script>
-        let currentInput = '0';
-        let previousInput = '';
-        let operation = null;
-        let shouldResetInput = false;
-        let history = '';
+        let current = '0';
+        let previous = '';
+        let op = null;
+        let resetNext = false;
+        let historyLine = '';
 
         function updateDisplay() {
-            document.getElementById('display').value = currentInput;
-            document.getElementById('history').textContent = history;
+            document.getElementById('display').value = current;
+            document.getElementById('history').textContent = historyLine;
         }
 
-        function appendNumber(num) {
-            if (shouldResetInput) {
-                currentInput = '';
-                shouldResetInput = false;
+        function number(num) {
+            if (resetNext) {
+                current = '';
+                resetNext = false;
             }
-            if (currentInput === '0' && num !== '.') {
-                currentInput = num;
+            if (current === '0' && num !== '.') {
+                current = num;
             } else {
-                currentInput += num;
+                current += num;
             }
             updateDisplay();
         }
 
-        function appendDecimal() {
-            if (shouldResetInput) {
-                currentInput = '0';
-                shouldResetInput = false;
+        function decimal() {
+            if (resetNext) {
+                current = '0';
+                resetNext = false;
             }
-            if (!currentInput.includes('.')) {
-                currentInput += '.';
+            if (!current.includes('.')) {
+                current += '.';
             }
             updateDisplay();
         }
 
-        function appendOperator(op) {
-            if (operation !== null && !shouldResetInput) {
+        function operator(opSymbol) {
+            if (op !== null && !resetNext) {
                 calculate();
             }
-            previousInput = currentInput;
-            operation = op;
-            history = previousInput + ' ' + getOperatorSymbol(op);
-            shouldResetInput = true;
+            previous = current;
+            op = opSymbol;
+            historyLine = previous + ' ' + getSymbol(opSymbol);
+            resetNext = true;
             updateDisplay();
         }
 
-        function getOperatorSymbol(op) {
-            switch(op) {
+        function getSymbol(s) {
+            switch(s) {
                 case '+': return '+';
                 case '-': return '−';
                 case '*': return '×';
                 case '/': return '÷';
-                default: return op;
+                default: return s;
             }
         }
 
         function calculate() {
-            if (operation === null || shouldResetInput) return;
+            if (op === null || resetNext) return;
             
-            let prev = parseFloat(previousInput);
-            let curr = parseFloat(currentInput);
+            let prev = parseFloat(previous);
+            let curr = parseFloat(current);
             let result;
             
-            switch(operation) {
+            switch(op) {
                 case '+': result = prev + curr; break;
                 case '-': result = prev - curr; break;
                 case '*': result = prev * curr; break;
@@ -416,79 +318,69 @@
                 default: return;
             }
             
-            if (!isFinite(result)) {
-                currentInput = 'Ошибка';
-            } else {
-                currentInput = result.toString();
-            }
-            
-            history = previousInput + ' ' + getOperatorSymbol(operation) + ' ' + curr + ' =';
-            operation = null;
-            shouldResetInput = true;
+            historyLine = previous + ' ' + getSymbol(op) + ' ' + curr + ' =';
+            current = result.toString();
+            op = null;
+            resetNext = true;
             updateDisplay();
         }
 
         function clearAll() {
-            currentInput = '0';
-            previousInput = '';
-            operation = null;
-            history = '';
-            shouldResetInput = false;
+            current = '0';
+            previous = '';
+            op = null;
+            historyLine = '';
+            resetNext = false;
+            updateDisplay();
+        }
+
+        function clearEntry() {
+            current = '0';
             updateDisplay();
         }
 
         function backspace() {
-            if (currentInput.length > 1) {
-                currentInput = currentInput.slice(0, -1);
+            if (current.length > 1) {
+                current = current.slice(0, -1);
             } else {
-                currentInput = '0';
+                current = '0';
             }
             updateDisplay();
         }
 
-        function toggleSign() {
-            currentInput = (parseFloat(currentInput) * -1).toString();
+        function plusMinus() {
+            current = (parseFloat(current) * -1).toString();
             updateDisplay();
         }
 
         function sqrt() {
-            currentInput = Math.sqrt(parseFloat(currentInput)).toString();
-            history = '√(' + currentInput + ')';
-            shouldResetInput = true;
+            current = Math.sqrt(parseFloat(current)).toString();
+            historyLine = '√(' + current + ')';
+            resetNext = true;
             updateDisplay();
         }
 
-        function percentage() {
-            currentInput = (parseFloat(currentInput) / 100).toString();
+        function percent() {
+            current = (parseFloat(current) / 100).toString();
             updateDisplay();
         }
 
         function reciprocal() {
-            let val = parseFloat(currentInput);
+            let val = parseFloat(current);
             if (val === 0) {
-                currentInput = 'Ошибка';
+                current = 'Ошибка';
             } else {
-                currentInput = (1 / val).toString();
+                current = (1 / val).toString();
             }
-            history = '1/(' + currentInput + ')';
-            shouldResetInput = true;
+            historyLine = '1/(' + current + ')';
+            resetNext = true;
             updateDisplay();
         }
 
-        function memoryFunction(func) {
-            // Заглушка для функций памяти
-            console.log('Memory function:', func);
+        function memory(m) {
+            console.log('Memory:', m);
         }
 
-        // Переключение режимов (заглушка)
-        document.querySelectorAll('.mode-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        // Инициализация
         updateDisplay();
     </script>
 </body>
