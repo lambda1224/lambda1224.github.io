@@ -18,7 +18,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', 'Segoe WP', 'Helvetica Neue', sans-serif;
+            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
             padding: 20px;
         }
 
@@ -26,14 +26,13 @@
             width: 340px;
             background: #f0f0f0;
             border: 2px solid #7a7a7a;
-            border-radius: 0;
             box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
         }
 
-        /* Заголовок */
+        /* Верхняя панель */
         .title-bar {
             background: #e3e3e3;
-            padding: 5px 8px;
+            padding: 6px 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -41,25 +40,14 @@
             font-size: 14px;
         }
 
-        .title-left {
+        .modes {
             display: flex;
             gap: 15px;
         }
 
-        .title-left span {
-            color: #1e1e1e;
-        }
-
-        .title-right {
+        .window-controls {
             display: flex;
             gap: 12px;
-        }
-
-        .title-right span {
-            color: #1e1e1e;
-            cursor: default;
-            font-size: 16px;
-            line-height: 1;
         }
 
         /* Дисплей */
@@ -68,16 +56,16 @@
             padding: 12px 10px;
             text-align: right;
             border-bottom: 2px solid #a0a0a0;
-            min-height: 70px;
+            min-height: 80px;
         }
 
-        .history-line {
+        .history {
             color: #2d2d2d;
             font-size: 14px;
             min-height: 20px;
         }
 
-        .main-line {
+        .current {
             color: #000;
             font-size: 36px;
             font-weight: 300;
@@ -88,7 +76,7 @@
             text-align: right;
         }
 
-        /* Кнопки */
+        /* Сетка кнопок */
         .buttons {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -102,8 +90,6 @@
             border: none;
             padding: 15px 0;
             font-size: 18px;
-            font-weight: 400;
-            color: #1e1e1e;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -112,19 +98,12 @@
             box-shadow: inset 1px 1px 2px rgba(255,255,255,0.8), inset -1px -1px 2px rgba(0,0,0,0.2);
         }
 
-        /* Цвета кнопок как на фото */
         .btn-memory {
             background: #d1d1d1;
-            font-weight: 500;
         }
 
         .btn-operator {
             background: #d1d1d1;
-            font-size: 20px;
-        }
-
-        .btn-number {
-            background: #e3e3e3;
         }
 
         .btn-equals {
@@ -132,7 +111,6 @@
             color: white;
             font-size: 24px;
             grid-row: span 2;
-            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.4), inset -1px -1px 2px rgba(0,0,0,0.3);
         }
 
         .btn-zero {
@@ -148,7 +126,7 @@
             background: #2d6fc0;
         }
 
-        /* Нижняя строка */
+        /* Нижняя панель */
         .bottom-bar {
             background: #e3e3e3;
             padding: 5px 8px;
@@ -156,21 +134,11 @@
             gap: 15px;
             border-top: 2px solid #a0a0a0;
             font-size: 13px;
-            color: #1e1e1e;
         }
 
-        .bottom-left {
+        .indicators {
             display: flex;
             gap: 15px;
-        }
-
-        .bottom-right {
-            margin-left: auto;
-        }
-
-        /* Для отображения знаков */
-        .material-symbols-outlined {
-            font-size: 20px;
         }
     </style>
 </head>
@@ -178,12 +146,12 @@
     <div class="calculator">
         <!-- Верхняя панель -->
         <div class="title-bar">
-            <div class="title-left">
+            <div class="modes">
                 <span>Стандартный</span>
                 <span>Инженерный</span>
                 <span>Преобразователь</span>
             </div>
-            <div class="title-right">
+            <div class="window-controls">
                 <span>−</span>
                 <span>□</span>
                 <span>✕</span>
@@ -192,196 +160,63 @@
 
         <!-- Дисплей -->
         <div class="display">
-            <div class="history-line" id="history"></div>
-            <input type="text" class="main-line" id="display" value="0" readonly>
+            <div class="history" id="history">10 + 10 =</div>
+            <input type="text" class="current" id="display" value="20" readonly>
         </div>
 
         <!-- Кнопки -->
         <div class="buttons">
-            <!-- Ряд 1 -->
-            <button class="btn btn-memory" onclick="memory('M')">M</button>
-            <button class="btn btn-memory" onclick="clearEntry()">CE</button>
-            <button class="btn btn-memory" onclick="clearAll()">C</button>
-            <button class="btn btn-memory" onclick="backspace()">⌫</button>
-            <button class="btn btn-operator" onclick="operator('/')">÷</button>
+            <!-- 1 ряд -->
+            <button class="btn btn-memory" onclick="press('M')">M</button>
+            <button class="btn btn-memory" onclick="press('CE')">CE</button>
+            <button class="btn btn-memory" onclick="press('C')">C</button>
+            <button class="btn btn-memory" onclick="press('⌫')">⌫</button>
+            <button class="btn btn-operator" onclick="press('/')">÷</button>
 
-            <!-- Ряд 2 -->
-            <button class="btn btn-operator" onclick="plusMinus()">±</button>
-            <button class="btn btn-number" onclick="number('7')">7</button>
-            <button class="btn btn-number" onclick="number('8')">8</button>
-            <button class="btn btn-number" onclick="number('9')">9</button>
-            <button class="btn btn-operator" onclick="operator('*')">×</button>
+            <!-- 2 ряд -->
+            <button class="btn btn-operator" onclick="press('±')">±</button>
+            <button class="btn" onclick="press('7')">7</button>
+            <button class="btn" onclick="press('8')">8</button>
+            <button class="btn" onclick="press('9')">9</button>
+            <button class="btn btn-operator" onclick="press('*')">×</button>
 
-            <!-- Ряд 3 -->
-            <button class="btn btn-operator" onclick="sqrt()">√</button>
-            <button class="btn btn-number" onclick="number('4')">4</button>
-            <button class="btn btn-number" onclick="number('5')">5</button>
-            <button class="btn btn-number" onclick="number('6')">6</button>
-            <button class="btn btn-operator" onclick="operator('-')">−</button>
+            <!-- 3 ряд -->
+            <button class="btn btn-operator" onclick="press('√')">√</button>
+            <button class="btn" onclick="press('4')">4</button>
+            <button class="btn" onclick="press('5')">5</button>
+            <button class="btn" onclick="press('6')">6</button>
+            <button class="btn btn-operator" onclick="press('-')">−</button>
 
-            <!-- Ряд 4 -->
-            <button class="btn btn-operator" onclick="percent()">%</button>
-            <button class="btn btn-number" onclick="number('1')">1</button>
-            <button class="btn btn-number" onclick="number('2')">2</button>
-            <button class="btn btn-number" onclick="number('3')">3</button>
-            <button class="btn btn-operator" onclick="operator('+')">+</button>
+            <!-- 4 ряд -->
+            <button class="btn btn-operator" onclick="press('%')">%</button>
+            <button class="btn" onclick="press('1')">1</button>
+            <button class="btn" onclick="press('2')">2</button>
+            <button class="btn" onclick="press('3')">3</button>
+            <button class="btn btn-operator" onclick="press('+')">+</button>
 
-            <!-- Ряд 5 -->
-            <button class="btn btn-operator" onclick="reciprocal()">1/x</button>
-            <button class="btn btn-number btn-zero" onclick="number('0')" style="grid-column: span 2;">0</button>
-            <button class="btn btn-number" onclick="decimal()">,</button>
-            <button class="btn btn-equals" onclick="calculate()" style="grid-row: span 2;">=</button>
+            <!-- 5 ряд -->
+            <button class="btn btn-operator" onclick="press('1/x')">1/x</button>
+            <button class="btn btn-zero" onclick="press('0')">0</button>
+            <button class="btn" onclick="press(',')">,</button>
+            <button class="btn btn-equals" onclick="press('=')">=</button>
         </div>
 
         <!-- Нижняя панель -->
         <div class="bottom-bar">
-            <div class="bottom-left">
+            <div class="indicators">
                 <span>M</span>
                 <span>Inv</span>
                 <span>Hyp</span>
             </div>
-            <div class="bottom-right">
-                <span>○</span>
-            </div>
+            <div>○</div>
         </div>
     </div>
 
     <script>
-        let current = '0';
-        let previous = '';
-        let op = null;
-        let resetNext = false;
-        let historyLine = '';
-
-        function updateDisplay() {
-            document.getElementById('display').value = current;
-            document.getElementById('history').textContent = historyLine;
+        function press(key) {
+            console.log('Pressed:', key);
+            // Сюда потом добавишь логику
         }
-
-        function number(num) {
-            if (resetNext) {
-                current = '';
-                resetNext = false;
-            }
-            if (current === '0' && num !== '.') {
-                current = num;
-            } else {
-                current += num;
-            }
-            updateDisplay();
-        }
-
-        function decimal() {
-            if (resetNext) {
-                current = '0';
-                resetNext = false;
-            }
-            if (!current.includes('.')) {
-                current += '.';
-            }
-            updateDisplay();
-        }
-
-        function operator(opSymbol) {
-            if (op !== null && !resetNext) {
-                calculate();
-            }
-            previous = current;
-            op = opSymbol;
-            historyLine = previous + ' ' + getSymbol(opSymbol);
-            resetNext = true;
-            updateDisplay();
-        }
-
-        function getSymbol(s) {
-            switch(s) {
-                case '+': return '+';
-                case '-': return '−';
-                case '*': return '×';
-                case '/': return '÷';
-                default: return s;
-            }
-        }
-
-        function calculate() {
-            if (op === null || resetNext) return;
-            
-            let prev = parseFloat(previous);
-            let curr = parseFloat(current);
-            let result;
-            
-            switch(op) {
-                case '+': result = prev + curr; break;
-                case '-': result = prev - curr; break;
-                case '*': result = prev * curr; break;
-                case '/': result = prev / curr; break;
-                default: return;
-            }
-            
-            historyLine = previous + ' ' + getSymbol(op) + ' ' + curr + ' =';
-            current = result.toString();
-            op = null;
-            resetNext = true;
-            updateDisplay();
-        }
-
-        function clearAll() {
-            current = '0';
-            previous = '';
-            op = null;
-            historyLine = '';
-            resetNext = false;
-            updateDisplay();
-        }
-
-        function clearEntry() {
-            current = '0';
-            updateDisplay();
-        }
-
-        function backspace() {
-            if (current.length > 1) {
-                current = current.slice(0, -1);
-            } else {
-                current = '0';
-            }
-            updateDisplay();
-        }
-
-        function plusMinus() {
-            current = (parseFloat(current) * -1).toString();
-            updateDisplay();
-        }
-
-        function sqrt() {
-            current = Math.sqrt(parseFloat(current)).toString();
-            historyLine = '√(' + current + ')';
-            resetNext = true;
-            updateDisplay();
-        }
-
-        function percent() {
-            current = (parseFloat(current) / 100).toString();
-            updateDisplay();
-        }
-
-        function reciprocal() {
-            let val = parseFloat(current);
-            if (val === 0) {
-                current = 'Ошибка';
-            } else {
-                current = (1 / val).toString();
-            }
-            historyLine = '1/(' + current + ')';
-            resetNext = true;
-            updateDisplay();
-        }
-
-        function memory(m) {
-            console.log('Memory:', m);
-        }
-
-        updateDisplay();
     </script>
 </body>
 </html>
