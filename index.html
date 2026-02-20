@@ -218,7 +218,7 @@
 
         /* Стиль для плитки приложений (квадратная, текст слева) */
         .app-tile {
-            background: #9b59b6;
+            background: #9b59b6; /* фиолетовый как в калькуляторе */
             text-decoration: none;
             color: white;
             display: flex;
@@ -226,7 +226,7 @@
             gap: 15px;
             padding: 20px;
             min-height: 120px;
-            grid-column: span 1;
+            grid-column: span 1; /* квадратная, не широкая */
         }
 
         .app-tile .tile-icon {
@@ -242,13 +242,9 @@
             text-align: left;
         }
 
-        /* Специальные цвета для игр */
-        .app-tile.calculator {
-            background: #9b59b6;
-        }
-
-        .app-tile.subzero {
-            background: #3498db; /* Синий как лёд */
+        /* Стиль для Geometry Dash (оранжевый) */
+        .app-tile.orange {
+            background: #e67e22;
         }
 
         @media (max-width: 600px) {
@@ -306,17 +302,17 @@
             </div>
         </div>
 
-        <!-- Секция "Приложения" с двумя играми -->
+        <!-- Секция "Приложения" с двумя плитками -->
         <div class="section-title">📱 Приложения</div>
         <div class="tile-grid">
-            <a href="/calc" class="app-tile calculator">
+            <a href="/calc" class="app-tile">
                 <div class="tile-icon"><i class="fas fa-calculator"></i></div>
                 <div class="tile-value">Калькулятор</div>
             </a>
             
-            <a href="/dashzero" class="app-tile subzero">
-                <div class="tile-icon"><i class="fas fa-snowflake"></i></div>
-                <div class="tile-value">GD SubZero</div>
+            <a href="/dashdash" class="app-tile orange">
+                <div class="tile-icon"><i class="fas fa-cube"></i></div>
+                <div class="tile-value">Geometry Dash</div>
             </a>
         </div>
 
@@ -330,6 +326,63 @@
                         <div style="display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap;">
                             <div><span class="tile-value" id="timerDays" style="font-size: 2.5rem;">0</span> <span class="tile-small">дней</span></div>
                             <div><span class="tile-value" id="timerHours" style="font-size: 2.5rem;">00</span> <span class="tile-small">ч</span></div>
+                            <div><span class="tile-value" id="timerMinutes" style="font-size: 2.5rem;">00</span> <span class="tile-small">мин</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">🔗 ссылки</div>
+        <div class="tile-grid">
+            <a href="https://github.com/lambda1224" class="tile dark social-tile" target="_blank">
+                <span class="tile-icon"><i class="fab fa-github"></i></span>
+                <span class="tile-title" style="font-size: 1.3rem;">GitHub</span>
+            </a>
+            <a href="https://t.me/lambda1224" class="tile blue social-tile" target="_blank">
+                <span class="tile-icon"><i class="fab fa-telegram-plane"></i></span>
+                <span class="tile-title" style="font-size: 1.3rem;">Telegram</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function updateTimer() {
+            const now = new Date();
+            const year = now.getFullYear();
+            
+            const june1 = new Date(year, 5, 1);
+            const jan1 = new Date(year + 1, 0, 1);
+            
+            let target, label, icon;
+            
+            if (now >= june1) {
+                target = jan1;
+                label = 'до Нового года';
+                icon = '<i class="fas fa-tree"></i>';
+            } else {
+                target = june1;
+                label = 'до лета';
+                icon = '<i class="fas fa-sun"></i>';
+            }
+            
+            let diff = target - now;
+            let days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            let hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            document.getElementById('timerLabel').textContent = label;
+            document.getElementById('timerIcon').innerHTML = icon;
+            document.getElementById('timerDays').textContent = days;
+            document.getElementById('timerHours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('timerMinutes').textContent = mins.toString().padStart(2, '0');
+        }
+
+        updateTimer();
+        setInterval(updateTimer, 60000);
+    </script>
+</body>
+    </html>tyle="font-size: 2.5rem;">00</span> <span class="tile-small">ч</span></div>
                             <div><span class="tile-value" id="timerMinutes" style="font-size: 2.5rem;">00</span> <span class="tile-small">мин</span></div>
                         </div>
                     </div>
