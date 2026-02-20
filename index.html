@@ -218,7 +218,7 @@
 
         /* Стиль для плитки приложений (квадратная, текст слева) */
         .app-tile {
-            background: #9b59b6; /* фиолетовый как в калькуляторе */
+            background: #9b59b6;
             text-decoration: none;
             color: white;
             display: flex;
@@ -226,7 +226,7 @@
             gap: 15px;
             padding: 20px;
             min-height: 120px;
-            grid-column: span 1; /* квадратная, не широкая */
+            grid-column: span 1;
         }
 
         .app-tile .tile-icon {
@@ -242,9 +242,13 @@
             text-align: left;
         }
 
-        /* Стиль для Geometry Dash (оранжевый) */
-        .app-tile.orange {
-            background: #e67e22;
+        /* Специальные цвета для игр */
+        .app-tile.calculator {
+            background: #9b59b6;
+        }
+
+        .app-tile.subzero {
+            background: #3498db; /* Синий как лёд */
         }
 
         @media (max-width: 600px) {
@@ -302,17 +306,17 @@
             </div>
         </div>
 
-        <!-- Секция "Приложения" с двумя плитками -->
+        <!-- Секция "Приложения" с двумя играми -->
         <div class="section-title">📱 Приложения</div>
         <div class="tile-grid">
-            <a href="/calc" class="app-tile">
+            <a href="/calc" class="app-tile calculator">
                 <div class="tile-icon"><i class="fas fa-calculator"></i></div>
                 <div class="tile-value">Калькулятор</div>
             </a>
             
-            <a href="/dashdash" class="app-tile orange">
-                <div class="tile-icon"><i class="fas fa-cube"></i></div>
-                <div class="tile-value">Geometry Dash</div>
+            <a href="/dashzero" class="app-tile subzero">
+                <div class="tile-icon"><i class="fas fa-snowflake"></i></div>
+                <div class="tile-value">GD SubZero</div>
             </a>
         </div>
 
