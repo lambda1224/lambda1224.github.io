@@ -242,6 +242,11 @@
             text-align: left;
         }
 
+        /* Стиль для Geometry Dash (оранжевый) */
+        .app-tile.orange {
+            background: #e67e22;
+        }
+
         @media (max-width: 600px) {
             .tile-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -297,7 +302,7 @@
             </div>
         </div>
 
-        <!-- Секция "Приложения" с квадратными плитками -->
+        <!-- Секция "Приложения" с двумя плитками -->
         <div class="section-title">📱 Приложения</div>
         <div class="tile-grid">
             <a href="/calc" class="app-tile">
@@ -305,13 +310,10 @@
                 <div class="tile-value">Калькулятор</div>
             </a>
             
-            <!-- Место для будущих приложений -->
-            <!--
-            <a href="/new-app" class="app-tile">
-                <div class="tile-icon"><i class="fas fa-icon"></i></div>
-                <div class="tile-value">Новое приложение</div>
+            <a href="/dashdash" class="app-tile orange">
+                <div class="tile-icon"><i class="fas fa-cube"></i></div>
+                <div class="tile-value">Geometry Dash</div>
             </a>
-            -->
         </div>
 
         <div class="section-title">⌛ обратный отсчет</div>
