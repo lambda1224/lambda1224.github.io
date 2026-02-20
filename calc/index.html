@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор · Windows 8.1</title>
+    <!-- Font Awesome 6 для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Подключение локальных шрифтов из папки /fonts (те же, что в био) */
+        @font-face {
+            font-family: 'Segoe UI';
+            src: url('../fonts/SegoeUI-Light.ttf') format('truetype');
+            font-weight: 300;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Segoe UI';
+            src: url('../fonts/SegoeUI.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Segoe UI';
+            src: url('../fonts/SegoeUI-SemiBold.ttf') format('truetype');
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Segoe UI';
+            src: url('../fonts/SegoeUI-Bold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Segoe WP', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #1b2a3f;
+            background: linear-gradient(145deg, #1f3348, #142433);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calculator-container {
+            max-width: 380px;
+            width: 100%;
+        }
+
+        /* Верхняя панель как в био */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
+
+        .app-title i {
+            color: #2d9cdb;
+        }
+
+        .close-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Основная карточка калькулятора */
+        .calculator-card {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Заголовок как в плитках */
+        .section-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 20px;
+            padding-left: 5px;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #2d9cdb;
+            font-size: 1.8rem;
+        }
+
+        /* Дисплей */
+        .display {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid #2d9cdb;
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+
+        .expression {
+            color: #8cb4ff;
+            font-size: 1rem;
+            font-weight: 300;
+            min-height: 24px;
+            text-align: right;
+            word-wrap: break-word;
+            font-family: 'Segoe UI', monospace;
+        }
+
+        .result {
+            color: white;
+            font-size: 3rem;
+            font-weight: 300;
+            text-align: right;
+            word-wrap: break-word;
+            font-family: 'Segoe UI', monospace;
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+        }
+
+        /* Сетка кнопок как плитки */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .calc-btn {
+            background: #2d9cdb;
+            color: white;
+            border: none;
+            padding: 18px 5px;
+            font-size: 1.3rem;
+            font-weight: 400;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #1a5a8a;
+            transition: 0.05s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Цвета как в плитках био */
+        .calc-btn.blue { background: #2d9cdb; box-shadow: 0 4px 0 #1a5a8a; }
+        .calc-btn.green { background: #27ae60; box-shadow: 0 4px 0 #1b7943; }
+        .calc-btn.purple { background: #9b59b6; box-shadow: 0 4px 0 #6f3f8a; }
+        .calc-btn.orange { background: #e67e22; box-shadow: 0 4px 0 #b85e1a; }
+        .calc-btn.red { background: #e74c3c; box-shadow: 0 4px 0 #b53b2e; }
+        .calc-btn.teal { background: #1abc9c; box-shadow: 0 4px 0 #13987e; }
+        .calc-btn.dark { background: #34495e; box-shadow: 0 4px 0 #1f2f3f; }
+
+        .calc-btn.wide {
+            grid-column: span 2;
+        }
+
+        .calc-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #1a5a8a;
+        }
+
+        .calc-btn i {
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
+
+        /* Нижняя панель как в био (но без времени) */
+        .bottom-bar {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            color: white;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+            gap: 15px;
+        }
+
+        .start-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            padding: 5px 15px;
+            background: rgba(255,255,255,0.1);
+            cursor: default;
+        }
+
+        .start-button i {
+            color: #2d9cdb;
+        }
+
+        /* Адаптация */
+        @media (max-width: 450px) {
+            .calculator-card { padding: 15px; }
+            .calc-btn { padding: 15px 3px; font-size: 1.1rem; }
+            .result { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <!-- Верхняя панель как в био -->
+        <div class="top-bar">
+            <div class="app-title">
+                <i class="fas fa-calculator"></i>
+                <span>Калькулятор</span>
+            </div>
+            <div class="close-btn" onclick="window.location.href='/'">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+
+        <!-- Основной блок калькулятора -->
+        <div class="calculator-card">
+            <div class="section-title">
+                <i class="fas fa-calculator"></i>
+                <span>Стандартный</span>
+            </div>
+
+            <!-- Дисплей -->
+            <div class="display">
+                <div class="expression" id="expression"></div>
+                <input type="text" class="result" id="result" value="0" readonly>
+            </div>
+
+            <!-- Кнопки как плитки -->
+            <div class="button-grid">
+                <!-- Первый ряд -->
+                <button class="calc-btn purple" onclick="appendFunction('M')">M</button>
+                <button class="calc-btn purple" onclick="clearEntry()">CE</button>
+                <button class="calc-btn purple" onclick="clearAll()">C</button>
+                <button class="calc-btn purple" onclick="backspace()"><i class="fas fa-backspace"></i></button>
+                <button class="calc-btn orange" onclick="appendOperator('/')">÷</button>
+
+                <!-- Второй ряд -->
+                <button class="calc-btn dark" onclick="toggleSign()">±</button>
+                <button class="calc-btn blue" onclick="appendNumber('7')">7</button>
+                <button class="calc-btn blue" onclick="appendNumber('8')">8</button>
+                <button class="calc-btn blue" onclick="appendNumber('9')">9</button>
+                <button class="calc-btn orange" onclick="appendOperator('*')">×</button>
+
+                <!-- Третий ряд -->
+                <button class="calc-btn dark" onclick="sqrt()">√</button>
+                <button class="calc-btn blue" onclick="appendNumber('4')">4</button>
+                <button class="calc-btn blue" onclick="appendNumber('5')">5</button>
+                <button class="calc-btn blue" onclick="appendNumber('6')">6</button>
+                <button class="calc-btn orange" onclick="appendOperator('-')">−</button>
+
+                <!-- Четвертый ряд -->
+                <button class="calc-btn dark" onclick="percentage()">%</button>
+                <button class="calc-btn blue" onclick="appendNumber('1')">1</button>
+                <button class="calc-btn blue" onclick="appendNumber('2')">2</button>
+                <button class="calc-btn blue" onclick="appendNumber('3')">3</button>
+                <button class="calc-btn orange" onclick="appendOperator('+')">+</button>
+
+                <!-- Пятый ряд -->
+                <button class="calc-btn dark" onclick="reciprocal()">1/x</button>
+                <button class="calc-btn blue wide" onclick="appendNumber('0')" style="grid-column: span 2;">0</button>
+                <button class="calc-btn blue" onclick="appendDecimal()">,</button>
+                <button class="calc-btn green wide" onclick="calculate()" style="grid-column: span 2;">=</button>
+            </div>
+        </div>
+
+        <!-- Нижняя панель как в био -->
+        <div class="bottom-bar">
+            <div class="start-button">
+                <i class="fas fa-windows"></i>
+                <span>Пуск</span>
+            </div>
+            <span>Калькулятор</span>
+        </div>
+    </div>
+
+    <script>
+        let currentInput = '0';
+        let previousInput = '';
+        let operation = null;
+        let shouldResetInput = false;
+        let expression = '';
+
+        function updateDisplay() {
+            document.getElementById('result').value = currentInput;
+            document.getElementById('expression').textContent = expression;
+        }
+
+        function appendNumber(num) {
+            if (shouldResetInput) {
+                currentInput = '';
+                shouldResetInput = false;
+            }
+            if (currentInput === '0' && num !== '.') {
+                currentInput = num;
+            } else {
+                currentInput += num;
+            }
+            updateDisplay();
+        }
+
+        function appendDecimal() {
+            if (shouldResetInput) {
+                currentInput = '0';
+                shouldResetInput = false;
+            }
+            if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(op) {
+            if (operation !== null && !shouldResetInput) {
+                calculate();
+            }
+            previousInput = currentInput;
+            operation = op;
+            expression = previousInput + ' ' + getOperatorSymbol(op);
+            shouldResetInput = true;
+            updateDisplay();
+        }
+
+        function getOperatorSymbol(op) {
+            switch(op) {
+                case '+': return '+';
+                case '-': return '−';
+                case '*': return '×';
+                case '/': return '÷';
+                default: return op;
+            }
+        }
+
+        function calculate() {
+            if (operation === null || shouldResetInput) return;
+            
+            let prev = parseFloat(previousInput);
+            let curr = parseFloat(currentInput);
+            let result;
+            
+            switch(operation) {
+                case '+': result = prev + curr; break;
+                case '-': result = prev - curr; break;
+                case '*': result = prev * curr; break;
+                case '/': result = prev / curr; break;
+                default: return;
+            }
+            
+            if (!isFinite(result)) {
+                currentInput = 'Ошибка';
+            } else {
+                currentInput = result.toString();
+            }
+            
+            expression = previousInput + ' ' + getOperatorSymbol(operation) + ' ' + curr + ' =';
+            operation = null;
+            shouldResetInput = true;
+            updateDisplay();
+        }
+
+        function clearAll() {
+            currentInput = '0';
+            previousInput = '';
+            operation = null;
+            expression = '';
+            shouldResetInput = false;
+            updateDisplay();
+        }
+
+        function clearEntry() {
+            currentInput = '0';
+            updateDisplay();
+        }
+
+        function backspace() {
+            if (currentInput.length > 1) {
+                currentInput = currentInput.slice(0, -1);
+            } else {
+                currentInput = '0';
+            }
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            currentInput = (parseFloat(currentInput) * -1).toString();
+            updateDisplay();
+        }
+
+        function sqrt() {
+            currentInput = Math.sqrt(parseFloat(currentInput)).toString();
+            expression = '√(' + currentInput + ')';
+            shouldResetInput = true;
+            updateDisplay();
+        }
+
+        function percentage() {
+            currentInput = (parseFloat(currentInput) / 100).toString();
+            updateDisplay();
+        }
+
+        function reciprocal() {
+            let val = parseFloat(currentInput);
+            if (val === 0) {
+                currentInput = 'Ошибка';
+            } else {
+                currentInput = (1 / val).toString();
+            }
+            expression = '1/(' + currentInput + ')';
+            shouldResetInput = true;
+            updateDisplay();
+        }
+
+        function appendFunction(func) {
+            // Заглушка для M (память) - можно добавить функционал позже
+            console.log('Memory function:', func);
+        }
+
+        // Инициализация
+        updateDisplay();
+    </script>
+</body>
+  </html>
