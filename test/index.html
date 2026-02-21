@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Bio · lambda1224</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, 'Helvetica Neue', 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 0 0 80px 0;
+        }
+
+        .profile-card {
+            max-width: 400px;
+            width: 100%;
+            background-color: #ffffff;
+            padding: 24px 20px 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .avatar {
+            flex-shrink: 0;
+        }
+
+        .avatar-image {
+            width: 86px;
+            height: 86px;
+            border-radius: 50%;
+            background: #e8e8ed;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            background-image: url('fonts/user.png');
+        }
+
+        .name-block {
+            flex: 1;
+        }
+
+        .name {
+            text-align: left;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: #000000;
+            margin-bottom: 4px;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .nickname {
+            text-align: left;
+            font-size: 15px;
+            font-weight: 400;
+            color: #8e8e93;
+            margin-bottom: 0;
+        }
+
+        /* Био с новым текстом */
+        .bio-text {
+            text-align: left;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #000000;
+            background: transparent;
+            padding: 0 0 20px 0;
+            margin-bottom: 0;
+            border-bottom: 1px solid #c6c6c8;
+            font-weight: 400;
+        }
+
+        .links-grid {
+            display: flex;
+            gap: 24px;
+            justify-content: flex-start;
+            padding: 20px 0 8px;
+            flex-wrap: wrap;
+        }
+
+        .link-item {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #007aff;
+            font-size: 24px;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,122,255,0.2);
+            transition: all 0.1s ease;
+            border: 1px solid rgba(0,122,255,0.15);
+        }
+
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255,255,255,0.94);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(0,0,0,0.1);
+            padding: 8px 24px 12px;
+            z-index: 100;
+        }
+
+        .tab-items {
+            max-width: 300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #8a8a8e;
+            font-size: 14px;
+            padding: 6px 0 2px;
+            flex: 1;
+            transition: color 0.1s;
+            border-radius: 8px;
+        }
+
+        .tab.active {
+            color: #007aff;
+        }
+
+        .tab i {
+            font-size: 26px;
+            margin-bottom: 4px;
+        }
+
+        .tab span {
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: -0.1px;
+        }
+
+        @media (max-width: 380px) {
+            .profile-card { padding: 20px 16px; }
+            .avatar-image { width: 78px; height: 78px; }
+            .name { font-size: 22px; }
+            .nickname { font-size: 14px; }
+            .links-grid { gap: 16px; }
+            .tab-items { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="avatar">
+                <div class="avatar-image" role="img" aria-label="User avatar"></div>
+            </div>
+            
+            <div class="name-block">
+                <div class="name">lambda1224</div>
+                <div class="nickname">@lambda1224</div>
+            </div>
+        </div>
+
+        <!-- Обновлённое био -->
+        <div class="bio-text">
+            Нравится делать разные приколюхи
+        </div>
+
+        <div class="links-grid">
+            <a href="#" class="link-item" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            <a href="#" class="link-item" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+        </div>
+    </div>
+
+    <div class="tab-bar">
+        <div class="tab-items">
+            <a href="#" class="tab active">
+                <i class="fas fa-user"></i>
+                <span>Обо мне</span>
+            </a>
+            <a href="#" class="tab">
+                <i class="fas fa-gamepad"></i>
+                <span>Игры</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
