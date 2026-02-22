@@ -23,27 +23,40 @@
 
 body {
     background: #ffffff;
-    min-height: 100vh;
+    overflow-x: hidden;
+    height: 100vh;
+}
+
+/* ===== КОНТЕЙНЕР ===== */
+
+.app {
+    position: relative;
+    max-width: 400px;
+    margin: auto;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ===== ЭКРАНЫ (IOS STYLE) ===== */
+
+.screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: #fff;
+    transition: transform 0.35s cubic-bezier(.25,.8,.25,1);
+    overflow-y: auto;
     padding-bottom: 90px;
 }
 
-/* ===== ЭКРАНЫ ===== */
-
-.screen {
-    display: none;
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-.screen.active {
-    display: block;
-}
+#profile { transform: translateX(0%); }
+#games { transform: translateX(100%); }
 
 /* ===== ПРОФИЛЬ ===== */
 
-.profile-card {
-    padding: 24px 20px;
-}
+.profile-card { padding: 24px 20px; }
 
 .profile-header {
     display: flex;
@@ -58,15 +71,8 @@ body {
     background: #e8e8ed url('fonts/user.png') center/cover no-repeat;
 }
 
-.name {
-    font-size: 24px;
-    font-weight: 600;
-}
-
-.nickname {
-    font-size: 15px;
-    color: #8e8e93;
-}
+.name { font-size: 24px; font-weight: 600; }
+.nickname { font-size: 15px; color: #8e8e93; }
 
 .bio-text {
     font-size: 16px;
@@ -75,10 +81,7 @@ body {
     border-bottom: 1px solid #c6c6c8;
 }
 
-.links-grid {
-    display: flex;
-    gap: 20px;
-}
+.links-grid { display: flex; gap: 20px; }
 
 .link-item {
     width: 48px;
@@ -93,7 +96,7 @@ body {
     box-shadow: 0 0 0 1px rgba(0,122,255,0.2);
 }
 
-/* ===== ЭКРАН ИГР ===== */
+/* ===== ИГРЫ ===== */
 
 .games-header {
     padding: 20px;
@@ -101,26 +104,21 @@ body {
     font-weight: 600;
 }
 
-.games-list {
-    list-style: none;
-}
+.games-list { list-style: none; }
 
 .game-item {
-    padding: 16px 20px;
+    padding: 18px 20px;
     font-size: 18px;
     border-bottom: 1px solid #e5e5ea;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: pointer;
 }
 
-.game-item:active {
-    background: #f2f2f7;
-}
+.game-item:active { background: #f2f2f7; }
 
-.game-arrow {
-    color: #c7c7cc;
-}
+.game-arrow { color: #c7c7cc; }
 
 /* ===== TAB BAR ===== */
 
@@ -128,6 +126,7 @@ body {
     position: fixed;
     bottom: 0;
     width: 100%;
+    max-width: 400px;
     background: rgba(255,255,255,0.95);
     backdrop-filter: blur(15px);
     border-top: 1px solid rgba(0,0,0,0.1);
@@ -135,8 +134,6 @@ body {
 }
 
 .tab-items {
-    max-width: 300px;
-    margin: auto;
     display: flex;
     justify-content: space-around;
 }
@@ -150,20 +147,17 @@ body {
     font-size: 12px;
 }
 
-.tab i {
-    font-size: 24px;
-    margin-bottom: 4px;
-}
+.tab i { font-size: 24px; margin-bottom: 4px; }
 
-.tab.active {
-    color: #007aff;
-}
+.tab.active { color: #007aff; }
 </style>
 </head>
 <body>
 
-<!-- ===== ЭКРАН ПРОФИЛЯ ===== -->
-<div class="screen active" id="profile">
+<div class="app">
+
+<!-- ===== ПРОФИЛЬ ===== -->
+<div class="screen" id="profile">
     <div class="profile-card">
         <div class="profile-header">
             <div class="avatar-image"></div>
@@ -184,34 +178,32 @@ body {
     </div>
 </div>
 
-<!-- ===== ЭКРАН ИГР ===== -->
+<!-- ===== ИГРЫ ===== -->
 <div class="screen" id="games">
     <div class="games-header">Игры</div>
 
     <ul class="games-list">
-        <li class="game-item">
-            Змейка
+        <li class="game-item" onclick="openGame('https://lambda1224.github.io/dashdash')">
+            Geometry Dash
             <i class="fas fa-chevron-right game-arrow"></i>
         </li>
-        <li class="game-item">
-            Кликер
-            <i class="fas fa-chevron-right game-arrow"></i>
-        </li>
-        <li class="game-item">
-            Мини-RPG
+        <li class="game-item" onclick="openGame('https://lambda1224.github.io/paperwork')">
+            Захват Территорий 2 IO
             <i class="fas fa-chevron-right game-arrow"></i>
         </li>
     </ul>
 </div>
 
+</div>
+
 <!-- ===== TAB BAR ===== -->
 <div class="tab-bar">
     <div class="tab-items">
-        <a href="#" class="tab active" data-screen="profile">
+        <a href="#" class="tab active" data-index="0">
             <i class="fas fa-user"></i>
             <span>Обо мне</span>
         </a>
-        <a href="#" class="tab" data-screen="games">
+        <a href="#" class="tab" data-index="1">
             <i class="fas fa-gamepad"></i>
             <span>Игры</span>
         </a>
@@ -219,26 +211,44 @@ body {
 </div>
 
 <script>
-const tabs = document.querySelectorAll('.tab');
 const screens = document.querySelectorAll('.screen');
+const tabs = document.querySelectorAll('.tab');
+
+let current = 0;
+
+function switchScreen(index) {
+    current = index;
+    screens[0].style.transform = `translateX(${(0 - current) * 100}%)`;
+    screens[1].style.transform = `translateX(${(1 - current) * 100}%)`;
+
+    tabs.forEach(t => t.classList.remove('active'));
+    tabs[index].classList.add('active');
+}
 
 tabs.forEach(tab => {
-    tab.addEventListener('click', function(e) {
+    tab.addEventListener('click', e => {
         e.preventDefault();
-
-        tabs.forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-
-        const target = this.dataset.screen;
-
-        screens.forEach(screen => {
-            screen.classList.remove('active');
-            if (screen.id === target) {
-                screen.classList.add('active');
-            }
-        });
+        switchScreen(Number(tab.dataset.index));
     });
 });
+
+/* ===== SWIPE IOS ===== */
+let startX = 0;
+
+document.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+});
+
+document.addEventListener('touchend', e => {
+    let diff = e.changedTouches[0].clientX - startX;
+
+    if (diff > 50 && current > 0) switchScreen(current - 1);
+    if (diff < -50 && current < screens.length - 1) switchScreen(current + 1);
+});
+
+function openGame(url){
+    window.location.href = url;
+}
 </script>
 
 </body>
