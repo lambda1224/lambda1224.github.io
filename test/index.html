@@ -23,44 +23,20 @@
 
 body {
     background: #ffffff;
-    overflow-x: hidden;
-}
-
-/* ===== ОБЁРТКА ===== */
-
-.app {
-    position: relative;
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
     min-height: 100vh;
     padding-bottom: 90px;
-    overflow: hidden;
 }
 
 /* ===== ЭКРАНЫ ===== */
 
 .screen {
-    position: absolute;
-    width: 100%;
-    top: 0;
-    left: 0;
-    min-height: 100%;
-    background: #fff;
-    transition: transform 0.35s cubic-bezier(.25,.8,.25,1);
-}
-
-.screen.hidden-right {
-    transform: translateX(100%);
-}
-
-.screen.hidden-left {
-    transform: translateX(-100%);
+    display: none;
+    max-width: 400px;
+    margin: 0 auto;
 }
 
 .screen.active {
-    transform: translateX(0);
-    z-index: 2;
+    display: block;
 }
 
 /* ===== ПРОФИЛЬ ===== */
@@ -131,6 +107,7 @@ body {
 
 .game-item {
     padding: 16px 20px;
+    font-size: 18px;
     border-bottom: 1px solid #e5e5ea;
     display: flex;
     justify-content: space-between;
@@ -139,20 +116,6 @@ body {
 
 .game-item:active {
     background: #f2f2f7;
-}
-
-.game-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.game-title {
-    font-size: 18px;
-}
-
-.game-subtitle {
-    font-size: 13px;
-    color: #8e8e93;
 }
 
 .game-arrow {
@@ -166,7 +129,7 @@ body {
     bottom: 0;
     width: 100%;
     background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(15px);
     border-top: 1px solid rgba(0,0,0,0.1);
     padding: 8px 24px 12px;
 }
@@ -199,9 +162,7 @@ body {
 </head>
 <body>
 
-<div class="app">
-
-<!-- ПРОФИЛЬ -->
+<!-- ===== ЭКРАН ПРОФИЛЯ ===== -->
 <div class="screen active" id="profile">
     <div class="profile-card">
         <div class="profile-header">
@@ -223,47 +184,34 @@ body {
     </div>
 </div>
 
-<!-- ИГРЫ -->
-<div class="screen hidden-right" id="games">
+<!-- ===== ЭКРАН ИГР ===== -->
+<div class="screen" id="games">
     <div class="games-header">Игры</div>
 
     <ul class="games-list">
-        <li class="game-item" onclick="openGame('https://lambda1224.github.io/calc')">
-            <div class="game-info">
-                <div class="game-title">Калькулятор</div>
-                <div class="game-subtitle">lambda1224.github.io/calc</div>
-            </div>
+        <li class="game-item">
+            Змейка
             <i class="fas fa-chevron-right game-arrow"></i>
         </li>
-
-        <li class="game-item" onclick="openGame('https://lambda1224.github.io/dashdash')">
-            <div class="game-info">
-                <div class="game-title">Geometry Dash</div>
-                <div class="game-subtitle">lambda1224.github.io/dashdash</div>
-            </div>
+        <li class="game-item">
+            Кликер
             <i class="fas fa-chevron-right game-arrow"></i>
         </li>
-
-        <li class="game-item" onclick="openGame('https://lambda1224.github.io/paperwork')">
-            <div class="game-info">
-                <div class="game-title">Cube Game 2 IO</div>
-                <div class="game-subtitle">lambda1224.github.io/paperwork</div>
-            </div>
+        <li class="game-item">
+            Мини-RPG
             <i class="fas fa-chevron-right game-arrow"></i>
         </li>
     </ul>
 </div>
 
-</div>
-
-<!-- TAB BAR -->
+<!-- ===== TAB BAR ===== -->
 <div class="tab-bar">
     <div class="tab-items">
-        <a href="#" class="tab active" data-index="0">
+        <a href="#" class="tab active" data-screen="profile">
             <i class="fas fa-user"></i>
             <span>Обо мне</span>
         </a>
-        <a href="#" class="tab" data-index="1">
+        <a href="#" class="tab" data-screen="games">
             <i class="fas fa-gamepad"></i>
             <span>Игры</span>
         </a>
@@ -273,35 +221,24 @@ body {
 <script>
 const tabs = document.querySelectorAll('.tab');
 const screens = document.querySelectorAll('.screen');
-let currentIndex = 0;
 
 tabs.forEach(tab => {
     tab.addEventListener('click', function(e) {
         e.preventDefault();
-        const newIndex = Number(this.dataset.index);
-        if (newIndex === currentIndex) return;
 
         tabs.forEach(t => t.classList.remove('active'));
         this.classList.add('active');
 
-        screens[currentIndex].classList.remove('active');
+        const target = this.dataset.screen;
 
-        if (newIndex > currentIndex) {
-            screens[newIndex].classList.remove('hidden-right');
-            screens[currentIndex].classList.add('hidden-left');
-        } else {
-            screens[newIndex].classList.remove('hidden-left');
-            screens[currentIndex].classList.add('hidden-right');
-        }
-
-        screens[newIndex].classList.add('active');
-        currentIndex = newIndex;
+        screens.forEach(screen => {
+            screen.classList.remove('active');
+            if (screen.id === target) {
+                screen.classList.add('active');
+            }
+        });
     });
 });
-
-function openGame(url) {
-    window.location.href = url;
-}
 </script>
 
 </body>
