@@ -1,205 +1,212 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Bio · lambda1224</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        /* Подключаем локальный шрифт SF UI Display Medium */
-        @font-face {
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bio · lambda1224</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+@font-face {
     font-family: 'SF UI Display';
     src: url('https://raw.githubusercontent.com/lambda1224/lambda1224.github.io/main/fonts/sf-ui-display-medium.ttf') format('truetype');
     font-weight: 500;
-    font-style: normal;
     font-display: swap;
-        }
+}
 
-        @font-face {
-    font-family: 'SF UI Display';
-    src: url('https://raw.githubusercontent.com/lambda1224/lambda1224.github.io/main/fonts/sf-ui-display-medium.ttf') format('truetype');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'SF UI Display', -apple-system, sans-serif;
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            font-family: 'SF UI Display', -apple-system, 'Helvetica Neue', 'Segoe UI', Roboto, sans-serif;
-        }
+body {
+    background: #ffffff;
+    overflow-x: hidden;
+}
 
-        body {
-            background-color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            min-height: 100vh;
-            padding: 0 0 80px 0;
-        }
+/* ===== ОБЁРТКА ===== */
 
-        .profile-card {
-            max-width: 400px;
-            width: 100%;
-            background-color: #ffffff;
-            padding: 24px 20px 20px;
-        }
+.app {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 90px;
+    overflow: hidden;
+}
 
-        .profile-header {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
+/* ===== ЭКРАНЫ ===== */
 
-        .avatar {
-            flex-shrink: 0;
-        }
+.screen {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    min-height: 100%;
+    background: #fff;
+    transition: transform 0.35s cubic-bezier(.25,.8,.25,1);
+}
 
-        .avatar-image {
-            width: 86px;
-            height: 86px;
-            border-radius: 50%;
-            background: #e8e8ed;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            border: 2px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            background-image: url('fonts/user.png');
-        }
+.screen.hidden-right {
+    transform: translateX(100%);
+}
 
-        .name-block {
-            flex: 1;
-        }
+.screen.hidden-left {
+    transform: translateX(-100%);
+}
 
-        .name {
-            text-align: left;
-            font-size: 24px;
-            font-weight: 600;
-            letter-spacing: -0.3px;
-            color: #000000;
-            margin-bottom: 4px;
-            line-height: 1.2;
-            word-break: break-word;
-        }
+.screen.active {
+    transform: translateX(0);
+    z-index: 2;
+}
 
-        .nickname {
-            text-align: left;
-            font-size: 15px;
-            font-weight: 500;
-            color: #8e8e93;
-            margin-bottom: 0;
-        }
+/* ===== ПРОФИЛЬ ===== */
 
-        .bio-text {
-            text-align: left;
-            font-size: 16px;
-            line-height: 1.5;
-            color: #000000;
-            background: transparent;
-            padding: 0 0 20px 0;
-            margin-bottom: 0;
-            border-bottom: 1px solid #c6c6c8;
-            font-weight: 500;
-        }
+.profile-card {
+    padding: 24px 20px;
+}
 
-        .links-grid {
-            display: flex;
-            gap: 24px;
-            justify-content: flex-start;
-            padding: 20px 0 8px;
-            flex-wrap: wrap;
-        }
+.profile-header {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
 
-        .link-item {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #007aff;
-            font-size: 24px;
-            text-decoration: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,122,255,0.2);
-            transition: all 0.1s ease;
-            border: 1px solid rgba(0,122,255,0.15);
-        }
+.avatar-image {
+    width: 86px;
+    height: 86px;
+    border-radius: 50%;
+    background: #e8e8ed url('fonts/user.png') center/cover no-repeat;
+}
 
-        .tab-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: rgba(255,255,255,0.94);
-            backdrop-filter: blur(15px);
-            border-top: 1px solid rgba(0,0,0,0.1);
-            padding: 8px 24px 12px;
-            z-index: 100;
-        }
+.name {
+    font-size: 24px;
+    font-weight: 600;
+}
 
-        .tab-items {
-            max-width: 300px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            gap: 30px;
-        }
+.nickname {
+    font-size: 15px;
+    color: #8e8e93;
+}
 
-        .tab {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: #8a8a8e;
-            font-size: 14px;
-            padding: 6px 0 2px;
-            flex: 1;
-            transition: color 0.1s;
-            border-radius: 8px;
-            font-weight: 500;
-        }
+.bio-text {
+    font-size: 16px;
+    margin: 20px 0;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #c6c6c8;
+}
 
-        .tab.active {
-            color: #007aff;
-        }
+.links-grid {
+    display: flex;
+    gap: 20px;
+}
 
-        .tab i {
-            font-size: 26px;
-            margin-bottom: 4px;
-        }
+.link-item {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #007aff;
+    font-size: 22px;
+    text-decoration: none;
+    box-shadow: 0 0 0 1px rgba(0,122,255,0.2);
+}
 
-        .tab span {
-            font-size: 12px;
-            font-weight: 500;
-            letter-spacing: -0.1px;
-        }
+/* ===== ЭКРАН ИГР ===== */
 
-        @media (max-width: 380px) {
-            .profile-card { padding: 20px 16px; }
-            .avatar-image { width: 78px; height: 78px; }
-            .name { font-size: 22px; }
-            .nickname { font-size: 14px; }
-            .links-grid { gap: 16px; }
-            .tab-items { gap: 20px; }
-        }
-    </style>
+.games-header {
+    padding: 20px;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.games-list {
+    list-style: none;
+}
+
+.game-item {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e5ea;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.game-item:active {
+    background: #f2f2f7;
+}
+
+.game-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.game-title {
+    font-size: 18px;
+}
+
+.game-subtitle {
+    font-size: 13px;
+    color: #8e8e93;
+}
+
+.game-arrow {
+    color: #c7c7cc;
+}
+
+/* ===== TAB BAR ===== */
+
+.tab-bar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0,0,0,0.1);
+    padding: 8px 24px 12px;
+}
+
+.tab-items {
+    max-width: 300px;
+    margin: auto;
+    display: flex;
+    justify-content: space-around;
+}
+
+.tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #8a8a8e;
+    font-size: 12px;
+}
+
+.tab i {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.tab.active {
+    color: #007aff;
+}
+</style>
 </head>
 <body>
+
+<div class="app">
+
+<!-- ПРОФИЛЬ -->
+<div class="screen active" id="profile">
     <div class="profile-card">
         <div class="profile-header">
-            <div class="avatar">
-                <div class="avatar-image" role="img" aria-label="User avatar"></div>
-            </div>
-            
-            <div class="name-block">
+            <div class="avatar-image"></div>
+            <div>
                 <div class="name">lambda1224</div>
                 <div class="nickname">@lambda1224</div>
             </div>
@@ -210,35 +217,92 @@
         </div>
 
         <div class="links-grid">
-            <a href="#" class="link-item" aria-label="GitHub"><i class="fab fa-github"></i></a>
-            <a href="#" class="link-item" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+            <a href="#" class="link-item"><i class="fab fa-github"></i></a>
+            <a href="#" class="link-item"><i class="fab fa-telegram"></i></a>
         </div>
     </div>
+</div>
 
-    <div class="tab-bar">
-        <div class="tab-items">
-            <a href="#" class="tab active">
-                <i class="fas fa-user"></i>
-                <span>Обо мне</span>
-            </a>
-            <a href="#" class="tab">
-                <i class="fas fa-gamepad"></i>
-                <span>Игры</span>
-            </a>
-        </div>
+<!-- ИГРЫ -->
+<div class="screen hidden-right" id="games">
+    <div class="games-header">Игры</div>
+
+    <ul class="games-list">
+        <li class="game-item" onclick="openGame('https://lambda1224.github.io/calc')">
+            <div class="game-info">
+                <div class="game-title">Калькулятор</div>
+                <div class="game-subtitle">lambda1224.github.io/calc</div>
+            </div>
+            <i class="fas fa-chevron-right game-arrow"></i>
+        </li>
+
+        <li class="game-item" onclick="openGame('https://lambda1224.github.io/dashdash')">
+            <div class="game-info">
+                <div class="game-title">Geometry Dash</div>
+                <div class="game-subtitle">lambda1224.github.io/dashdash</div>
+            </div>
+            <i class="fas fa-chevron-right game-arrow"></i>
+        </li>
+
+        <li class="game-item" onclick="openGame('https://lambda1224.github.io/paperwork')">
+            <div class="game-info">
+                <div class="game-title">Cube Game 2 IO</div>
+                <div class="game-subtitle">lambda1224.github.io/paperwork</div>
+            </div>
+            <i class="fas fa-chevron-right game-arrow"></i>
+        </li>
+    </ul>
+</div>
+
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+    <div class="tab-items">
+        <a href="#" class="tab active" data-index="0">
+            <i class="fas fa-user"></i>
+            <span>Обо мне</span>
+        </a>
+        <a href="#" class="tab" data-index="1">
+            <i class="fas fa-gamepad"></i>
+            <span>Игры</span>
+        </a>
     </div>
+</div>
 
-    <script>
-        (function() {
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-        })();
-    </script>
+<script>
+const tabs = document.querySelectorAll('.tab');
+const screens = document.querySelectorAll('.screen');
+let currentIndex = 0;
+
+tabs.forEach(tab => {
+    tab.addEventListener('click', function(e) {
+        e.preventDefault();
+        const newIndex = Number(this.dataset.index);
+        if (newIndex === currentIndex) return;
+
+        tabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+
+        screens[currentIndex].classList.remove('active');
+
+        if (newIndex > currentIndex) {
+            screens[newIndex].classList.remove('hidden-right');
+            screens[currentIndex].classList.add('hidden-left');
+        } else {
+            screens[newIndex].classList.remove('hidden-left');
+            screens[currentIndex].classList.add('hidden-right');
+        }
+
+        screens[newIndex].classList.add('active');
+        currentIndex = newIndex;
+    });
+});
+
+function openGame(url) {
+    window.location.href = url;
+}
+</script>
+
 </body>
 </html>
