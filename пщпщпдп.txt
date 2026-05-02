@@ -1,0 +1,55 @@
+Основные дистро
+
+1. Ubuntu
+2. Debian
+3. Fedora
+4. Arch Linux
+5. openSUSE
+6. Gentoo
+7. Slackware
+
+Для новичков и домашних ПК
+
+8. Linux Mint
+9. Zorin OS
+10. Pop! OS
+11. Elementary OS
+12. Deepin
+13. Manjaro
+14. KDE neon
+15. Solus
+16. MX Linux
+
+GAYмерские
+17. Bazzite
+18. Nobara
+19. ChimeraOS
+20. Garuda Linux
+21. Lakka
+22. Artix Linux
+
+Продвинутые и необычные 
+23. NixOS
+24. Void
+25. Alpine
+26. VanillaOS
+27. CachyOS
+28. EndavourOS
+29. Arco Linux
+
+Старое железо
+30. Lubuntu
+31. Xubuntu
+32. Puppy Linux
+33. antiX
+34. Bodhi Linux
+35. Tiny Core Linux
+36. Linux Lite
+
+Русские дистро💀💀💀
+37. Astra Linux
+38. Alt Linux
+39. ROSA Linux
+40. РЕДОС
+
+БОНУС 41. шрек линукс
