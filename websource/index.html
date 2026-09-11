@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Source Movement Engine — Three.js Bhop Demo</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    font-family: "Consolas", "Courier New", monospace;
+    cursor: default;
+  }
+
+  canvas {
+    display: block;
+  }
+
+  /* Прицел по центру экрана */
+  #crosshair {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 18px;
+    height: 18px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 20;
+  }
+  #crosshair::before, #crosshair::after {
+    content: "";
+    position: absolute;
+    background: #39ff14;
+    box-shadow: 0 0 2px #000;
+  }
+  #crosshair::before { left: 8px; top: 0; width: 2px; height: 18px; }
+  #crosshair::after  { top: 8px; left: 0; height: 2px; width: 18px; }
+
+  /* HUD со скоростью и состоянием */
+  #hud {
+    position: fixed;
+    left: 12px;
+    bottom: 12px;
+    color: #d6d6d6;
+    font-size: 13px;
+    line-height: 1.5;
+    background: rgba(20,20,20,0.45);
+    padding: 8px 12px;
+    border: 1px solid #444;
+    z-index: 20;
+    pointer-events: none;
+    white-space: pre;
+  }
+
+  /* Панель выбора оружия внизу справа */
+  #weaponBar {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    color: #d6d6d6;
+    font-size: 13px;
+    line-height: 1.6;
+    background: rgba(20,20,20,0.45);
+    padding: 8px 12px;
+    border: 1px solid #444;
+    z-index: 20;
+    pointer-events: none;
+  }
+  #weaponBar .active { color: #ffd24d; font-weight: bold; }
+
+  /* Экран блокировки указателя ("нажмите чтобы играть") */
+  #blocker {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    color: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 30;
+    text-align: center;
+    font-size: 18px;
+  }
+  #blocker span { color: #ffb000; font-weight: bold; }
+  #blocker p { max-width: 560px; font-size: 13px; color: #aaa; line-height: 1.6; }
+
+  /* Оверлей консоли разработчика в стиле Valve */
+  #console {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 42%;
+    background: rgba(30,30,30,0.85);
+    border-bottom: 2px solid #666;
+    z-index: 50;
+    display: none;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+  #consoleLog {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 10px;
+    color: #c8c8c8;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  #consoleLog .cmdline { color: #ffffff; }
+  #consoleLog .info { color: #7fd0ff; }
+  #consoleLog .warn { color: #ff9a4d; }
+  #consoleLog .err  { color: #ff5c5c; }
+  #consoleInputWrap {
+    display: flex;
+    border-top: 1px solid #555;
+    background: rgba(15,15,15,0.9);
+  }
+  #consoleInputWrap span {
+    color: #888;
+    padding: 6px 4px 6px 8px;
+  }
+  #consoleInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 6px 8px 6px 0;
+  }
+</style>
+</head>
+<body>
+
+<div id="crosshair"></div>
+
+<div id="hud"></div>
+<div id="weaponBar"></div>
+
+<div id="blocker">
+  <div><span>Source Movement Engine</span></div>
+  <p>
+    Нажмите, чтобы захватить курсор и начать движение.<br/>
+    WASD — движение, ПРОБЕЛ — прыжок, ЛКМ — атака/выстрел.<br/>
+    1 / 2 или колесо мыши — смена оружия (монтировка / автомат).<br/>
+    Клавиша ~ (или Ё) — открыть/закрыть консоль разработчика.
+  </p>
+</div>
+
+<div id="console">
+  <div id="consoleLog"></div>
+  <div id="consoleInputWrap">
+    <span>]</span>
+    <input id="consoleInput" type="text" autocomplete="off" spellcheck="false" />
+  </div>
+</div>
+
+<!-- Основной движок Three.js (не-модульная сборка r128) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- GLTFLoader (не-модульная UMD-версия из examples/js, совместимая с глобальным THREE r128) -->
+<script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+"use strict";
+
+/* =========================================================================
+   1. БАЗОВАЯ НАСТРОЙКА СЦЕНЫ, КАМЕРЫ И РЕНДЕРЕРА
+   ========================================================================= */
+
+const scene = new THREE.Scene();
+// ВАЖНО: scene.background НЕ используется как THREE.Color — если задать его Color-ом,
+// Three.js будет ПРИНУДИТЕЛЬНО очищать color+depth+stencil буферы при КАЖДОМ вызове
+// renderer.render(), даже если renderer.autoClear = false. Именно это ломало наш
+// двухпроходный рендер: второй проход (viewmodel) стирал уже нарисованный мир,
+// и на экране оставался только сплошной "небесный" цвет + чёрный силуэт оружия сверху.
+// Решение: scene.background = null, а сам цвет неба задаём через renderer.setClearColor —
+// это красится в фон ТОЛЬКО при нашей явной ручной очистке в animate(), а не при каждом render().
+scene.background = null;
+scene.fog = new THREE.Fog(0x9fb8d9, 400, 4000);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = false;
+renderer.autoClear = false; // управляем очисткой буферов вручную (два прохода рендера)
+renderer.setClearColor(0x9fb8d9, 1); // цвет неба — красится при ручном renderer.clear()
+document.body.appendChild(renderer.domElement);
+
+// Основная камера мира. near=0.1 — вполне достаточно (мир и коллайдеры измеряются
+// десятками/сотнями юнитов), и НЕ нужно делать его экстремально маленьким, как раньше:
+// сверхмалый near для viewmodel теперь обеспечивает отдельная viewmodelCamera ниже,
+// что также устраняет z-fighting на платформе 10000x10000 из-за слишком большого
+// соотношения far/near на основной камере.
+const camera = new THREE.PerspectiveCamera(
+  90, window.innerWidth / window.innerHeight, 0.1, 20000
+);
+
+// Отдельная камера для рендера viewmodel (Depth Layer / двойной рендер).
+// Поэтому viewmodel рендерится ОТДЕЛЬНЫМ проходом со своей камерой с крошечным near
+// (0.001) и маленьким far (10) — модель оружия физически не может попасть за
+// ближнюю плоскость отсечения при разумных значениях viewmodel_z, и её геометрия
+// никогда не может провалиться в мир, так как это два независимых прохода рендера.
+// Слой 1 используется, чтобы основная камера НЕ рисовала viewmodel, а viewmodel-камера
+// рисовала ТОЛЬКО его (см. animate()).
+const VIEWMODEL_LAYER = 1;
+const viewmodelCamera = new THREE.PerspectiveCamera(
+  90, window.innerWidth / window.innerHeight, 0.001, 10
+);
+viewmodelCamera.layers.disable(0);
+viewmodelCamera.layers.enable(VIEWMODEL_LAYER);
+camera.layers.disable(VIEWMODEL_LAYER); // основная камера viewmodel не видит
+
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  viewmodelCamera.aspect = window.innerWidth / window.innerHeight;
+  viewmodelCamera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Освещение.
+// КРИТИЧЕСКИЙ ФИКС #2: в Three.js источники света ТОЖЕ фильтруются по camera.layers
+// (как и меши) — если свет находится на слое 0, а рендерящая камера видит только слой 1
+// (как наша viewmodelCamera), этот свет вообще не учитывается при расчёте освещения для
+// этого прохода, и материалы (MeshStandardMaterial) остаются полностью чёрными.
+// Поэтому ВСЕ источники общего освещения сцены явно включены на ВСЕХ слоях (enableAll),
+// чтобы одинаково работать и в основном проходе (мир), и в проходе viewmodel.
+const ambient = new THREE.AmbientLight(0xffffff, 0.55); // базовая заливка, чтобы материалы не были чёрными
+ambient.layers.enableAll();
+scene.add(ambient);
+
+const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.1);
+hemi.layers.enableAll();
+scene.add(hemi);
+
+const sun = new THREE.DirectionalLight(0xffffff, 0.9);
+sun.position.set(300, 500, 200);
+sun.layers.enableAll();
+scene.add(sun);
+
+
+/* =========================================================================
+   2. ГЕНЕРАЦИЯ DEV-ТЕКСТУРЫ (Developer texture style) ЧЕРЕЗ CANVAS
+   ========================================================================= */
+
+function makeDevTexture(hue = "#4d4d4d", accent = "#ff7a00") {
+  const size = 256;
+  const c = document.createElement("canvas");
+  c.width = size;
+  c.height = size;
+  const ctx = c.getContext("2d");
+
+  // Базовый серый фон в шахматную клетку
+  const cell = 32;
+  for (let y = 0; y < size; y += cell) {
+    for (let x = 0; x < size; x += cell) {
+      const even = ((x / cell) + (y / cell)) % 2 === 0;
+      ctx.fillStyle = even ? "#5a5a5a" : "#4a4a4a";
+      ctx.fillRect(x, y, cell, cell);
+    }
+  }
+
+  // Диагональная предупредительная окантовка (оранжево-чёрная), как на dev-текстурах Source
+  const stripe = 10;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, size, stripe);
+  ctx.rect(0, size - stripe, size, stripe);
+  ctx.rect(0, 0, stripe, size);
+  ctx.rect(size - stripe, 0, stripe, size);
+  ctx.clip();
+  for (let i = -size; i < size * 2; i += stripe) {
+    ctx.fillStyle = ((i / stripe) % 2 === 0) ? accent : "#111111";
+    ctx.beginPath();
+    ctx.moveTo(i, 0);
+    ctx.lineTo(i + size, size);
+    ctx.lineTo(i + size + stripe, size);
+    ctx.lineTo(i + stripe, 0);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+
+  // Текст с "размером юнита" по центру, как на измерительных dev-текстурах
+  ctx.fillStyle = "#e0e0e0";
+  ctx.font = "bold 22px monospace";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("64", size / 2, size / 2);
+  ctx.strokeStyle = "#2a2a2a";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(stripe, stripe, size - stripe * 2, size - stripe * 2);
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.magFilter = THREE.NearestFilter;
+  tex.minFilter = THREE.LinearMipMapLinearFilter;
+  return tex;
+}
+
+const groundTex = makeDevTexture("#4d4d4d", "#ff7a00");
+const boxTex = makeDevTexture("#4d4d4d", "#3aa0ff");
+
+
+/* =========================================================================
+   3. ГЕОМЕТРИЯ УРОВНЯ: ПЛАТФОРМА 10000x10000 + БЛОКИ ДЛЯ БХОПА / СТУПЕНЕЙ
+   ========================================================================= */
+
+const WORLD_SIZE = 10000;
+
+// Основная плоская платформа с полным коллайдером (проверка коллизии — по Y=0)
+groundTex.repeat.set(WORLD_SIZE / 64, WORLD_SIZE / 64);
+const groundGeo = new THREE.PlaneGeometry(WORLD_SIZE, WORLD_SIZE);
+groundGeo.rotateX(-Math.PI / 2);
+const groundMat = new THREE.MeshStandardMaterial({ map: groundTex, roughness: 1 });
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.position.set(0, 0, 0);
+scene.add(ground);
+
+// Список коллайдеров-параллелепипедов (для блоков/платформ для бхопа)
+// Каждый элемент: { mesh, box: THREE.Box3, height }
+const worldColliders = [];
+
+function addBoxCollider(w, h, d, x, y, z, tex = boxTex, repeat = 1) {
+  const geo = new THREE.BoxGeometry(w, h, d);
+  const t = tex.clone();
+  t.needsUpdate = true;
+  t.repeat.set(Math.max(1, w / 64) * repeat, Math.max(1, h / 64) * repeat);
+  const mat = new THREE.MeshStandardMaterial({ map: t, roughness: 1 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(x, y + h / 2, z);
+  scene.add(mesh);
+  const box = new THREE.Box3().setFromObject(mesh);
+  worldColliders.push({ mesh, box, height: h });
+  return mesh;
+}
+
+// Низкие "ступеньки" (высота <= 18 юнитов) — должны преодолеваться авто-степом без прыжка
+addBoxCollider(140, 8, 140, -200, 0, -150);
+addBoxCollider(140, 16, 140, -200, 0, 20);
+
+// Высокие препятствия (32/64/96/160 юнитов) — НЕ должны преодолеваться степом,
+// на них нужно запрыгивать или их нужно обходить
+addBoxCollider(256, 32, 256, 400, 0, 0);
+addBoxCollider(256, 64, 256, 800, 0, 150);
+addBoxCollider(256, 96, 256, 1200, 0, 350);
+addBoxCollider(160, 160, 160, -500, 0, 300);
+addBoxCollider(160, 48, 800, -900, 0, -300);
+addBoxCollider(120, 24, 120, 200, 0, -450);
+addBoxCollider(120, 24, 120, 500, 0, -650);
+addBoxCollider(120, 24, 120, 850, 0, -850);
+
+
+/* =========================================================================
+   4. КОНФИГУРАЦИЯ ФИЗИКИ ДВИЖЕНИЯ SOURCE (изменяемые через консоль cvars)
+   ========================================================================= */
+
+const CFG = {
+  sv_gravity: 800,
+  sv_friction: 5.2,
+  sv_accelerate: 10,
+  sv_airaccelerate: 10,      // становится 100 при cl_autobhop 1 (по ТЗ)
+  sv_airaccelerate_base: 10,
+  sv_airaccelerate_bhop: 100,
+  sv_stopspeed: 100,
+  sv_maxspeed: 320,
+  sv_cheats: 0,
+  cl_autobhop: 0,
+  sv_stepsize: 18,           // максимальная высота автоматического "степа" (как в Source, ~18u)
+  viewmodel_x: 0,            // ручная подстройка позиции текущего viewmodel по X (калибровка GLB)
+  viewmodel_y: 0,            // ручная подстройка позиции текущего viewmodel по Y
+  viewmodel_z: 0,            // ручная подстройка позиции текущего viewmodel по Z
+  viewmodel_rot_x: 0,        // доп. поворот viewmodel по X, в ГРАДУСАХ
+  viewmodel_rot_y: 0,        // доп. поворот viewmodel по Y, в ГРАДУСАХ
+  viewmodel_rot_z: 0,        // доп. поворот viewmodel по Z, в ГРАДУСАХ
+};
+
+const TICKRATE = 66.67;
+const FIXED_DT = 1 / TICKRATE; // ~0.014999 сек на тик — фиксированный шаг физики Source
+
+// Высота прыжка Source (~45 юнитов), скорость прыжка выводится из v = sqrt(2 * g * h)
+function jumpSpeed() {
+  return Math.sqrt(2 * CFG.sv_gravity * 45);
+}
+
+// Буфер прыжка (в тиках): если игрок нажал прыжок незадолго до приземления,
+// прыжок всё равно сработает в первый тик касания земли (важно для бхопа)
+const JUMP_BUFFER_TICKS = 3;
+
+
+/* =========================================================================
+   5. ИГРОК: СОСТОЯНИЕ, ВВОД, PointerLock, МЫШЬ
+   ========================================================================= */
+
+const player = {
+  position: new THREE.Vector3(0, 0, 500),  // позиция НОГ игрока
+  velocity: new THREE.Vector3(0, 0, 0),
+  radius: 16,
+  height: 72,
+  eyeHeight: 64,
+  onGround: false,
+  yaw: 0,
+  pitch: 0,
+  jumpQueuedTicks: -999, // сколько тиков назад был нажат прыжок (для буфера)
+  noclip: false,
+  god: false,
+  stuck: false, // застревание в геометрии при выключении noclip внутри блока (см. Source)
+};
+
+// Свободная камера-наблюдатель (freecam): полностью отделена от тела игрока —
+// физика игрока (в т.ч. sv_gravity/friction/accelerate) продолжает считаться как обычно,
+// но камера и мышь временно управляют независимой точкой обзора. Удобно для отладки/
+// калибровки viewmodel (можно отлететь и посмотреть на модель оружия со стороны).
+const freecamState = {
+  active: false,
+  position: new THREE.Vector3(),
+  yaw: 0,
+  pitch: 0,
+};
+
+camera.position.set(player.position.x, player.position.y + player.eyeHeight, player.position.z);
+
+const keys = {
+  KeyW: false, KeyA: false, KeyS: false, KeyD: false,
+  Space: false, ControlLeft: false, ShiftLeft: false,
+};
+
+let pointerLocked = false;
+let consoleOpen = false;
+
+const blocker = document.getElementById("blocker");
+const crosshair = document.getElementById("crosshair");
+
+blocker.addEventListener("click", () => {
+  if (!consoleOpen) renderer.domElement.requestPointerLock();
+});
+
+document.addEventListener("pointerlockchange", () => {
+  pointerLocked = document.pointerLockElement === renderer.domElement;
+  blocker.style.display = pointerLocked ? "none" : "flex";
+  crosshair.style.display = pointerLocked ? "block" : "none";
+});
+
+// Чувствительность мыши
+const MOUSE_SENS = 0.0022;
+let mouseDX = 0, mouseDY = 0; // накопленное смещение мыши за тик (для покачивания оружия)
+
+document.addEventListener("mousemove", (e) => {
+  if (!pointerLocked || consoleOpen) return;
+
+  const limit = Math.PI / 2 - 0.01;
+
+  if (freecamState.active) {
+    freecamState.yaw -= e.movementX * MOUSE_SENS;
+    freecamState.pitch -= e.movementY * MOUSE_SENS;
+    freecamState.pitch = Math.max(-limit, Math.min(limit, freecamState.pitch));
+    return; // во freecam-режиме игрок не поворачивается, viewmodel не свэится
+  }
+
+  player.yaw -= e.movementX * MOUSE_SENS;
+  player.pitch -= e.movementY * MOUSE_SENS;
+  player.pitch = Math.max(-limit, Math.min(limit, player.pitch));
+  mouseDX += e.movementX;
+  mouseDY += e.movementY;
+});
+
+document.addEventListener("keydown", (e) => {
+  handleConsoleToggle(e);
+  if (consoleOpen) return; // пока открыта консоль — игровой ввод не обрабатываем
+  if (e.code in keys) keys[e.code] = true;
+
+  // Смена оружия по цифрам 1 / 2
+  if (e.code === "Digit1") selectWeapon(0);
+  if (e.code === "Digit2") selectWeapon(1);
+});
+document.addEventListener("keyup", (e) => {
+  if (e.code in keys) keys[e.code] = false;
+});
+
+document.addEventListener("wheel", (e) => {
+  if (!pointerLocked || consoleOpen) return;
+  if (e.deltaY > 0) selectWeapon((currentWeaponIndex + 1) % WEAPONS.length);
+  else if (e.deltaY < 0) selectWeapon((currentWeaponIndex - 1 + WEAPONS.length) % WEAPONS.length);
+});
+
+let mouseHeld = false;
+document.addEventListener("mousedown", (e) => {
+  if (e.button === 0 && pointerLocked && !consoleOpen) {
+    mouseHeld = true;
+    triggerAttack();
+  }
+});
+document.addEventListener("mouseup", (e) => {
+  if (e.button === 0) mouseHeld = false;
+});
+
+
+/* =========================================================================
+   6. ФИЗИЧЕСКОЕ ЯДРО SOURCE/QUAKE-СТИЛЯ (написано с нуля, без сторонних либ)
+   ========================================================================= */
+
+// PM_Friction — трение применяется ТОЛЬКО на земле. В воздухе трение отсутствует полностью.
+function PM_Friction(dt) {
+  if (!player.onGround) return;
+
+  const vel = player.velocity;
+  const speed = Math.hypot(vel.x, vel.z);
+  if (speed < 0.1) {
+    vel.x = 0;
+    vel.z = 0;
+    return;
+  }
+
+  const control = speed < CFG.sv_stopspeed ? CFG.sv_stopspeed : speed;
+  const drop = control * CFG.sv_friction * dt;
+
+  let newspeed = speed - drop;
+  if (newspeed < 0) newspeed = 0;
+  newspeed /= speed;
+
+  vel.x *= newspeed;
+  vel.z *= newspeed;
+}
+
+// PM_Accelerate — классическое ускорение на земле (жёсткая проекция скорости на wishdir)
+function PM_Accelerate(wishdir, wishspeed, accel, dt) {
+  const vel = player.velocity;
+  const currentspeed = vel.x * wishdir.x + vel.z * wishdir.z;
+  const addspeed = wishspeed - currentspeed;
+  if (addspeed <= 0) return;
+
+  let accelspeed = accel * wishspeed * dt;
+  if (accelspeed > addspeed) accelspeed = addspeed;
+
+  vel.x += accelspeed * wishdir.x;
+  vel.z += accelspeed * wishdir.z;
+}
+
+// PM_AirAccelerate — воздушное ускорение с ограничением wishspeed до 30 юнитов при расчёте
+// addspeed. Именно это ограничение позволяет накапливать скорость при стрейфе мышью
+// (air-strafe), потому что реальная прибавка accelspeed считается от НЕ ограниченного
+// wishspeed, а предел применяется только к проверке "сколько ещё можно добавить".
+function PM_AirAccelerate(wishdir, wishspeed, accel, dt) {
+  const vel = player.velocity;
+  const wishspd = Math.min(wishspeed, 30);
+  const currentspeed = vel.x * wishdir.x + vel.z * wishdir.z;
+  const addspeed = wishspd - currentspeed;
+  if (addspeed <= 0) return;
+
+  let accelspeed = accel * wishspeed * dt;
+  if (accelspeed > addspeed) accelspeed = addspeed;
+
+  vel.x += accelspeed * wishdir.x;
+  vel.z += accelspeed * wishdir.z;
+}
+
+// Вычисление wishdir/wishspeed на основе ввода и текущего угла обзора (yaw).
+//
+// ИСПРАВЛЕНИЕ ИНВЕРСИИ A/D: направление "вправо" получается как cross(forward, up),
+// что при forward = (-sin(yaw), 0, -cos(yaw)) даёт right = (cos(yaw), 0, -sin(yaw)).
+// Раньше вектор считался через forward, повёрнутый на +90°, и затем ОШИБОЧНО
+// инвертировался (.negate()), из-за чего D двигал влево, а A — вправо.
+const _forward = new THREE.Vector3();
+const _right = new THREE.Vector3();
+const _wishdir = new THREE.Vector3();
+
+function computeWishDir() {
+  // Во freecam-режиме клавиши движения управляют свободной камерой (см. freecamTick),
+  // поэтому тело игрока не должно получать ввод — иначе оно продолжало бы бежать
+  // "вслепую" в последнем выбранном направлении.
+  if (freecamState.active) {
+    _wishdir.set(0, 0, 0);
+    return { wishdir: _wishdir, wishspeed: CFG.sv_maxspeed, hasInput: false };
+  }
+
+  _forward.set(Math.sin(player.yaw), 0, Math.cos(player.yaw)).negate();
+  // Правильный вектор "вправо" относительно направления взгляда (без лишней инверсии)
+  _right.set(Math.cos(player.yaw), 0, -Math.sin(player.yaw));
+
+  let fMove = 0, sMove = 0;
+  if (keys.KeyW) fMove += 1;
+  if (keys.KeyS) fMove -= 1;
+  if (keys.KeyD) sMove += 1;   // D — вправо (+right)
+  if (keys.KeyA) sMove -= 1;   // A — влево (-right)
+
+  _wishdir.set(0, 0, 0);
+  _wishdir.addScaledVector(_forward, fMove);
+  _wishdir.addScaledVector(_right, sMove);
+
+  const len = _wishdir.length();
+  if (len > 0.0001) _wishdir.divideScalar(len);
+
+  return { wishdir: _wishdir, wishspeed: CFG.sv_maxspeed, hasInput: len > 0.0001 };
+}
+
+// Один тик физики с фиксированным dt = 1/66.67
+function physicsTick(dt) {
+  if (player.noclip) {
+    noclipTick(dt);
+    return;
+  }
+
+  // Игрок "застрял" в геометрии (см. логику выхода из noclip ниже) — поведение 1-в-1
+  // как в Source: полностью замораживаем движение, пока не включат noclip снова
+  // или не выполнят команду "kill". Смотреть по сторонам (мышью) при этом можно.
+  if (player.stuck) {
+    player.velocity.set(0, 0, 0);
+    return;
+  }
+
+  player.jumpQueuedTicks++;
+
+  if (keys.Space) {
+    player.jumpQueuedTicks = 0; // прыжок нажат в этом тике — сбрасываем буфер
+  }
+
+  const { wishdir, wishspeed } = computeWishDir();
+
+  if (player.onGround) {
+    PM_Friction(dt);
+    PM_Accelerate(wishdir, wishspeed, CFG.sv_accelerate, dt);
+
+    // Прыжок: срабатывает если прыжок был нажат в течение буфера тиков
+    // (Jump Buffer / Auto-Bhop) — сохраняет скорость от предыдущей распрыжки
+    const canAutoJump = CFG.cl_autobhop === 1 && keys.Space;
+    if (player.jumpQueuedTicks <= JUMP_BUFFER_TICKS || canAutoJump) {
+      player.velocity.y = jumpSpeed();
+      player.onGround = false;
+      player.jumpQueuedTicks = 999; // потребляем буфер, чтобы не спамить прыжками
+    } else {
+      player.velocity.y = 0;
+    }
+  } else {
+    const airAccel = CFG.cl_autobhop === 1
+      ? CFG.sv_airaccelerate_bhop
+      : CFG.sv_airaccelerate_base;
+    PM_AirAccelerate(wishdir, wishspeed, airAccel, dt);
+    player.velocity.y -= CFG.sv_gravity * dt;
+  }
+
+  // Запоминаем позицию по Y ДО интеграции — нужно, чтобы отличить
+  // "приземление сверху на препятствие" от "упора сбоку в стену" при разрешении коллизий.
+  const prevY = player.position.y;
+
+  // Интеграция позиции
+  player.position.x += player.velocity.x * dt;
+  player.position.y += player.velocity.y * dt;
+  player.position.z += player.velocity.z * dt;
+
+  resolveCollisions(prevY);
+}
+
+// Полёт без коллизий (noclip) — свободное перемещение по направлению камеры
+function noclipTick(dt) {
+  const speed = CFG.sv_maxspeed * 2.5;
+  const dir = new THREE.Vector3();
+  camera.getWorldDirection(dir);
+  const right = new THREE.Vector3().crossVectors(dir, camera.up).normalize();
+
+  const move = new THREE.Vector3();
+  if (keys.KeyW) move.addScaledVector(dir, 1);
+  if (keys.KeyS) move.addScaledVector(dir, -1);
+  if (keys.KeyD) move.addScaledVector(right, 1);
+  if (keys.KeyA) move.addScaledVector(right, -1);
+  if (keys.Space) move.y += 1;
+  if (keys.ControlLeft) move.y -= 1;
+
+  if (move.lengthSq() > 0) move.normalize().multiplyScalar(speed * dt);
+  player.position.add(move);
+  player.velocity.set(0, 0, 0);
+}
+
+// Тик свободной камеры-наблюдателя (freecam). Использует те же клавиши, что и noclip
+// (WASD + Space/Ctrl для вертикали), но двигает freecamState, а не тело игрока —
+// физика игрока при этом продолжает считаться независимо в physicsTick().
+function freecamTick(dt) {
+  const speed = CFG.sv_maxspeed * 2.0;
+  const yaw = freecamState.yaw;
+  const pitch = freecamState.pitch;
+
+  const dir = new THREE.Vector3(
+    -Math.sin(yaw) * Math.cos(pitch),
+    Math.sin(pitch),
+    -Math.cos(yaw) * Math.cos(pitch)
+  );
+  const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
+
+  const move = new THREE.Vector3();
+  if (keys.KeyW) move.addScaledVector(dir, 1);
+  if (keys.KeyS) move.addScaledVector(dir, -1);
+  if (keys.KeyD) move.addScaledVector(right, 1);
+  if (keys.KeyA) move.addScaledVector(right, -1);
+  if (keys.Space) move.y += 1;
+  if (keys.ControlLeft) move.y -= 1;
+
+  if (move.lengthSq() > 0) move.normalize().multiplyScalar(speed * dt);
+  freecamState.position.add(move);
+}
+
+// Вспомогательная функция: текущий AABB игрока (упрощённая капсула-параллелепипед)
+function getPlayerBox() {
+  const r = player.radius;
+  return new THREE.Box3(
+    new THREE.Vector3(player.position.x - r, player.position.y, player.position.z - r),
+    new THREE.Vector3(player.position.x + r, player.position.y + player.height, player.position.z + r)
+  );
+}
+
+// Проверяет, пересекается ли текущий хитбокс игрока с твёрдой геометрией уровня —
+// используется при выключении noclip, чтобы решить, застрял игрок или нет.
+function isPlayerStuckInGeometry() {
+  if (player.position.y < 0) return true; // провалился под платформу
+  const box = getPlayerBox();
+  for (const collider of worldColliders) {
+    if (box.intersectsBox(collider.box)) return true;
+  }
+  return false;
+}
+
+// -------------------------------------------------------------------------
+// Проверка коллизий: земля (Y=0) + AABB блоков уровня, С ОГРАНИЧЕНИЕМ ВЫСОТЫ ШАГА.
+//
+// Логика (аналог PM_StepSlideMove в Source):
+//   1. Если игрок ДО этого тика находился выше верхней грани препятствия (prevY >=
+//      box.max.y) — это посадка сверху, снэпаем на поверхность независимо от глубины
+//      проникновения (иначе быстрое падение "проваливалось" бы внутрь блока).
+//   2. Иначе считаем requiredStepUp = box.max.y - player.position.y — на сколько нужно
+//      было бы поднять игрока, чтобы он оказался наверху препятствия.
+//        - Если 0 < requiredStepUp <= sv_stepsize (по умолчанию 18 юнитов) — это
+//          проходимая "ступенька": игрока плавно поднимает наверх без потери
+//          горизонтальной скорости, как и должно быть в Source-подобном движке.
+//        - Если requiredStepUp > sv_stepsize — препятствие слишком высокое: степ
+//          НЕ срабатывает, игрок просто блокируется по горизонтали (упирается в стену).
+// -------------------------------------------------------------------------
+// Допуск "приземлённости" по высоте — сглаживает мелкие неровности сетки/переходы
+// между соседними коллайдерами, не давая onGround мигать между true/false каждый тик.
+const GROUND_TOLERANCE = 3;
+
+// -------------------------------------------------------------------------
+// Проверка коллизий: земля (Y=0) + AABB блоков уровня, С ОГРАНИЧЕНИЕМ ВЫСОТЫ ШАГА
+// И СКОЛЬЖЕНИЕМ ВДОЛЬ СТЕН (PM_SlideMove).
+//
+// Логика (аналог PM_StepSlideMove в Source):
+//   1. Если игрок ДО этого тика находился выше верхней грани препятствия (prevY >=
+//      box.max.y) — это посадка сверху, снэпаем на поверхность независимо от глубины
+//      проникновения (иначе быстрое падение "проваливалось" бы внутрь блока).
+//   2. Иначе считаем requiredStepUp = box.max.y - player.position.y — на сколько нужно
+//      было бы поднять игрока, чтобы он оказался наверху препятствия.
+//        - Если 0 < requiredStepUp <= sv_stepsize (по умолчанию 18 юнитов) — это
+//          проходимая "ступенька": игрока плавно поднимает наверх без потери
+//          горизонтальной скорости, как и должно быть в Source-подобном движке.
+//        - Если requiredStepUp > sv_stepsize — препятствие слишком высокое: степ
+//          НЕ срабатывает. Вместо жёсткого выталкивания назад скорость ПРОЕЦИРУЕТСЯ
+//          на плоскость стены (PM_SlideMove): velocity -= dot(velocity, normal) * normal.
+//          Игрок плавно скользит вдоль препятствия вместо микро-телепортаций/дрожания.
+// -------------------------------------------------------------------------
+function resolveCollisions(prevY) {
+  // Коллизия с землёй платформы 10000x10000 (с допуском GROUND_TOLERANCE)
+  if (player.position.y <= GROUND_TOLERANCE) {
+    if (player.velocity.y <= 0) {
+      player.position.y = 0;
+      player.velocity.y = 0;
+      player.onGround = true;
+    } else {
+      player.onGround = false; // движемся вверх (например, только что прыгнули)
+    }
+  } else {
+    player.onGround = false;
+  }
+
+  for (const collider of worldColliders) {
+    const b = collider.box;
+
+    // Быстрая проверка пересечения по горизонтали (X/Z), без учёта Y —
+    // нужна и для степа, и для стены, поэтому считаем её независимо от вертикали.
+    const r = player.radius;
+    const horizOverlap =
+      (player.position.x + r > b.min.x) && (player.position.x - r < b.max.x) &&
+      (player.position.z + r > b.min.z) && (player.position.z - r < b.max.z);
+    if (!horizOverlap) continue;
+
+    const wasAbove = prevY >= b.max.y - GROUND_TOLERANCE;
+
+    if (wasAbove) {
+      // Случай 1: игрок падает сверху на препятствие — просто ставим его на поверхность,
+      // если сейчас он оказался ниже (или на уровне, с допуском) верхней грани блока.
+      if (player.position.y < b.max.y + GROUND_TOLERANCE && player.position.y + 0.001 > b.min.y) {
+        player.position.y = b.max.y;
+        if (player.velocity.y <= 0) {
+          player.velocity.y = 0;
+          player.onGround = true;
+        }
+      }
+      continue;
+    }
+
+    const requiredStepUp = b.max.y - player.position.y;
+
+    if (requiredStepUp > 0 && requiredStepUp <= CFG.sv_stepsize) {
+      // Случай 2: невысокая ступенька — авто-подъём БЕЗ гашения горизонтальной скорости
+      player.position.y = b.max.y;
+      if (player.velocity.y <= 0) player.velocity.y = 0;
+      player.onGround = true;
+      continue;
+    }
+
+    if (requiredStepUp <= 0) {
+      // Верх блока уже ниже или на уровне ног игрока — вертикального конфликта нет,
+      // здесь возможен только горизонтальный контакт (обрабатывается ниже) либо
+      // касание нижней грани блока головой (если блок "парит" над игроком).
+      const pTop = player.position.y + player.height;
+      if (b.min.y < pTop && b.max.y > pTop) {
+        // Удар головой о нижнюю грань блока — гасим вертикальную скорость вверх
+        player.position.y = b.min.y - player.height;
+        if (player.velocity.y > 0) player.velocity.y = 0;
+        continue;
+      }
+    }
+
+    // Случай 3: препятствие ВЫШЕ допустимой высоты степа — PM_SlideMove.
+    const box = getPlayerBox();
+    if (!box.intersectsBox(b)) continue;
+
+    const overlapX1 = b.max.x - box.min.x; // сторона -X
+    const overlapX2 = box.max.x - b.min.x; // сторона +X
+    const overlapZ1 = b.max.z - box.min.z; // сторона -Z
+    const overlapZ2 = box.max.z - b.min.z; // сторона +Z
+
+    const candidates = [
+      { axis: "x", val: overlapX1, sign: -1 },
+      { axis: "x", val: overlapX2, sign: 1 },
+      { axis: "z", val: overlapZ1, sign: -1 },
+      { axis: "z", val: overlapZ2, sign: 1 },
+    ];
+    let best = candidates[0];
+    for (const c of candidates) if (c.val < best.val) best = c;
+
+    // Нормаль стены — направлена ОТ препятствия К игроку (сторона наименьшего перекрытия)
+    const normal = best.axis === "x"
+      ? new THREE.Vector3(best.sign, 0, 0)
+      : new THREE.Vector3(0, 0, best.sign);
+
+    // PM_SlideMove: убираем из скорости только компоненту, направленную В стену,
+    // касательная (вдоль стены) составляющая скорости сохраняется — игрок скользит,
+    // а не останавливается мёртво и не дёргается при повторном "вжимании" в стену.
+    const vDotN = player.velocity.x * normal.x + player.velocity.z * normal.z;
+    if (vDotN < 0) {
+      player.velocity.x -= vDotN * normal.x;
+      player.velocity.z -= vDotN * normal.z;
+    }
+
+    // Минимальная позиционная коррекция, чтобы не "тонуть" в геометрии между тиками
+    // (сама по себе она мала — максимум равна перемещению за один тик — поэтому не даёт
+    // заметных микро-телепортаций; резкость раньше создавало именно обнуление скорости).
+    if (best.axis === "x") {
+      player.position.x += best.sign * best.val;
+    } else {
+      player.position.z += best.sign * best.val;
+    }
+  }
+}
+
+
+/* =========================================================================
+   7. ОРУЖИЕ / VIEWMODEL: РАСКАЧКА, СТРЕЙФ-СВЭЙ, ОТДАЧА, ВЫСТРЕЛЫ, МОНТИРОВКА
+   ========================================================================= */
+
+const viewmodelRoot = new THREE.Group();
+viewmodelCamera.add(viewmodelRoot); // viewmodel рендерится отдельным проходом (см. Depth Layer выше)
+scene.add(camera);
+scene.add(viewmodelCamera);
+
+// Рекурсивно переключает МЕШИ объекта на слой VIEWMODEL_LAYER, чтобы основная камера
+// их не рисовала, а viewmodel-камера — рисовала. Источники света (PointLight и т.п.)
+// намеренно НЕ трогаем — enableAll() на них уже выставлен при создании, чтобы они
+// освещали объекты в обоих проходах рендера независимо от слоя.
+function setViewmodelLayer(object) {
+  object.traverse((obj) => {
+    if (obj.isLight) {
+      obj.layers.enableAll();
+    } else {
+      obj.layers.set(VIEWMODEL_LAYER);
+    }
+  });
+}
+
+/* ---------- 7.1. Автомат (процедурная модель из примитивов) ---------- */
+
+const gunMat = new THREE.MeshStandardMaterial({ color: 0x2b2b2b, roughness: 0.6, metalness: 0.3 });
+const gunAccentMat = new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.5, metalness: 0.4 });
+
+const gunBody = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.09, 0.4), gunMat);
+const gunBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.35, 12), gunAccentMat);
+gunBarrel.rotation.x = Math.PI / 2;
+gunBarrel.position.set(0, 0.01, -0.35);
+const gunMag = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.18, 0.06), gunMat);
+gunMag.position.set(0, -0.12, -0.02);
+gunMag.rotation.x = 0.25;
+const gunStock = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.18), gunAccentMat);
+gunStock.position.set(0, -0.01, 0.28);
+
+const riflePivot = new THREE.Group();
+riflePivot.add(gunBody, gunBarrel, gunMag, gunStock);
+riflePivot.position.set(0.18, -0.16, -0.32);
+
+// Точечный свет для вспышки выстрела (Muzzle flash via point light).
+// enableAll(), чтобы вспышка была видна в обоих проходах рендера (мир + viewmodel).
+const muzzleLight = new THREE.PointLight(0xffb347, 0, 6, 2);
+muzzleLight.position.set(0, 0.01, -0.55);
+muzzleLight.layers.enableAll();
+riflePivot.add(muzzleLight);
+
+viewmodelRoot.add(riflePivot);
+setViewmodelLayer(riflePivot);
+
+/* ---------- 7.2. Монтировка / Crowbar (GLTF с фоллбэком на примитивы) ---------- */
+
+const crowbarPivot = new THREE.Group();
+crowbarPivot.position.set(0.16, -0.2, -0.3);
+viewmodelRoot.add(crowbarPivot);
+
+function buildProceduralCrowbar() {
+  // Фоллбэк-модель монтировки из примитивов — используется, если GLB не загрузился
+  // (например, из-за CORS-ограничений Google Drive или недоступности файла).
+  const group = new THREE.Group();
+  const metal = new THREE.MeshStandardMaterial({ color: 0x8a8a8a, roughness: 0.35, metalness: 0.85 });
+
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.55, 8), metal);
+  shaft.rotation.z = Math.PI / 2.3;
+  group.add(shaft);
+
+  const hookGeo = new THREE.TorusGeometry(0.05, 0.014, 8, 12, Math.PI);
+  const hook = new THREE.Mesh(hookGeo, metal);
+  hook.position.set(0.27, 0.08, 0);
+  hook.rotation.z = 0.4;
+  group.add(hook);
+
+  const tail = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.06, 8), metal);
+  tail.position.set(-0.28, -0.09, 0);
+  tail.rotation.z = Math.PI / 2.3;
+  group.add(tail);
+
+  group.scale.set(1.1, 1.1, 1.1);
+  return group;
+}
+
+let crowbarModel = buildProceduralCrowbar();
+crowbarPivot.add(crowbarModel);
+setViewmodelLayer(crowbarPivot);
+
+// Состояние анимаций монтировки (заполняется после успешной загрузки GLB).
+// Если клипов в файле нет/не нашлись — остаёмся на процедурной анимации взмаха (fallback).
+let crowbarMixer = null;
+let crowbarActions = {};          // { "draw": AnimationAction, "misscenter1": AnimationAction, ... }
+let crowbarUsesGLTFAnim = false;
+let crowbarAttackBusy = false;    // блокирует повторный клик, пока текущий клип атаки не доиграл
+
+// Ищет клип анимации по ключевому слову (без учёта регистра и разделителей типа
+// "v_crowbar.qc_skeleton | draw" — достаточно совпадения по хвосту имени клипа).
+function findAnimationClip(animations, keyword) {
+  const kw = keyword.toLowerCase();
+  return animations.find((clip) => clip.name.toLowerCase().includes(kw)) || null;
+}
+
+// Строит THREE.AnimationMixer и action'ы для всех нужных клипов монтировки.
+function buildCrowbarAnimations(gltf) {
+  if (!gltf.animations || gltf.animations.length === 0) {
+    consolePrint("В GLB-файле монтировки не найдено анимационных клипов — используется процедурный взмах.", "warn");
+    return;
+  }
+
+  crowbarMixer = new THREE.AnimationMixer(crowbarModel);
+
+  const wantedClips = [
+    "draw",
+    "misscenter1", "misscenter2",
+    "hitcenter1", "hitcenter2", "hitcenter3",
+  ];
+
+  let foundAny = false;
+  for (const keyword of wantedClips) {
+    const clip = findAnimationClip(gltf.animations, keyword);
+    if (!clip) {
+      consolePrint(`Клип анимации не найден по ключу "${keyword}".`, "warn");
+      continue;
+    }
+    const action = crowbarMixer.clipAction(clip);
+    // Одноразовые анимации: не зацикливаем и не фиксируем позу на последнем кадре,
+    // чтобы после удара/доставания плавно возвращалось базовое положение оружия.
+    action.setLoop(THREE.LoopOnce, 1);
+    action.clampWhenFinished = false;
+    crowbarActions[keyword] = action;
+    foundAny = true;
+  }
+
+  crowbarUsesGLTFAnim = foundAny;
+  if (foundAny) {
+    consolePrint("Анимации монтировки подключены через THREE.AnimationMixer.", "info");
+  }
+}
+
+// Проигрывает клип по ключу, обрывая (stopAllAction) всё, что играло до этого,
+// чтобы анимации не "застревали" и не смешивались друг с другом непредсказуемо.
+function playCrowbarAnim(keyword) {
+  if (!crowbarMixer || !crowbarActions[keyword]) return null;
+  crowbarMixer.stopAllAction();
+  const action = crowbarActions[keyword];
+  action.reset();
+  action.play();
+  return action;
+}
+
+// Постоянный Raw-URL с GitHub — отдаёт корректные CORS-заголовки
+// (access-control-allow-origin: *) и не истекает, в отличие от временных ссылок
+// Google Drive / Dropbox, поэтому GLTFLoader может грузить модель напрямую.
+const CROWBAR_GLB_URL =
+  "https://raw.githubusercontent.com/lambda1224/lambda1224.github.io/refs/heads/main/half-life2_crowbar_with_animations.glb";
+
+if (typeof THREE.GLTFLoader === "function") {
+  const gltfLoader = new THREE.GLTFLoader();
+  gltfLoader.load(
+    CROWBAR_GLB_URL,
+    (gltf) => {
+      // Успешная загрузка: убираем процедурный фоллбэк и вставляем настоящую модель
+      crowbarPivot.remove(crowbarModel);
+      crowbarModel = gltf.scene;
+
+      // Настройка трансформации под руки от первого лица.
+      // ИСПРАВЛЕНИЕ: раньше rotation.y = Math.PI/2 разворачивало модель сильно вправо.
+      // По референс-скриншоту модели (bind-поза): металлический стержень монтировки
+      // направлен почти строго ВВЕРХ (+Y) с небольшим наклоном назад, кисть — у низа кадра.
+      // Чтобы для FPS-вида "верх" модели стал "вперёд" (в глубину экрана, -Z), поворачиваем
+      // её на -90° вокруг локальной оси X. Это по-прежнему приближение "на глаз" по фото,
+      // а не точная калибровка — доведите до идеала командами viewmodel_rot_x/y/z.
+      crowbarModel.scale.set(0.35, 0.35, 0.35);
+      crowbarModel.position.set(0, 0, 0);
+      crowbarModel.rotation.set(-Math.PI / 2, 0, 0);
+
+      crowbarModel.traverse((obj) => {
+        if (obj.isMesh) {
+          obj.castShadow = false;
+          obj.receiveShadow = false;
+        }
+      });
+
+      crowbarPivot.add(crowbarModel);
+      setViewmodelLayer(crowbarModel); // модель GLB тоже должна рисоваться только viewmodel-камерой
+      buildCrowbarAnimations(gltf);
+      consolePrint("Модель монтировки (GLB) успешно загружена.", "info");
+
+      // Если монтировка уже выбрана в момент завершения загрузки — сразу проигрываем "draw"
+      if (currentWeaponIndex === 0 && crowbarUsesGLTFAnim) {
+        playCrowbarAnim("draw");
+      }
+    },
+    undefined,
+    (err) => {
+      consolePrint(
+        "Не удалось загрузить GLB-модель монтировки (вероятно, CORS/недоступность файла). " +
+        "Используется процедурная резервная модель.",
+        "warn"
+      );
+      console.warn("GLTFLoader error:", err);
+    }
+  );
+} else {
+  consolePrint("THREE.GLTFLoader недоступен — используется процедурная монтировка.", "warn");
+}
+
+/* ---------- 7.3. Общая система оружия: слоты, переключение, атака ---------- */
+
+const WEAPONS = [
+  {
+    id: "crowbar",
+    name: "Монтировка",
+    group: crowbarPivot,
+    type: "melee",
+    range: 80,           // короткая дистанция ближнего боя
+    restPos: crowbarPivot.position.clone(),
+    restRot: new THREE.Euler(0, 0, 0),
+    swing: { active: false, t: 0, duration: 0.28 },
+  },
+  {
+    id: "rifle",
+    name: "Автомат",
+    group: riflePivot,
+    type: "ranged",
+    range: 2000,
+    restPos: riflePivot.position.clone(),
+    restRot: new THREE.Euler(0, 0, 0),
+  },
+];
+
+let currentWeaponIndex = 1; // по умолчанию — автомат
+
+function selectWeapon(index) {
+  if (index === currentWeaponIndex) return;
+  currentWeaponIndex = index;
+  for (let i = 0; i < WEAPONS.length; i++) {
+    WEAPONS[i].group.visible = (i === currentWeaponIndex);
+  }
+  // Сбрасываем состояние покачивания/отдачи при смене оружия, чтобы не было рывка
+  sway.x = 0; sway.y = 0;
+  recoilKick = 0; recoilPitchKick = 0;
+  bobTime = 0;
+
+  // Анимация доставания монтировки при переключении на неё
+  if (WEAPONS[index].id === "crowbar" && crowbarUsesGLTFAnim) {
+    crowbarAttackBusy = false;
+    playCrowbarAnim("draw");
+  }
+
+  updateWeaponBarHUD();
+}
+selectWeapon(1); // инициализация видимости (автомат виден, монтировка скрыта)
+
+function updateWeaponBarHUD() {
+  const el = document.getElementById("weaponBar");
+  el.innerHTML = WEAPONS.map((w, i) => {
+    const marker = (i === currentWeaponIndex) ? "class='active'" : "";
+    return `<div ${marker}>[${i + 1}] ${w.name}</div>`;
+  }).join("");
+}
+updateWeaponBarHUD();
+
+// Диспетчер атаки по ЛКМ — в зависимости от типа текущего оружия
+function triggerAttack() {
+  const w = WEAPONS[currentWeaponIndex];
+  if (w.type === "melee") {
+    meleeAttack(w);
+  } else {
+    fireWeapon(w);
+  }
+}
+
+/* ---------- 7.4. Покачивание, свэй, отдача (общие для активного оружия) ---------- */
+
+const sway = { x: 0, y: 0 };
+let recoilKick = 0;      // текущий "толчок" оружия назад/вверх
+let recoilPitchKick = 0; // добавка к тангажу камеры от отдачи
+let bobTime = 0;
+
+function updateWeapon(dt) {
+  const w = WEAPONS[currentWeaponIndex];
+  const pivot = w.group;
+
+  const horizSpeed = Math.hypot(player.velocity.x, player.velocity.z);
+  const speedFrac = Math.min(horizSpeed / CFG.sv_maxspeed, 1.4);
+
+  // --- Source-style Bobbing: раскачка оружия при ходьбе на основе синусоид скорости ---
+  if (player.onGround && horizSpeed > 5) {
+    bobTime += dt * (6 + speedFrac * 6);
+  } else {
+    bobTime += dt * 2; // лёгкий "дрейф" в воздухе/на месте
+  }
+  const bobX = Math.sin(bobTime) * 0.012 * (0.3 + speedFrac);
+  const bobY = Math.abs(Math.cos(bobTime)) * 0.01 * (0.3 + speedFrac);
+
+  // --- Weapon Sway: инерция/отставание оружия при повороте мыши через LERP ---
+  const targetSwayX = THREE.MathUtils.clamp(-mouseDX * 0.0015, -0.06, 0.06);
+  const targetSwayY = THREE.MathUtils.clamp(-mouseDY * 0.0015, -0.06, 0.06);
+  sway.x = THREE.MathUtils.lerp(sway.x, targetSwayX, 1 - Math.pow(0.001, dt));
+  sway.y = THREE.MathUtils.lerp(sway.y, targetSwayY, 1 - Math.pow(0.001, dt));
+  // Сбрасываем накопленное смещение мыши за тик, чтобы свэй не "залипал"
+  mouseDX *= 0.5;
+  mouseDY *= 0.5;
+
+  // --- Отдача: плавное восстановление в состояние покоя (LERP-затухание) ---
+  recoilKick = THREE.MathUtils.lerp(recoilKick, 0, 1 - Math.pow(0.0005, dt));
+  recoilPitchKick = THREE.MathUtils.lerp(recoilPitchKick, 0, 1 - Math.pow(0.001, dt));
+
+  pivot.position.set(
+    w.restPos.x + sway.x + CFG.viewmodel_x,
+    w.restPos.y + bobY + sway.y + CFG.viewmodel_y,
+    w.restPos.z + recoilKick * 0.12 + CFG.viewmodel_z
+  );
+  pivot.rotation.set(
+    w.restRot.x - recoilKick * 0.6 + THREE.MathUtils.degToRad(CFG.viewmodel_rot_x),
+    w.restRot.y - sway.x * 1.2 + THREE.MathUtils.degToRad(CFG.viewmodel_rot_y),
+    w.restRot.z + bobX * 0.4 + THREE.MathUtils.degToRad(CFG.viewmodel_rot_z)
+  );
+
+  // Обновление AnimationMixer монтировки (проигрывание клипов draw/hit/miss из GLB)
+  if (crowbarMixer) crowbarMixer.update(dt);
+
+  // Процедурная анимация удара монтировкой — используется ТОЛЬКО как fallback,
+  // если в GLB не нашлось нужных клипов (crowbarUsesGLTFAnim === false)
+  if (w.type === "melee" && !crowbarUsesGLTFAnim && w.swing.active) {
+    w.swing.t += dt;
+    const p = Math.min(w.swing.t / w.swing.duration, 1);
+    const swingAngle = Math.sin(p * Math.PI) * 1.1; // взмах вперёд и обратно
+    pivot.rotation.x -= swingAngle;
+    pivot.rotation.y -= swingAngle * 0.5;
+    pivot.position.z -= swingAngle * 0.08;
+
+    // Момент удара — примерно на пике взмаха (~45% анимации)
+    if (!w.swing.hitDone && p >= 0.45) {
+      w.swing.hitDone = true;
+      performMeleeRaycast(w);
+    }
+
+    if (p >= 1) {
+      w.swing.active = false;
+    }
+  }
+
+  // Плавное затухание точечного света вспышки выстрела
+  if (muzzleLight.intensity > 0) {
+    muzzleLight.intensity = THREE.MathUtils.lerp(muzzleLight.intensity, 0, 1 - Math.pow(0.0008, dt));
+  }
+}
+
+/* ---------- 7.5. Огнестрельное оружие: raycast, отдача, вспышка, трассер, гильза ---------- */
+
+const raycaster = new THREE.Raycaster();
+const tracers = [];  // активные трассирующие линии {line, life}
+const shells = [];   // активные гильзы {mesh, vel, life}
+
+function getShootTargets() {
+  return [ground, ...worldColliders.map(c => c.mesh)];
+}
+
+function fireWeapon(weapon) {
+  // Отдача камеры и оружия вверх/назад
+  recoilKick = Math.min(recoilKick + 1.0, 2.5);
+  recoilPitchKick += 0.02;
+  player.pitch = Math.min(player.pitch + 0.02, Math.PI / 2 - 0.01);
+
+  // Вспышка выстрела
+  muzzleLight.intensity = 6;
+
+  // Трассировка луча из центра камеры
+  raycaster.set(camera.getWorldPosition(new THREE.Vector3()), camera.getWorldDirection(new THREE.Vector3()));
+  raycaster.far = weapon.range;
+  const hits = raycaster.intersectObjects(getShootTargets(), false);
+
+  const muzzleWorldPos = new THREE.Vector3();
+  gunBarrel.getWorldPosition(muzzleWorldPos);
+
+  let endPoint;
+  if (hits.length > 0) {
+    endPoint = hits[0].point;
+  } else {
+    endPoint = raycaster.ray.origin.clone().addScaledVector(raycaster.ray.direction, weapon.range);
+  }
+
+  // Визуальный трассер (затухающая линия)
+  const lineGeo = new THREE.BufferGeometry().setFromPoints([muzzleWorldPos, endPoint]);
+  const lineMat = new THREE.LineBasicMaterial({ color: 0xfff2b0, transparent: true, opacity: 0.9 });
+  const line = new THREE.Line(lineGeo, lineMat);
+  scene.add(line);
+  tracers.push({ line, life: 0.08 });
+
+  // Опадающая гильза — простая физика (гравитация + затухание при ударе о землю)
+  const shellGeo = new THREE.CylinderGeometry(0.01, 0.01, 0.03, 6);
+  const shellMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.8, roughness: 0.3 });
+  const shellMesh = new THREE.Mesh(shellGeo, shellMat);
+  const ejectPortWorld = new THREE.Vector3();
+  riflePivot.getWorldPosition(ejectPortWorld);
+  shellMesh.position.copy(ejectPortWorld);
+  scene.add(shellMesh);
+
+  const rightVec = new THREE.Vector3();
+  camera.getWorldDirection(rightVec);
+  rightVec.set(rightVec.z, 0, -rightVec.x); // перпендикуляр в горизонтальной плоскости
+
+  shells.push({
+    mesh: shellMesh,
+    vel: new THREE.Vector3(
+      rightVec.x * 1.5 + (Math.random() - 0.5) * 0.5,
+      2.5 + Math.random(),
+      rightVec.z * 1.5 + (Math.random() - 0.5) * 0.5
+    ),
+    life: 3.0,
+  });
+}
+
+/* ---------- 7.6. Ближний бой: монтировка ---------- */
+
+// Визуальное подтверждение попадания (искра) — переиспользуется и GLTF-, и fallback-путём
+function spawnMeleeSpark(point) {
+  const sparkLight = new THREE.PointLight(0xffffff, 4, 3, 2);
+  sparkLight.position.copy(point);
+  scene.add(sparkLight);
+  let life = 0.08;
+  const decay = () => {
+    life -= 1 / 60;
+    sparkLight.intensity = Math.max(0, life / 0.08) * 4;
+    if (life > 0) requestAnimationFrame(decay);
+    else scene.remove(sparkLight);
+  };
+  decay();
+}
+
+// Диспетчер атаки монтировкой: если в GLB нашлись клипы анимации — используем
+// AnimationMixer (draw/hit*/miss*), иначе — процедурный взмах (старое поведение).
+function meleeAttack(weapon) {
+  if (crowbarUsesGLTFAnim) {
+    meleeAttackGLTF(weapon);
+  } else {
+    meleeAttackProcedural(weapon);
+  }
+}
+
+function meleeAttackGLTF(weapon) {
+  if (crowbarAttackBusy) return; // не прерываем текущий проигрываемый клип повторным кликом
+  crowbarAttackBusy = true;
+
+  // Raycast выполняется СРАЗУ, чтобы понять, какой клип проигрывать — попадание или промах
+  raycaster.set(camera.getWorldPosition(new THREE.Vector3()), camera.getWorldDirection(new THREE.Vector3()));
+  raycaster.far = weapon.range;
+  const hits = raycaster.intersectObjects(getShootTargets(), false);
+  const didHit = hits.length > 0;
+
+  const hitClips = ["hitcenter1", "hitcenter2", "hitcenter3"];
+  const missClips = ["misscenter1", "misscenter2"];
+  const pool = didHit ? hitClips : missClips;
+  const availablePool = pool.filter((k) => crowbarActions[k]);
+  const chosenKey = availablePool.length > 0
+    ? availablePool[Math.floor(Math.random() * availablePool.length)]
+    : null;
+
+  let clipDuration = 0.3; // запасное значение, если клип почему-то не нашёлся
+  if (chosenKey) {
+    const action = playCrowbarAnim(chosenKey);
+    if (action) clipDuration = action.getClip().duration;
+  }
+
+  if (didHit) {
+    // Момент "контакта" примерно на середине анимации удара
+    setTimeout(() => spawnMeleeSpark(hits[0].point), clipDuration * 0.4 * 1000);
+    consolePrint(`Удар монтировкой (${chosenKey || "?"}): попадание на дистанции ${hits[0].distance.toFixed(0)} u.`, "info");
+  } else {
+    consolePrint(`Удар монтировкой (${chosenKey || "?"}): промах.`, "info");
+  }
+
+  setTimeout(() => { crowbarAttackBusy = false; }, clipDuration * 1000);
+}
+
+// Старая процедурная анимация взмаха — используется только как fallback,
+// если клипы анимации в GLB не найдены (crowbarUsesGLTFAnim === false)
+function meleeAttackProcedural(weapon) {
+  if (weapon.swing.active) return; // не прерываем текущий взмах повторным нажатием
+  weapon.swing.active = true;
+  weapon.swing.t = 0;
+  weapon.swing.hitDone = false;
+}
+
+function performMeleeRaycast(weapon) {
+  raycaster.set(camera.getWorldPosition(new THREE.Vector3()), camera.getWorldDirection(new THREE.Vector3()));
+  raycaster.far = weapon.range;
+  const hits = raycaster.intersectObjects(getShootTargets(), false);
+
+  if (hits.length > 0) {
+    spawnMeleeSpark(hits[0].point);
+    consolePrint(`Удар монтировкой: попадание на дистанции ${hits[0].distance.toFixed(0)} u.`, "info");
+  }
+}
+
+function updateTracersAndShells(dt) {
+  for (let i = tracers.length - 1; i >= 0; i--) {
+    const t = tracers[i];
+    t.life -= dt;
+    t.line.material.opacity = Math.max(0, t.life / 0.08) * 0.9;
+    if (t.life <= 0) {
+      scene.remove(t.line);
+      t.line.geometry.dispose();
+      t.line.material.dispose();
+      tracers.splice(i, 1);
+    }
+  }
+
+  for (let i = shells.length - 1; i >= 0; i--) {
+    const s = shells[i];
+    s.vel.y -= 9.8 * dt; // отдельная лёгкая гравитация для декоративной гильзы (в метрах/юнитах сцены)
+    s.mesh.position.addScaledVector(s.vel, dt * 60);
+    s.mesh.rotation.x += dt * 10;
+    if (s.mesh.position.y < 0.02) {
+      s.mesh.position.y = 0.02;
+      s.vel.y *= -0.3;
+      s.vel.x *= 0.6;
+      s.vel.z *= 0.6;
+    }
+    s.life -= dt;
+    if (s.life <= 0) {
+      scene.remove(s.mesh);
+      s.mesh.geometry.dispose();
+      s.mesh.material.dispose();
+      shells.splice(i, 1);
+    }
+  }
+}
+
+
+/* =========================================================================
+   8. КОНСОЛЬ РАЗРАБОТЧИКА (~ / ё)
+   ========================================================================= */
+
+const consoleEl = document.getElementById("console");
+const consoleLogEl = document.getElementById("consoleLog");
+const consoleInputEl = document.getElementById("consoleInput");
+
+function consolePrint(text, cls = "info") {
+  const line = document.createElement("div");
+  line.className = cls;
+  line.textContent = text;
+  consoleLogEl.appendChild(line);
+  consoleLogEl.scrollTop = consoleLogEl.scrollHeight;
+}
+
+function handleConsoleToggle(e) {
+  // event.code === 'Backquote' срабатывает на физическую клавишу слева от "1"
+  // независимо от раскладки — то есть и для '~', и для русской 'ё' на этой же клавише.
+  if (e.code === "Backquote") {
+    e.preventDefault();
+    toggleConsole();
+  }
+  if (consoleOpen && e.code === "Escape") {
+    toggleConsole(false);
+  }
+}
+
+function toggleConsole(forceState) {
+  consoleOpen = forceState !== undefined ? forceState : !consoleOpen;
+  consoleEl.style.display = consoleOpen ? "flex" : "none";
+
+  if (consoleOpen) {
+    if (document.pointerLockElement) document.exitPointerLock();
+    // Сбрасываем зажатые игровые клавиши, чтобы персонаж не "залипал" в движении
+    for (const k in keys) keys[k] = false;
+    setTimeout(() => consoleInputEl.focus(), 0);
+  } else {
+    consoleInputEl.blur();
+  }
+}
+
+consoleInputEl.addEventListener("keydown", (e) => {
+  e.stopPropagation();
+  if (e.code === "Backquote") {
+    e.preventDefault();
+    toggleConsole(false);
+    return;
+  }
+  if (e.key === "Enter") {
+    const raw = consoleInputEl.value.trim();
+    if (raw.length > 0) {
+      consolePrint("] " + raw, "cmdline");
+      execCommand(raw);
+    }
+    consoleInputEl.value = "";
+  }
+});
+
+function requireCheats(cmdName) {
+  if (CFG.sv_cheats !== 1) {
+    consolePrint(`Нельзя использовать читерскую команду '${cmdName}', требуется sv_cheats 1.`, "warn");
+    return false;
+  }
+  return true;
+}
+
+function execCommand(raw) {
+  const parts = raw.split(/\s+/);
+  const cmd = parts[0].toLowerCase();
+  const arg = parts[1];
+
+  switch (cmd) {
+    case "sv_gravity": {
+      if (arg === undefined) { consolePrint(`sv_gravity = ${CFG.sv_gravity}`, "info"); break; }
+      const v = parseFloat(arg);
+      if (Number.isFinite(v)) {
+        CFG.sv_gravity = v;
+        consolePrint(`sv_gravity установлен в ${v}`, "info");
+      } else {
+        consolePrint("Некорректное значение sv_gravity.", "err");
+      }
+      break;
+    }
+
+    case "sv_stepsize": {
+      if (arg === undefined) { consolePrint(`sv_stepsize = ${CFG.sv_stepsize}`, "info"); break; }
+      const v = parseFloat(arg);
+      if (Number.isFinite(v) && v >= 0) {
+        CFG.sv_stepsize = v;
+        consolePrint(`sv_stepsize установлен в ${v}`, "info");
+      } else {
+        consolePrint("Некорректное значение sv_stepsize.", "err");
+      }
+      break;
+    }
+
+    case "sv_cheats": {
+      if (arg === undefined) { consolePrint(`sv_cheats = ${CFG.sv_cheats}`, "info"); break; }
+      const v = arg === "1" ? 1 : 0;
+      CFG.sv_cheats = v;
+      consolePrint(`sv_cheats установлен в ${v}`, "info");
+      if (v === 0 && player.noclip) {
+        player.noclip = false;
+        consolePrint("noclip автоматически выключен (sv_cheats 0).", "warn");
+      }
+      break;
+    }
+
+    case "cl_autobhop": {
+      if (arg === undefined) { consolePrint(`cl_autobhop = ${CFG.cl_autobhop}`, "info"); break; }
+      const v = arg === "1" ? 1 : 0;
+      CFG.cl_autobhop = v;
+      consolePrint(`cl_autobhop установлен в ${v}`, "info");
+      break;
+    }
+
+    case "god": {
+      if (!requireCheats("god")) break;
+      player.god = !player.god;
+      consolePrint(`Godmode ${player.god ? "включён" : "выключен"}.`, "info");
+      break;
+    }
+
+    case "noclip": {
+      if (!requireCheats("noclip")) break;
+      player.noclip = !player.noclip;
+      if (player.noclip) {
+        player.velocity.set(0, 0, 0);
+        player.stuck = false; // включение noclip всегда освобождает из "застревания"
+        consolePrint("noclip ВКЛ — коллизии отключены, свободный полёт.", "info");
+      } else {
+        player.velocity.set(0, 0, 0);
+        // Поведение 1-в-1 как в Source: если хитбокс пересекается с твёрдой геометрией —
+        // НЕ выталкиваем, а просто фиксируем игрока на месте до kill/повторного noclip.
+        if (isPlayerStuckInGeometry()) {
+          player.stuck = true;
+          consolePrint(
+            "noclip ВЫКЛ — игрок оказался внутри геометрии и зафиксирован на месте. " +
+            "Включите noclip повторно или выполните 'kill', чтобы освободиться.",
+            "warn"
+          );
+        } else {
+          player.stuck = false;
+          consolePrint("noclip ВЫКЛ.", "info");
+        }
+      }
+      break;
+    }
+
+    case "kill": {
+      player.position.set(0, 0, 500);
+      player.velocity.set(0, 0, 0);
+      player.stuck = false;
+      player.noclip = false;
+      player.onGround = false;
+      consolePrint("Игрок возрождён в точке спавна.", "info");
+      break;
+    }
+
+    case "freecam": {
+      freecamState.active = !freecamState.active;
+      if (freecamState.active) {
+        // Стартуем свободную камеру из текущего положения игрока, чтобы не было рывка
+        freecamState.position.set(
+          player.position.x,
+          player.position.y + player.eyeHeight,
+          player.position.z
+        );
+        freecamState.yaw = player.yaw;
+        freecamState.pitch = player.pitch;
+        consolePrint("freecam ВКЛ — камера отделена от игрока (WASD/Space/Ctrl для полёта).", "info");
+      } else {
+        consolePrint("freecam ВЫКЛ — камера возвращена к игроку.", "info");
+      }
+      break;
+    }
+
+    case "viewmodel_x": {
+      if (arg === undefined) { consolePrint(`viewmodel_x = ${CFG.viewmodel_x}`, "info"); break; }
+      const v = parseFloat(arg);
+      if (Number.isFinite(v)) { CFG.viewmodel_x = v; consolePrint(`viewmodel_x установлен в ${v}`, "info"); }
+      else consolePrint("Некорректное значение viewmodel_x.", "err");
+      break;
+    }
+
+    case "viewmodel_y": {
+      if (arg === undefined) { consolePrint(`viewmodel_y = ${CFG.viewmodel_y}`, "info"); break; }
+      const v = parseFloat(arg);
+      if (Number.isFinite(v)) { CFG.viewmodel_y = v; consolePrint(`viewmodel_y установлен в ${v}`, "info"); }
+      else consolePrint("Некорректное значение viewmodel_y.", "err");
+      break;
+    }
+
+    case "viewmodel_z": {
+      if (arg === undefined) { consolePrint(`viewmodel_z = ${CFG.viewmodel_z}`, "info"); break; }
+      const v = parseFloat(arg);
+      if (Number.isFinite(v)) { CFG.viewmodel_z = v; consolePrint(`viewmodel_z установлен в ${v}`, "info"); }
+      else consolePrint("Некорректное значение viewmodel_z.", "err");
+      break;
+    }
+
+    case "viewmodel_rot_x": {
+      if (arg === undefined) { consolePrint(`viewmodel_rot_x = ${CFG.viewmodel_rot_x}°`, "info"); break; }
+      const v = parseFloat(arg);
+      if (Number.isFinite(v)) { CFG.viewmodel_rot_x = v; consolePrint(`viewmodel_rot_x установлен в ${v}° `, "info"); }
+      else consolePrint("Некорректное значение viewmodel_rot_x.", "err");
+      break;
+    }
+
+    case "viewmodel_rot_y": {
+      if (arg === undefined) { consolePrint(`viewmodel_rot_y = ${CFG.viewmodel_rot_y}°`, "info"); break; }
+      const v = parseFloat(arg);
+      if (Number.isFinite(v)) { CFG.viewmodel_rot_y = v; consolePrint(`viewmodel_rot_y установлен в ${v}° `, "info"); }
+      else consolePrint("Некорректное значение viewmodel_rot_y.", "err");
+      break;
+    }
+
+    case "viewmodel_rot_z": {
+      if (arg === undefined) { consolePrint(`viewmodel_rot_z = ${CFG.viewmodel_rot_z}°`, "info"); break; }
+      const v = parseFloat(arg);
+      if (Number.isFinite(v)) { CFG.viewmodel_rot_z = v; consolePrint(`viewmodel_rot_z установлен в ${v}° `, "info"); }
+      else consolePrint("Некорректное значение viewmodel_rot_z.", "err");
+      break;
+    }
+
+    case "clear": {
+      consoleLogEl.innerHTML = "";
+      break;
+    }
+
+    default:
+      consolePrint(`Неизвестная команда: "${cmd}"`, "err");
+  }
+}
+
+consolePrint("Консоль разработчика инициализирована. Введите 'sv_cheats 1' для доступа к god/noclip.", "info");
+consolePrint("Доступные команды: sv_gravity <val>, sv_stepsize <val>, sv_cheats <0/1>, cl_autobhop <0/1>, god, noclip, kill, freecam, viewmodel_x/y/z <val>, viewmodel_rot_x/y/z <градусы>, clear", "info");
+
+
+/* =========================================================================
+   9. ГЛАВНЫЙ ЦИКЛ: ФИКСИРОВАННЫЙ ШАГ ФИЗИКИ (66.67 Гц) + РЕНДЕР
+   ========================================================================= */
+
+const hudEl = document.getElementById("hud");
+let lastTime = performance.now();
+let accumulator = 0;
+
+function applyCameraFromPlayer() {
+  camera.rotation.order = "YXZ";
+
+  if (freecamState.active) {
+    camera.position.copy(freecamState.position);
+    camera.rotation.y = freecamState.yaw;
+    camera.rotation.x = freecamState.pitch;
+    camera.rotation.z = 0;
+  } else {
+    camera.position.set(
+      player.position.x,
+      player.position.y + player.eyeHeight,
+      player.position.z
+    );
+    camera.rotation.y = player.yaw;
+    camera.rotation.x = player.pitch + recoilPitchKick;
+    camera.rotation.z = 0;
+  }
+
+  // Viewmodel-камера всегда повторяет трансформацию основной камеры (см. Depth Layer
+  // выше) — так оружие всегда рисуется "из глаз" текущего вида, включая freecam.
+  camera.updateMatrixWorld();
+  viewmodelCamera.position.copy(camera.position);
+  viewmodelCamera.quaternion.copy(camera.quaternion);
+}
+
+function updateHUD() {
+  const speed = Math.hypot(player.velocity.x, player.velocity.z);
+  const weaponName = WEAPONS[currentWeaponIndex].name;
+  hudEl.textContent =
+    `speed: ${speed.toFixed(1)} u/s\n` +
+    `pos: ${player.position.x.toFixed(0)}, ${player.position.y.toFixed(0)}, ${player.position.z.toFixed(0)}\n` +
+    `onGround: ${player.onGround}   noclip: ${player.noclip}   god: ${player.god}   freecam: ${freecamState.active}\n` +
+    `stuck: ${player.stuck}   sv_gravity: ${CFG.sv_gravity}   sv_stepsize: ${CFG.sv_stepsize}   cl_autobhop: ${CFG.cl_autobhop}\n` +
+    `viewmodel_offset: ${CFG.viewmodel_x.toFixed(2)}, ${CFG.viewmodel_y.toFixed(2)}, ${CFG.viewmodel_z.toFixed(2)}\n` +
+    `viewmodel_rot(deg): ${CFG.viewmodel_rot_x.toFixed(0)}, ${CFG.viewmodel_rot_y.toFixed(0)}, ${CFG.viewmodel_rot_z.toFixed(0)}\n` +
+    `weapon: ${weaponName}   tickrate: ${TICKRATE.toFixed(2)} Hz`;
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  const now = performance.now();
+  let frameTime = (now - lastTime) / 1000;
+  lastTime = now;
+  frameTime = Math.min(frameTime, 0.25); // защита от гигантских скачков (смена вкладки и т.п.)
+
+  if (!consoleOpen) {
+    accumulator += frameTime;
+    // Прогоняем физику фиксированными тиками по 1/66.67 сек — стабильный тикрейт Source
+    while (accumulator >= FIXED_DT) {
+      physicsTick(FIXED_DT);
+      accumulator -= FIXED_DT;
+    }
+    if (freecamState.active) freecamTick(frameTime);
+    updateWeapon(frameTime);
+  }
+
+  updateTracersAndShells(frameTime);
+  applyCameraFromPlayer();
+  updateHUD();
+
+  // --- Двухпроходный рендер (Depth Layer) ---
+  // 1) Основной мир основной камерой (near=0.01) — viewmodel не видна (слой отключён).
+  // 2) Очищаем ТОЛЬКО буфер глубины и рисуем viewmodel отдельной камерой с near=0.001,
+  //    поверх уже отрисованного мира — модель оружия физически не может ни "выпасть"
+  //    за ближнюю плоскость отсечения при любом разумном viewmodel_z, ни провалиться
+  //    в геометрию мира, так как это независимый проход рендера.
+  renderer.clear(true, true, true);
+  renderer.render(scene, camera);
+  renderer.clearDepth();
+  renderer.render(scene, viewmodelCamera);
+}
+
+animate();
+
+</script>
+</body>
+</html>
