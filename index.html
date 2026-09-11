@@ -1,295 +1,331 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>lambda1224 · случайный челик из интернета</title>
-    <!-- Font Awesome 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<title>~*~ lambda1224 ~*~ Официальная Страничка ~*~</title>
+<style>
+  body {
+    background-color: #1a0d3d;
+    background-image: repeating-linear-gradient(45deg, #1a0d3d 0px, #1a0d3d 40px, #241350 40px, #241350 80px);
+    color: #C9B8FF;
+    font-family: "Comic Sans MS", "Verdana", sans-serif;
+    margin: 0;
+    padding: 0;
+  }
 
-        body {
-            background: #0B0B0F;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            color: #E9EDF0;
-            line-height: 1.4;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 24px 20px;
-        }
+  .wrapper {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #2b1a5e;
+    border: 6px ridge #8a5cf6;
+    padding: 4px;
+  }
 
-        /* material you surface card */
-        .bio-card {
-            max-width: 640px;
-            width: 100%;
-            background: #141417;
-            border-radius: 32px;
-            padding: 32px 28px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 4px 8px rgba(0, 0, 0, 0.3);
-            transition: all 0.2s ease;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+  .titlebar {
+    background: linear-gradient(to right, #2e1065, #4c1d95, #6d28d9, #3730a3);
+    color: #F3E8FF;
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    padding: 10px;
+    text-shadow: 2px 2px 2px #00000080;
+    border-bottom: 4px double #A78BFA;
+  }
 
-        /* avatar */
-        .avatar-section {
-            margin-bottom: 24px;
-        }
-        .avatar {
-            background: linear-gradient(135deg, #2E2C3A, #1C1B23);
-            width: 80px;
-            height: 80px;
-            border-radius: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 18px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-        .avatar span {
-            font-size: 48px;
-            font-weight: 500;
-            background: linear-gradient(135deg, #CDE4FF, #B2A5FF);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: 1px;
-        }
+  marquee {
+    background-color: #150826;
+    color: #C4B5FD;
+    font-size: 18px;
+    padding: 6px;
+    border-top: 2px solid #8B5CF6;
+    border-bottom: 2px solid #8B5CF6;
+  }
 
-        /* имя */
-        .display-name {
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            background: linear-gradient(140deg, #FFFFFF, #CAC4E0);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 6px;
-        }
-        .handle {
-            font-size: 0.9rem;
-            color: #8F8BAB;
-            font-weight: 500;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .handle i {
-            font-size: 14px;
-            color: #7F7A9B;
-        }
+  .content {
+    background-color: #F5F3FF;
+    color: #241350;
+    padding: 15px;
+    border: 3px inset #7C3AED;
+    margin: 10px;
+  }
 
-        /* био — только приветствие без эмодзи */
-        .bio-text {
-            background: #1C1B23;
-            border-radius: 28px;
-            padding: 20px 24px;
-            margin: 20px 0 28px 0;
-            border-left: 4px solid #9B8CFF;
-            font-size: 1rem;
-            font-weight: 450;
-            line-height: 1.5;
-            color: #E2E0F0;
-            box-shadow: inset 0 1px 1px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.2);
-        }
-        .bio-text p {
-            margin-bottom: 0;
-        }
+  .section {
+    border: 2px dashed #7C3AED;
+    background-color: #EDE9FE;
+    padding: 10px;
+    margin-bottom: 15px;
+  }
 
-        /* кнопки */
-        .links-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .action-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            background: #1E1E28;
-            border-radius: 28px;
-            padding: 14px 20px;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            text-decoration: none;
-            color: #F0EEFF;
-            border: 1px solid rgba(255,255,255,0.06);
-            backdrop-filter: blur(2px);
-            letter-spacing: 0.2px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        .action-btn i {
-            font-size: 1.35rem;
-            width: 28px;
-            text-align: center;
-            transition: transform 0.2s;
-        }
-        .telegram-btn {
-            background: linear-gradient(95deg, #1F2A3A, #19212E);
-            border-bottom: 2px solid #2F8FCE;
-        }
-        .github-btn {
-            background: linear-gradient(95deg, #1E1C2A, #18171F);
-            border-bottom: 2px solid #8F8BB9;
-        }
-        .action-btn:hover {
-            transform: translateY(-3px);
-            background: #2A2A38;
-            border-color: rgba(155, 140, 255, 0.5);
-            box-shadow: 0 12px 18px -8px rgba(0, 0, 0, 0.5);
-        }
-        .action-btn:hover i {
-            transform: scale(1.05);
-        }
-        .telegram-btn:hover {
-            background: #1F3A5F;
-            border-bottom-color: #53B2F0;
-        }
-        .github-btn:hover {
-            background: #2A2740;
-            border-bottom-color: #B9ADFF;
-        }
+  .section h2 {
+    background-color: #4C1D95;
+    color: #E9D5FF;
+    padding: 4px 8px;
+    margin: -10px -10px 10px -10px;
+    font-size: 20px;
+    text-shadow: 1px 1px 0px #00000060;
+  }
 
-        /* футер — минималистично */
-        .footer-note {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            margin-top: 12px;
-            font-size: 0.7rem;
-            font-weight: 450;
-            color: #6D688A;
-            text-align: center;
-            flex-wrap: wrap;
-        }
-        .footer-note i {
-            font-size: 11px;
-        }
+  .blink {
+    animation: blinker 1s step-start infinite;
+    color: #6D28D9;
+    font-weight: bold;
+  }
 
-        /* ripple эффект */
-        .action-btn {
-            position: relative;
-            overflow: hidden;
-        }
-        .action-btn:after {
-            content: "";
-            display: block;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            background-image: radial-gradient(circle, rgba(255,255,255,0.2) 10%, transparent 10%);
-            background-repeat: no-repeat;
-            background-position: 50%;
-            transform: scale(10);
-            opacity: 0;
-            transition: transform 0.4s, opacity 0.6s;
-        }
-        .action-btn:active:after {
-            transform: scale(0);
-            opacity: 0.3;
-            transition: 0s;
-        }
+  @keyframes blinker {
+    50% { opacity: 0; }
+  }
 
-        @media (max-width: 480px) {
-            .bio-card {
-                padding: 24px 20px;
-            }
-            .display-name {
-                font-size: 1.7rem;
-            }
-            .action-btn {
-                padding: 12px 18px;
-                font-size: 0.9rem;
-            }
-            .avatar {
-                width: 68px;
-                height: 68px;
-            }
-            .avatar span {
-                font-size: 38px;
-            }
-        }
-        
-        a:focus-visible {
-            outline: 2px solid #9B8CFF;
-            outline-offset: 4px;
-            border-radius: 32px;
-        }
-        .bio-card {
-            animation: fadeSlideUp 0.45s ease-out;
-        }
-        @keyframes fadeSlideUp {
-            from {
-                opacity: 0;
-                transform: translateY(14px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
+  .avatar-box {
+    float: left;
+    margin-right: 15px;
+    border: 4px groove #7C3AED;
+    padding: 3px;
+    background: #DDD6FE;
+  }
+
+  .avatar-box img {
+    display: block;
+    width: 130px;
+    height: 130px;
+    object-fit: cover;
+  }
+
+  .counter-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #1a0d3d;
+    color: #C4B5FD;
+    font-family: "Courier New", monospace;
+    font-size: 15px;
+  }
+
+  .counter-table td {
+    border: 1px solid #7C3AED;
+    padding: 6px;
+    text-align: center;
+  }
+
+  .counter-table th {
+    background-color: #3B0764;
+    color: #E9D5FF;
+    padding: 6px;
+    border: 1px solid #7C3AED;
+  }
+
+  ul.linklist {
+    list-style-type: square;
+    padding-left: 25px;
+  }
+
+  ul.linklist li {
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+
+  a {
+    color: #4338CA;
+    font-weight: bold;
+  }
+
+  a:visited {
+    color: #6D28D9;
+  }
+
+  a:hover {
+    color: #F5F3FF;
+    background-color: #7C3AED;
+  }
+
+  .button89 {
+    display: inline-block;
+    background-color: #DDD6FE;
+    border: 2px outset #C4B5FD;
+    padding: 6px 12px;
+    margin: 4px;
+    text-decoration: none;
+    color: #3B0764;
+    font-weight: bold;
+    font-family: "Verdana", sans-serif;
+  }
+
+  .button89:hover {
+    border-style: inset;
+    background-color: #A78BFA;
+  }
+
+  .footer {
+    text-align: center;
+    background-color: #150826;
+    color: #C4B5FD;
+    padding: 10px;
+    font-size: 13px;
+    border-top: 4px double #7C3AED;
+  }
+
+  .badge-row {
+    text-align: center;
+    padding: 8px;
+    background-color: #F5F3FF;
+  }
+
+  .badge-row img {
+    border: 1px solid #4C1D95;
+  }
+
+  .stamp {
+    color: #6D28D9;
+    font-size: 12px;
+  }
+
+  hr.rainbow {
+    border: 0;
+    height: 4px;
+    background: linear-gradient(to right, #3730A3, #6D28D9, #A855F7, #4C1D95, #312E81);
+  }
+</style>
 </head>
 <body>
-    <div class="bio-card">
-        <!-- аватар -->
-        <div class="avatar-section">
-            <div class="avatar">
-                <span>λ</span>
-            </div>
-        </div>
 
-        <!-- имя и ник -->
-        <div class="display-name">lambda1224</div>
-        <div class="handle">
-            <i class="fas fa-at"></i> <span>lambda1224</span>
-            <span style="font-size: 6px; color: #4C4870;">●</span>
-            <i class="fas fa-globe"></i> <span>случайный челик из интернета</span>
-        </div>
+<div class="wrapper">
 
-        <!-- простое описание без эмодзи -->
-        <div class="bio-text">
-            <p>привет, я лямбда — случайный челик из интернета.</p>
-        </div>
+  <div class="titlebar">
+    ★彡 ДОБРО ПОЖАЛОВАТЬ НА СТРАНИЧКУ lambda1224 彡★
+  </div>
 
-        <!-- кнопки: телеграм и гитхаб -->
-        <div class="links-grid">
-            <a href="https://t.me/lambda1224" target="_blank" rel="noopener noreferrer" class="action-btn telegram-btn">
-                <i class="fab fa-telegram-plane"></i> 
-                <span>Telegram · @lambda1224</span>
-                <i class="fas fa-arrow-up-right-from-squares" style="font-size: 0.75rem; opacity: 0.7; margin-left: auto;"></i>
-            </a>
-            <a href="https://github.com/lambda1224" target="_blank" rel="noopener noreferrer" class="action-btn github-btn">
-                <i class="fab fa-github"></i>
-                <span>GitHub · /lambda1224</span>
-                <i class="fas fa-arrow-up-right-from-squares" style="font-size: 0.75rem; opacity: 0.7; margin-left: auto;"></i>
-            </a>
-        </div>
+  <marquee behavior="scroll" direction="left" scrollamount="6">
+    ПРИВЕТ ЛИМОНАДНЫЙ КИОСК | ПОДПИШИСЬ НА LINUX SYSTEM DATAMINES | Дарова Доготриггер | MaybeLev помог с оформлением LSD | ratogramX best tg client
+  </marquee>
 
-        <!-- минималистичный футер -->
-        <div class="footer-note">
-            <i class="fas fa-crown"></i> 
-            <span>lambda1224</span>
-            <i class="fas fa-code"></i>
-        </div>
+  <div class="content">
+
+    <div class="section" style="overflow: auto;">
+      <h2>♦ О СЕБЕ ♦</h2>
+      <div class="avatar-box">
+        <img src="https://raw.githubusercontent.com/lambda1224/lambda1224.github.io/8690aae21d000e1500f4c656d84970fbb08b1824/websource/photo_2026-09-11_21-42-12.jpg" alt="lambda1224">
+      </div>
+      <p>
+        Привет! Меня зовут <b>lambda1224</b>.<br>
+        Я — <span class="blink">неумелый вайбкодер</span>, но это меня не останавливает :)<br><br>
+        Люблю кодить, ломать и чинить разные штуки, копаться в системах и запускать
+        проекты, о которых никто не просил. Эта страничка сделана в стиле старого доброго
+        рунета начала 2000-х — потому что ностальгия наше всё.
+      </p>
     </div>
+
+    <hr class="rainbow">
+
+    <div class="section">
+      <h2>⏳ СЧЁТЧИК ЖИЗНИ ⏳</h2>
+      <p style="text-align:center;">Тикает с <b>29 января 2012 года</b>...</p>
+      <table class="counter-table" id="lifeCounterTable">
+        <tr>
+          <th>Лет</th>
+          <th>Месяцев</th>
+          <th>Дней</th>
+          <th>Часов</th>
+          <th>Минут</th>
+          <th>Секунд</th>
+        </tr>
+        <tr>
+          <td id="c-years">--</td>
+          <td id="c-months">--</td>
+          <td id="c-days">--</td>
+          <td id="c-hours">--</td>
+          <td id="c-minutes">--</td>
+          <td id="c-seconds">--</td>
+        </tr>
+      </table>
+      <p style="text-align:center; font-family: 'Courier New', monospace;">
+        Всего дней прожито: <span id="c-totaldays" style="color:#FF0000; font-weight:bold;">--</span> |
+        Всего секунд: <span id="c-totalseconds" style="color:#FF0000; font-weight:bold;">--</span>
+      </p>
+    </div>
+
+    <hr class="rainbow">
+
+    <div class="section">
+      <h2>💾 МОИ ПРОЕКТЫ 💾</h2>
+      <ul class="linklist">
+        <li>
+          🔧 <b>WebSource</b> —
+          <a href="http://lambda1224.cyou/websource/" target="_blank">lambda1224.cyou/websource</a>
+        </li>
+        <li>
+          🐧 <b>Linux System Datamines</b> —
+          <a href="https://t.me/kupisochiminet" target="_blank">t.me/kupisochiminet</a>
+        </li>
+      </ul>
+    </div>
+
+    <hr class="rainbow">
+
+    <div class="section">
+      <h2>🔗 МОИ РЕСУРСЫ 🔗</h2>
+      <div style="text-align:center;">
+        <a class="button89" href="https://www.youtube.com/@%D0%BB%D1%8F%D0%BC%D0%B1%D0%B4%D0%B0" target="_blank">▶ YouTube: lambda1224</a>
+        <a class="button89" href="https://t.me/lambda1224" target="_blank">✈ Telegram: lambda1224</a>
+        <a class="button89" href="https://github.com/lambda1224" target="_blank">🐱 GitHub: lambda1224</a>
+      </div>
+    </div>
+
+    <div class="badge-row">
+      <a href="https://mynickname.com/id1846477" target="_blank">
+        <img src="https://mynickname.com/forum1t5/lambda1224.gif" alt="mynickname lambda1224">
+      </a>
+      <img src="https://raw.githubusercontent.com/lambda1224/lambda1224.github.io/7a07d2fd4f433ec651f6fc38026784ccab3e2003/websource/ntvmir.gif" alt="ntv mir" width="90" height="33">
+    </div>
+
+  </div>
+
+  <div class="footer">
+    © lambda1224, 2026 г.
+  </div>
+
+</div>
+
+<script>
+  // ---- Life counter from 29 January 2012 ----
+  const startDate = new Date(2012, 0, 29, 0, 0, 0); // month is 0-indexed: 0 = January
+
+  function updateCounter() {
+    const now = new Date();
+    let diffMs = now - startDate;
+
+    const totalSeconds = Math.floor(diffMs / 1000);
+    const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    // Calendar-accurate breakdown
+    let years = now.getFullYear() - startDate.getFullYear();
+    let months = now.getMonth() - startDate.getMonth();
+    let days = now.getDate() - startDate.getDate();
+    let hours = now.getHours() - startDate.getHours();
+    let minutes = now.getMinutes() - startDate.getMinutes();
+    let seconds = now.getSeconds() - startDate.getSeconds();
+
+    if (seconds < 0) { seconds += 60; minutes--; }
+    if (minutes < 0) { minutes += 60; hours--; }
+    if (hours < 0) { hours += 24; days--; }
+    if (days < 0) {
+      const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      days += prevMonth.getDate();
+      months--;
+    }
+    if (months < 0) { months += 12; years--; }
+
+    document.getElementById('c-years').textContent = years;
+    document.getElementById('c-months').textContent = months;
+    document.getElementById('c-days').textContent = days;
+    document.getElementById('c-hours').textContent = hours;
+    document.getElementById('c-minutes').textContent = minutes;
+    document.getElementById('c-seconds').textContent = seconds;
+
+    document.getElementById('c-totaldays').textContent = totalDays.toLocaleString('ru-RU');
+    document.getElementById('c-totalseconds').textContent = totalSeconds.toLocaleString('ru-RU');
+  }
+
+  updateCounter();
+  setInterval(updateCounter, 1000);
+</script>
+
 </body>
 </html>
