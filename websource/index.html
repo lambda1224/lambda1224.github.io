@@ -4,6 +4,20 @@
 <meta charset="UTF-8" />
 <title>Source Movement Engine — Three.js Bhop Demo</title>
 <style>
+  @font-face {
+    font-family: "DIN Pro";
+    src: url("https://raw.githubusercontent.com/lambda1224/lambda1224.github.io/refs/heads/main/websource/dinpro-regular.otf") format("opentype");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+  }
+
+  :root {
+    --hud-yellow: #e7bd43;
+    --hud-yellow-dim: #aa8730;
+    --hud-shadow: rgba(0, 0, 0, 0.88);
+  }
+
   html, body {
     margin: 0;
     padding: 0;
@@ -39,27 +53,122 @@
   #crosshair::before { left: 8px; top: 0; width: 2px; height: 18px; }
   #crosshair::after  { top: 8px; left: 0; height: 2px; width: 18px; }
 
-  /* HUD со скоростью и состоянием */
-  #hud {
+  /* Диагностический HUD движка, переключается клавишей F3 */
+  #debugHud {
     position: fixed;
     left: 12px;
-    bottom: 12px;
+    top: 12px;
     color: #d6d6d6;
-    font-size: 13px;
-    line-height: 1.5;
-    background: rgba(20,20,20,0.45);
-    padding: 8px 12px;
+    font-size: 11px;
+    line-height: 1.4;
+    background: rgba(20,20,20,0.58);
+    padding: 7px 10px;
     border: 1px solid #444;
     z-index: 20;
     pointer-events: none;
     white-space: pre;
+    display: none;
+  }
+
+  /* Игровой HUD в стилистике Half-Life 2 */
+  #gameHud {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+    color: var(--hud-yellow);
+    font-family: "DIN Pro", "Arial Narrow", Arial, sans-serif;
+    text-shadow: 0 2px 2px var(--hud-shadow), 0 0 4px var(--hud-shadow);
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .hud-cluster {
+    position: absolute;
+    bottom: 22px;
+    display: flex;
+    align-items: flex-end;
+  }
+  #vitalsHud { left: 30px; gap: 30px; }
+  .hud-metric {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: end;
+    column-gap: 9px;
+  }
+  .hud-label {
+    color: var(--hud-yellow-dim);
+    font-size: 11px;
+    line-height: 1;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+  }
+  .hud-value {
+    min-width: 2ch;
+    font-size: 38px;
+    line-height: 0.82;
+  }
+  #movementHud {
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    align-items: baseline;
+    gap: 7px;
+  }
+  #movementMode {
+    color: var(--hud-yellow-dim);
+    font-size: 10px;
+  }
+  #speedValue { font-size: 25px; line-height: 1; min-width: 3ch; text-align: right; }
+  #speedUnit { color: var(--hud-yellow-dim); font-size: 9px; }
+  #ammoHud {
+    right: 30px;
+    gap: 10px;
+  }
+  #ammoHud[hidden] { display: none; }
+  #ammoHud .hud-label { padding-bottom: 4px; }
+  #clipValue { min-width: 2ch; text-align: right; }
+  #reserveValue {
+    min-width: 2ch;
+    color: var(--hud-yellow-dim);
+    font-size: 20px;
+    line-height: 1;
+  }
+  .ammo-separator {
+    width: 1px;
+    height: 31px;
+    background: var(--hud-yellow-dim);
+    opacity: 0.65;
+  }
+  .ammo-glyph {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 25px;
+    padding-bottom: 1px;
+  }
+  .ammo-glyph i {
+    display: block;
+    width: 3px;
+    height: 17px;
+    background: var(--hud-yellow);
+    box-shadow: 0 1px 2px var(--hud-shadow);
+  }
+  .ammo-glyph i:nth-child(2) { height: 21px; }
+  .ammo-glyph i:nth-child(3) { height: 19px; }
+  #reloadStatus {
+    position: absolute;
+    right: 0;
+    bottom: 42px;
+    color: var(--hud-yellow-dim);
+    font-size: 10px;
+    white-space: nowrap;
   }
 
   /* Панель выбора оружия внизу справа */
   #weaponBar {
     position: fixed;
     right: 12px;
-    bottom: 12px;
+    bottom: 88px;
     color: #d6d6d6;
     font-size: 13px;
     line-height: 1.6;
@@ -117,6 +226,29 @@
   #consoleLog .info { color: #7fd0ff; }
   #consoleLog .warn { color: #ff9a4d; }
   #consoleLog .err  { color: #ff5c5c; }
+  #consoleHints {
+    display: none;
+    max-height: 156px;
+    overflow-y: auto;
+    border-top: 1px solid #484848;
+    background: rgba(10,10,10,0.94);
+    color: #aaa;
+    font-size: 12px;
+  }
+  #consoleHints.visible { display: block; }
+  .consoleHint {
+    display: grid;
+    grid-template-columns: minmax(150px, 0.42fr) 1fr auto;
+    gap: 12px;
+    align-items: center;
+    min-height: 26px;
+    padding: 2px 10px;
+    cursor: pointer;
+  }
+  .consoleHint.selected { background: rgba(210, 210, 210, 0.14); }
+  .consoleHintName { color: #eee; }
+  .consoleHintDescription { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .consoleHintValue { color: #7fd0ff; white-space: nowrap; }
   #consoleInputWrap {
     display: flex;
     border-top: 1px solid #555;
@@ -149,10 +281,10 @@
       line-height: 1.5;
       overflow-wrap: anywhere;
     }
-    #hud {
+    #debugHud {
       left: 8px;
       right: 8px;
-      bottom: 58px;
+      top: 8px;
       max-height: 38%;
       overflow: hidden;
       box-sizing: border-box;
@@ -162,12 +294,29 @@
       white-space: pre-wrap;
       overflow-wrap: anywhere;
     }
+    #vitalsHud { left: 14px; bottom: 15px; gap: 16px; }
+    #ammoHud { right: 14px; bottom: 15px; gap: 7px; }
+    .hud-label { font-size: 8px; padding-bottom: 3px; }
+    .hud-value { font-size: 27px; }
+    #reserveValue { font-size: 15px; }
+    .ammo-separator { height: 23px; }
+    .ammo-glyph { display: none; }
+    #movementHud { bottom: 59px; }
+    #movementMode { font-size: 8px; }
+    #speedValue { font-size: 19px; }
+    #reloadStatus { bottom: 32px; font-size: 8px; }
     #weaponBar {
       right: 8px;
-      bottom: 8px;
+      bottom: 70px;
       padding: 4px 7px;
       font-size: 10px;
     }
+    .consoleHint {
+      grid-template-columns: minmax(112px, 0.45fr) 1fr;
+      gap: 8px;
+      font-size: 10px;
+    }
+    .consoleHintValue { display: none; }
   }
 </style>
 </head>
@@ -175,14 +324,39 @@
 
 <div id="crosshair"></div>
 
-<div id="hud"></div>
+<div id="debugHud"></div>
+<div id="gameHud">
+  <div id="vitalsHud" class="hud-cluster">
+    <div class="hud-metric">
+      <span class="hud-label">HEALTH</span>
+      <span id="healthValue" class="hud-value">100</span>
+    </div>
+    <div class="hud-metric">
+      <span class="hud-label">SUIT</span>
+      <span id="suitValue" class="hud-value">100</span>
+    </div>
+  </div>
+  <div id="movementHud" class="hud-cluster">
+    <span id="movementMode">WALK</span>
+    <span id="speedValue">0</span>
+    <span id="speedUnit">U/S</span>
+  </div>
+  <div id="ammoHud" class="hud-cluster">
+    <span class="ammo-glyph" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="hud-label">AMMO</span>
+    <span id="clipValue" class="hud-value">30</span>
+    <span class="ammo-separator" aria-hidden="true"></span>
+    <span id="reserveValue">90</span>
+    <span id="reloadStatus"></span>
+  </div>
+</div>
 <div id="weaponBar"></div>
 
 <div id="blocker">
   <div><span>Source Movement Engine</span></div>
   <p>
     Нажмите, чтобы захватить курсор<br/>и начать движение.<br/>
-    WASD — движение, ПРОБЕЛ — прыжок,<br/>ЛКМ — атака/выстрел.<br/>
+    WASD — движение, SHIFT — бег, C — присесть,<br/>ПРОБЕЛ — прыжок, ЛКМ — атака, R — перезарядка.<br/>
     1 / 2 или колесо мыши — смена оружия<br/>(монтировка / автомат).<br/>
     Клавиша ~ (или Ё) — открыть/закрыть<br/>консоль разработчика.
   </p>
@@ -191,6 +365,7 @@
 
 <div id="console">
   <div id="consoleLog"></div>
+  <div id="consoleHints" role="listbox" aria-label="Подсказки команд"></div>
   <div id="consoleInputWrap">
     <span>]</span>
     <input id="consoleInput" type="text" autocomplete="off" spellcheck="false" />
@@ -398,11 +573,12 @@ addBoxCollider(120, 24, 120, 200, 0, -450);
 addBoxCollider(120, 24, 120, 500, 0, -650);
 addBoxCollider(120, 24, 120, 850, 0, -850);
 
-// Основная карта. GLB экспортирован в метрах, а физика этого демо работает в
-// Source-юнитах (1 unit = 1 inch), поэтому переводим метры в дюймы.
+// Основная карта. Три вложенных экспортных масштаба Sketchfab/FBX дают итоговые
+// 0.0171942009232254 единицы сцены на один исходный юнит карты. Обратный коэффициент
+// возвращает геометрию к сетке 1:1 с физическими Source-юнитами этого движка.
 const DUST2_GLB_URL =
   "https://raw.githubusercontent.com/lambda1224/lambda1224.github.io/refs/heads/main/websource/de_dust_2_with_real_light.glb";
-const METERS_TO_SOURCE_UNITS = 39.37007874;
+const DUST2_SOURCE_SCALE = 58.15914357;
 const RESPAWN_POINT = new THREE.Vector3(0, 0, 500);
 const dust2Map = {
   root: null,
@@ -426,7 +602,10 @@ const CFG = {
   sv_airaccelerate_base: 10,
   sv_airaccelerate_bhop: 100,
   sv_stopspeed: 100,
-  sv_maxspeed: 320,
+  sv_maxspeed: 320,             // верхний предел (спринт); обычный режим — sv_walkspeed
+  sv_walkspeed: 190,
+  sv_sprintspeed: 320,
+  sv_crouchspeed: 63,
   sv_cheats: 0,
   cl_autobhop: 0,
   sv_stepsize: 18,           // максимальная высота автоматического "степа" (как в Source, ~18u)
@@ -449,6 +628,11 @@ function jumpSpeed() {
 // Буфер прыжка (в тиках): если игрок нажал прыжок незадолго до приземления,
 // прыжок всё равно сработает в первый тик касания земли (важно для бхопа)
 const JUMP_BUFFER_TICKS = 3;
+const PLAYER_STAND_HEIGHT = 72;
+const PLAYER_CROUCH_HEIGHT = 45;
+const PLAYER_STAND_EYE = 64;
+const PLAYER_CROUCH_EYE = 36;
+const CROUCH_TRANSITION_SPEED = 180;
 
 
 /* =========================================================================
@@ -459,8 +643,11 @@ const player = {
   position: RESPAWN_POINT.clone(),  // позиция НОГ игрока
   velocity: new THREE.Vector3(0, 0, 0),
   radius: 16,
-  height: 72,
-  eyeHeight: 64,
+  height: PLAYER_STAND_HEIGHT,
+  eyeHeight: PLAYER_STAND_EYE,
+  crouching: false,
+  health: 100,
+  suit: 100,
   onGround: false,
   yaw: 0,
   pitch: 0,
@@ -476,6 +663,20 @@ function respawnPlayer() {
   player.stuck = false;
   player.noclip = false;
   player.onGround = false;
+  player.height = PLAYER_STAND_HEIGHT;
+  player.eyeHeight = PLAYER_STAND_EYE;
+  player.crouching = false;
+  player.health = 100;
+  player.suit = 100;
+
+  for (const weapon of WEAPONS) {
+    if (!weapon.ammo) continue;
+    weapon.ammo.clip = weapon.ammo.clipSize;
+    weapon.ammo.reserve = weapon.ammo.maxReserve;
+    weapon.ammo.reloading = false;
+    weapon.ammo.reloadRemaining = 0;
+    weapon.ammo.emptyNotified = false;
+  }
 }
 
 // Свободная камера-наблюдатель (freecam): полностью отделена от тела игрока —
@@ -493,7 +694,8 @@ camera.position.set(player.position.x, player.position.y + player.eyeHeight, pla
 
 const keys = {
   KeyW: false, KeyA: false, KeyS: false, KeyD: false,
-  Space: false, ControlLeft: false, ShiftLeft: false,
+  Space: false, KeyC: false, ControlLeft: false,
+  ShiftLeft: false, ShiftRight: false,
 };
 
 let pointerLocked = false;
@@ -540,6 +742,13 @@ document.addEventListener("keydown", (e) => {
   handleConsoleToggle(e);
   if (consoleOpen) return; // пока открыта консоль — игровой ввод не обрабатываем
   if (e.code in keys) keys[e.code] = true;
+
+  if (e.code === "KeyR" && !e.repeat) startReload();
+  if (e.code === "F3" && !e.repeat) {
+    e.preventDefault();
+    debugHudVisible = !debugHudVisible;
+    debugHudEl.style.display = debugHudVisible ? "block" : "none";
+  }
 
   // Смена оружия по цифрам 1 / 2
   if (e.code === "Digit1") selectWeapon(0);
@@ -636,13 +845,25 @@ const _forward = new THREE.Vector3();
 const _right = new THREE.Vector3();
 const _wishdir = new THREE.Vector3();
 
+function getMovementSpeedLimit() {
+  if (player.crouching || keys.KeyC) return CFG.sv_crouchspeed;
+  if (keys.ShiftLeft || keys.ShiftRight) return CFG.sv_sprintspeed;
+  return CFG.sv_walkspeed;
+}
+
+function getMovementMode() {
+  if (player.crouching || keys.KeyC) return "CROUCH";
+  if (keys.ShiftLeft || keys.ShiftRight) return "SPRINT";
+  return "WALK";
+}
+
 function computeWishDir() {
   // Во freecam-режиме клавиши движения управляют свободной камерой (см. freecamTick),
   // поэтому тело игрока не должно получать ввод — иначе оно продолжало бы бежать
   // "вслепую" в последнем выбранном направлении.
   if (freecamState.active) {
     _wishdir.set(0, 0, 0);
-    return { wishdir: _wishdir, wishspeed: CFG.sv_maxspeed, hasInput: false };
+    return { wishdir: _wishdir, wishspeed: getMovementSpeedLimit(), hasInput: false };
   }
 
   _forward.set(Math.sin(player.yaw), 0, Math.cos(player.yaw)).negate();
@@ -662,11 +883,13 @@ function computeWishDir() {
   const len = _wishdir.length();
   if (len > 0.0001) _wishdir.divideScalar(len);
 
-  return { wishdir: _wishdir, wishspeed: CFG.sv_maxspeed, hasInput: len > 0.0001 };
+  return { wishdir: _wishdir, wishspeed: getMovementSpeedLimit(), hasInput: len > 0.0001 };
 }
 
 // Один тик физики с фиксированным dt = 1/66.67
 function physicsTick(dt) {
+  updateCrouchState(dt);
+
   if (player.noclip) {
     noclipTick(dt);
     return;
@@ -774,21 +997,58 @@ function freecamTick(dt) {
   freecamState.position.add(move);
 }
 
+function canPlayerStand() {
+  if (player.noclip || player.height >= PLAYER_STAND_HEIGHT - 0.01) return true;
+
+  if (dust2Map.ready) {
+    const standingCapsule = getPlayerCapsule(player.position, PLAYER_STAND_HEIGHT);
+    const hit = dust2Map.octree.capsuleIntersect(standingCapsule);
+    return !hit || hit.depth < 0.5 || hit.normal.y > 0.55;
+  }
+
+  const r = player.radius;
+  const headSpace = new THREE.Box3(
+    new THREE.Vector3(player.position.x - r, player.position.y + player.height + 0.01, player.position.z - r),
+    new THREE.Vector3(player.position.x + r, player.position.y + PLAYER_STAND_HEIGHT, player.position.z + r)
+  );
+  return !worldColliders.some((collider) => headSpace.intersectsBox(collider.box));
+}
+
+function updateCrouchState(dt) {
+  const wantsCrouch = keys.KeyC;
+  const mayStand = !wantsCrouch && canPlayerStand();
+  const targetHeight = mayStand ? PLAYER_STAND_HEIGHT : PLAYER_CROUCH_HEIGHT;
+  const maxChange = CROUCH_TRANSITION_SPEED * dt;
+
+  if (player.height < targetHeight) {
+    player.height = Math.min(targetHeight, player.height + maxChange);
+  } else if (player.height > targetHeight) {
+    player.height = Math.max(targetHeight, player.height - maxChange);
+  }
+
+  const standFraction = THREE.MathUtils.clamp(
+    (player.height - PLAYER_CROUCH_HEIGHT) / (PLAYER_STAND_HEIGHT - PLAYER_CROUCH_HEIGHT),
+    0,
+    1
+  );
+  player.eyeHeight = THREE.MathUtils.lerp(PLAYER_CROUCH_EYE, PLAYER_STAND_EYE, standFraction);
+  player.crouching = wantsCrouch || player.height < PLAYER_STAND_HEIGHT - 0.01;
+}
+
 // Вспомогательная функция: текущий AABB игрока (упрощённая капсула-параллелепипед)
-function getPlayerBox() {
+function getPlayerBox(height = player.height) {
   const r = player.radius;
   return new THREE.Box3(
     new THREE.Vector3(player.position.x - r, player.position.y, player.position.z - r),
-    new THREE.Vector3(player.position.x + r, player.position.y + player.height, player.position.z + r)
+    new THREE.Vector3(player.position.x + r, player.position.y + height, player.position.z + r)
   );
 }
 
-function getPlayerCapsule(position = player.position) {
-  const r = player.radius;
+function getPlayerCapsule(position = player.position, height = player.height, radius = player.radius) {
   return new THREE.Capsule(
-    new THREE.Vector3(position.x, position.y + r, position.z),
-    new THREE.Vector3(position.x, position.y + player.height - r, position.z),
-    r
+    new THREE.Vector3(position.x, position.y + radius, position.z),
+    new THREE.Vector3(position.x, position.y + height - radius, position.z),
+    radius
   );
 }
 
@@ -1281,6 +1541,16 @@ const WEAPONS = [
     range: 2000,
     restPos: riflePivot.position.clone(),
     restRot: new THREE.Euler(0, 0, 0),
+    ammo: {
+      clip: 30,
+      clipSize: 30,
+      reserve: 90,
+      maxReserve: 90,
+      reloading: false,
+      reloadDuration: 1.55,
+      reloadRemaining: 0,
+      emptyNotified: false,
+    },
   },
 ];
 
@@ -1290,6 +1560,13 @@ riflePivot.visible = true;
 
 function selectWeapon(index) {
   if (index === currentWeaponIndex) return;
+
+  const previousWeapon = WEAPONS[currentWeaponIndex];
+  if (previousWeapon && previousWeapon.ammo) {
+    previousWeapon.ammo.reloading = false;
+    previousWeapon.ammo.reloadRemaining = 0;
+  }
+
   currentWeaponIndex = index;
   for (let i = 0; i < WEAPONS.length; i++) {
     WEAPONS[i].group.visible = (i === currentWeaponIndex);
@@ -1316,6 +1593,48 @@ function updateWeaponBarHUD() {
   }).join("");
 }
 updateWeaponBarHUD();
+
+function startReload(weapon = WEAPONS[currentWeaponIndex], announce = true) {
+  if (!weapon || weapon.type !== "ranged" || !weapon.ammo) return false;
+
+  const ammo = weapon.ammo;
+  if (ammo.reloading) return false;
+  if (ammo.clip >= ammo.clipSize) {
+    if (announce) consolePrint("Магазин уже полон.", "info");
+    return false;
+  }
+  if (ammo.reserve <= 0) {
+    if (announce && !ammo.emptyNotified) {
+      consolePrint("Запасные боеприпасы закончились.", "warn");
+      ammo.emptyNotified = true;
+    }
+    return false;
+  }
+
+  ammo.reloading = true;
+  ammo.reloadRemaining = ammo.reloadDuration;
+  ammo.emptyNotified = false;
+  if (announce) consolePrint("Перезарядка...", "info");
+  return true;
+}
+
+function updateReload(dt) {
+  const weapon = WEAPONS[currentWeaponIndex];
+  if (!weapon.ammo || !weapon.ammo.reloading) return;
+
+  const ammo = weapon.ammo;
+  ammo.reloadRemaining -= dt;
+  if (ammo.reloadRemaining > 0) return;
+
+  const needed = ammo.clipSize - ammo.clip;
+  const loaded = Math.min(needed, ammo.reserve);
+  ammo.clip += loaded;
+  ammo.reserve -= loaded;
+  ammo.reloading = false;
+  ammo.reloadRemaining = 0;
+  ammo.emptyNotified = false;
+  consolePrint(`Перезаряжено: ${ammo.clip} / ${ammo.reserve}.`, "info");
+}
 
 // Диспетчер атаки по ЛКМ — в зависимости от типа текущего оружия
 function triggerAttack() {
@@ -1344,6 +1663,7 @@ function handleHeldAttackInput(dt) {
     const busy = crowbarUsesGLTFAnim ? crowbarAttackBusy : w.swing.active;
     if (!busy) triggerAttack();
   } else {
+    if (w.ammo && w.ammo.reloading) return;
     rifleFireCooldown -= dt;
     if (rifleFireCooldown <= 0) {
       triggerAttack();
@@ -1362,6 +1682,8 @@ let bobTime = 0;
 function updateWeapon(dt) {
   const w = WEAPONS[currentWeaponIndex];
   const pivot = w.group;
+
+  updateReload(dt);
 
   const horizSpeed = Math.hypot(player.velocity.x, player.velocity.z);
   const speedFrac = Math.min(horizSpeed / CFG.sv_maxspeed, 1.4);
@@ -1442,6 +1764,15 @@ function getShootTargets() {
 }
 
 function fireWeapon(weapon) {
+  const ammo = weapon.ammo;
+  if (!ammo || ammo.reloading) return;
+  if (ammo.clip <= 0) {
+    startReload(weapon);
+    return;
+  }
+  ammo.clip--;
+  ammo.emptyNotified = false;
+
   // Отдача камеры и оружия вверх/назад
   recoilKick = Math.min(recoilKick + 1.0, 2.5);
   recoilPitchKick += 0.02;
@@ -1494,6 +1825,8 @@ function fireWeapon(weapon) {
     ),
     life: 3.0,
   });
+
+  if (ammo.clip === 0 && ammo.reserve > 0) startReload(weapon, false);
 }
 
 /* ---------- 7.6. Ближний бой: монтировка ---------- */
@@ -1624,7 +1957,102 @@ function updateTracersAndShells(dt) {
 
 const consoleEl = document.getElementById("console");
 const consoleLogEl = document.getElementById("consoleLog");
+const consoleHintsEl = document.getElementById("consoleHints");
 const consoleInputEl = document.getElementById("consoleInput");
+const consoleHistory = [];
+let consoleHistoryIndex = 0;
+let consoleHintIndex = 0;
+let consoleHintMatches = [];
+
+const CONSOLE_COMMANDS = [
+  { name: "cl_autobhop", usage: "cl_autobhop <0|1>", description: "Автоматический bunny hop", value: () => CFG.cl_autobhop },
+  { name: "cl_showdebug", usage: "cl_showdebug <0|1>", description: "Диагностический HUD (также F3)", value: () => Number(debugHudVisible) },
+  { name: "clear", usage: "clear", description: "Очистить вывод консоли" },
+  { name: "freecam", usage: "freecam", description: "Переключить свободную камеру", value: () => freecamState.active ? "ON" : "OFF" },
+  { name: "god", usage: "god", description: "Переключить бессмертие (sv_cheats 1)", value: () => player.god ? "ON" : "OFF" },
+  { name: "help", usage: "help [фильтр]", description: "Показать справку по командам" },
+  { name: "kill", usage: "kill", description: "Возродить игрока" },
+  { name: "noclip", usage: "noclip", description: "Переключить полёт (sv_cheats 1)", value: () => player.noclip ? "ON" : "OFF" },
+  { name: "reload", usage: "reload", description: "Перезарядить активное оружие" },
+  { name: "sv_cheats", usage: "sv_cheats <0|1>", description: "Разрешить чит-команды", value: () => CFG.sv_cheats },
+  { name: "sv_crouchspeed", usage: "sv_crouchspeed <число>", description: "Скорость в приседе", value: () => CFG.sv_crouchspeed },
+  { name: "sv_gravity", usage: "sv_gravity <число>", description: "Сила гравитации", value: () => CFG.sv_gravity },
+  { name: "sv_sprintspeed", usage: "sv_sprintspeed <число>", description: "Скорость бега с Shift", value: () => CFG.sv_sprintspeed },
+  { name: "sv_stepsize", usage: "sv_stepsize <число>", description: "Максимальная высота автошага", value: () => CFG.sv_stepsize },
+  { name: "sv_walkspeed", usage: "sv_walkspeed <число>", description: "Обычная скорость ходьбы", value: () => CFG.sv_walkspeed },
+  { name: "viewmodel_rot_x", usage: "viewmodel_rot_x <градусы>", description: "Поворот оружия по X", value: () => CFG.viewmodel_rot_x },
+  { name: "viewmodel_rot_y", usage: "viewmodel_rot_y <градусы>", description: "Поворот оружия по Y", value: () => CFG.viewmodel_rot_y },
+  { name: "viewmodel_rot_z", usage: "viewmodel_rot_z <градусы>", description: "Поворот оружия по Z", value: () => CFG.viewmodel_rot_z },
+  { name: "viewmodel_x", usage: "viewmodel_x <число>", description: "Смещение оружия по X", value: () => CFG.viewmodel_x },
+  { name: "viewmodel_y", usage: "viewmodel_y <число>", description: "Смещение оружия по Y", value: () => CFG.viewmodel_y },
+  { name: "viewmodel_z", usage: "viewmodel_z <число>", description: "Смещение оружия по Z", value: () => CFG.viewmodel_z },
+];
+
+function getConsoleHintMatches(raw) {
+  const query = raw.trimStart().split(/\s+/)[0].toLowerCase();
+  if (!query) return [];
+
+  return CONSOLE_COMMANDS
+    .filter((command) => command.name.startsWith(query))
+    .concat(CONSOLE_COMMANDS.filter((command) =>
+      !command.name.startsWith(query) && command.name.includes(query)
+    ))
+    .slice(0, 7);
+}
+
+function renderConsoleHints() {
+  consoleHintsEl.replaceChildren();
+
+  if (consoleHintMatches.length === 0) {
+    consoleHintsEl.classList.remove("visible");
+    return;
+  }
+
+  consoleHintIndex = THREE.MathUtils.clamp(consoleHintIndex, 0, consoleHintMatches.length - 1);
+  for (let index = 0; index < consoleHintMatches.length; index++) {
+    const command = consoleHintMatches[index];
+    const row = document.createElement("div");
+    row.className = `consoleHint${index === consoleHintIndex ? " selected" : ""}`;
+    row.dataset.index = String(index);
+    row.setAttribute("role", "option");
+    row.setAttribute("aria-selected", String(index === consoleHintIndex));
+
+    const name = document.createElement("span");
+    name.className = "consoleHintName";
+    name.textContent = command.usage;
+
+    const description = document.createElement("span");
+    description.className = "consoleHintDescription";
+    description.textContent = command.description;
+
+    const value = document.createElement("span");
+    value.className = "consoleHintValue";
+    value.textContent = command.value ? String(command.value()) : "";
+
+    row.append(name, description, value);
+    consoleHintsEl.appendChild(row);
+  }
+
+  consoleHintsEl.classList.add("visible");
+}
+
+function updateConsoleHints(resetSelection = true) {
+  consoleHintMatches = getConsoleHintMatches(consoleInputEl.value);
+  if (resetSelection) consoleHintIndex = 0;
+  renderConsoleHints();
+}
+
+function applySelectedConsoleHint() {
+  const command = consoleHintMatches[consoleHintIndex];
+  if (!command) return;
+
+  const raw = consoleInputEl.value.trimStart();
+  const firstSpace = raw.search(/\s/);
+  const suffix = firstSpace >= 0 ? raw.slice(firstSpace) : " ";
+  consoleInputEl.value = command.name + suffix;
+  consoleInputEl.focus();
+  updateConsoleHints(false);
+}
 
 function consolePrint(text, cls = "info") {
   const line = document.createElement("div");
@@ -1654,11 +2082,24 @@ function toggleConsole(forceState) {
     if (document.pointerLockElement) document.exitPointerLock();
     // Сбрасываем зажатые игровые клавиши, чтобы персонаж не "залипал" в движении
     for (const k in keys) keys[k] = false;
-    setTimeout(() => consoleInputEl.focus(), 0);
+    setTimeout(() => {
+      consoleInputEl.focus();
+      updateConsoleHints();
+    }, 0);
   } else {
     consoleInputEl.blur();
+    consoleHintsEl.classList.remove("visible");
   }
 }
+
+consoleInputEl.addEventListener("input", () => updateConsoleHints());
+consoleHintsEl.addEventListener("pointerdown", (e) => {
+  const row = e.target.closest(".consoleHint");
+  if (!row) return;
+  e.preventDefault();
+  consoleHintIndex = Number(row.dataset.index);
+  applySelectedConsoleHint();
+});
 
 consoleInputEl.addEventListener("keydown", (e) => {
   e.stopPropagation();
@@ -1667,13 +2108,46 @@ consoleInputEl.addEventListener("keydown", (e) => {
     toggleConsole(false);
     return;
   }
+  if (e.code === "Escape") {
+    e.preventDefault();
+    toggleConsole(false);
+    return;
+  }
+  if (e.key === "Tab" && consoleHintMatches.length > 0) {
+    e.preventDefault();
+    applySelectedConsoleHint();
+    return;
+  }
+  if ((e.key === "ArrowDown" || e.key === "ArrowUp") && consoleHintMatches.length > 0) {
+    e.preventDefault();
+    const direction = e.key === "ArrowDown" ? 1 : -1;
+    consoleHintIndex = (consoleHintIndex + direction + consoleHintMatches.length) % consoleHintMatches.length;
+    renderConsoleHints();
+    return;
+  }
+  if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+    e.preventDefault();
+    if (consoleHistory.length === 0) return;
+    const direction = e.key === "ArrowUp" ? -1 : 1;
+    consoleHistoryIndex = THREE.MathUtils.clamp(
+      consoleHistoryIndex + direction,
+      0,
+      consoleHistory.length
+    );
+    consoleInputEl.value = consoleHistory[consoleHistoryIndex] || "";
+    updateConsoleHints();
+    return;
+  }
   if (e.key === "Enter") {
     const raw = consoleInputEl.value.trim();
     if (raw.length > 0) {
+      if (consoleHistory[consoleHistory.length - 1] !== raw) consoleHistory.push(raw);
+      consoleHistoryIndex = consoleHistory.length;
       consolePrint("] " + raw, "cmdline");
       execCommand(raw);
     }
     consoleInputEl.value = "";
+    updateConsoleHints();
   }
 });
 
@@ -1867,7 +2341,7 @@ function setMapStatus(label, state) {
 function findDust2Spawn() {
   const center = dust2Map.bounds.getCenter(new THREE.Vector3());
   const probes = [
-    new THREE.Vector3(-1050, 0, 550),
+    new THREE.Vector3(-1550, 0, 810),
     new THREE.Vector3(0, 0, 0),
     new THREE.Vector3(center.x, 0, center.z),
   ];
@@ -1922,7 +2396,7 @@ function loadDust2Map() {
 
       try {
         root.name = "de_dust_2_with_real_light";
-        root.scale.multiplyScalar(METERS_TO_SOURCE_UNITS);
+        root.scale.multiplyScalar(DUST2_SOURCE_SCALE);
 
         const meshes = [];
         root.traverse((obj) => {
@@ -1964,9 +2438,10 @@ function loadDust2Map() {
         dust2Map.octree = null;
         dust2Map.ready = false;
         devLevelRoot.visible = true;
-        setMapStatus("Dust 2: ошибка подготовки, включён dev-уровень", "error");
-        consolePrint("GLB карты загружен, но не удалось построить уровень и коллизии.", "err");
-        console.error("Dust 2 setup error:", err);
+        const detail = err && err.message ? err.message : String(err);
+        setMapStatus(`Dust 2: ошибка подготовки (${detail}), включён dev-уровень`, "error");
+        consolePrint(`GLB карты загружен, но подготовка не удалась: ${detail}`, "err");
+        console.error("Dust 2 setup error:", err && err.stack ? err.stack : err);
       }
     },
     (progress) => {
@@ -1989,7 +2464,16 @@ loadDust2Map();
    9. ГЛАВНЫЙ ЦИКЛ: ФИКСИРОВАННЫЙ ШАГ ФИЗИКИ (66.67 Гц) + РЕНДЕР
    ========================================================================= */
 
-const hudEl = document.getElementById("hud");
+const debugHudEl = document.getElementById("debugHud");
+const healthValueEl = document.getElementById("healthValue");
+const suitValueEl = document.getElementById("suitValue");
+const movementModeEl = document.getElementById("movementMode");
+const speedValueEl = document.getElementById("speedValue");
+const ammoHudEl = document.getElementById("ammoHud");
+const clipValueEl = document.getElementById("clipValue");
+const reserveValueEl = document.getElementById("reserveValue");
+const reloadStatusEl = document.getElementById("reloadStatus");
+let debugHudVisible = false;
 let lastTime = performance.now();
 let accumulator = 0;
 
@@ -2021,16 +2505,35 @@ function applyCameraFromPlayer() {
 
 function updateHUD() {
   const speed = Math.hypot(player.velocity.x, player.velocity.z);
-  const weaponName = WEAPONS[currentWeaponIndex].name;
-  hudEl.textContent =
+  const weapon = WEAPONS[currentWeaponIndex];
+
+  healthValueEl.textContent = String(Math.max(0, Math.ceil(player.health)));
+  suitValueEl.textContent = String(Math.max(0, Math.ceil(player.suit)));
+  movementModeEl.textContent = getMovementMode();
+  speedValueEl.textContent = String(Math.round(speed));
+
+  if (weapon.ammo) {
+    ammoHudEl.hidden = false;
+    clipValueEl.textContent = String(weapon.ammo.clip);
+    reserveValueEl.textContent = String(weapon.ammo.reserve);
+    reloadStatusEl.textContent = weapon.ammo.reloading
+      ? `RELOADING ${Math.max(0, weapon.ammo.reloadRemaining).toFixed(1)}`
+      : "";
+  } else {
+    ammoHudEl.hidden = true;
+    reloadStatusEl.textContent = "";
+  }
+
+  debugHudEl.textContent =
     `map: ${dust2Map.label}\n` +
     `speed: ${speed.toFixed(1)} u/s\n` +
     `pos: ${player.position.x.toFixed(0)}, ${player.position.y.toFixed(0)}, ${player.position.z.toFixed(0)}\n` +
+    `move: ${getMovementMode()} (${getMovementSpeedLimit()} max)   crouch: ${player.crouching}   hull: ${player.height.toFixed(0)}\n` +
     `onGround: ${player.onGround}   noclip: ${player.noclip}   god: ${player.god}   freecam: ${freecamState.active}\n` +
     `stuck: ${player.stuck}   sv_gravity: ${CFG.sv_gravity}   sv_stepsize: ${CFG.sv_stepsize}   cl_autobhop: ${CFG.cl_autobhop}\n` +
     `viewmodel_offset: ${CFG.viewmodel_x.toFixed(2)}, ${CFG.viewmodel_y.toFixed(2)}, ${CFG.viewmodel_z.toFixed(2)}\n` +
     `viewmodel_rot(deg): ${CFG.viewmodel_rot_x.toFixed(0)}, ${CFG.viewmodel_rot_y.toFixed(0)}, ${CFG.viewmodel_rot_z.toFixed(0)}\n` +
-    `weapon: ${weaponName}   tickrate: ${TICKRATE.toFixed(2)} Hz`;
+    `weapon: ${weapon.name}   tickrate: ${TICKRATE.toFixed(2)} Hz`;
 }
 
 function animate() {
