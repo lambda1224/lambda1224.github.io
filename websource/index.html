@@ -87,6 +87,9 @@
   }
   #blocker span { color: #ffb000; font-weight: bold; }
   #blocker p { max-width: 560px; font-size: 13px; color: #aaa; line-height: 1.6; }
+  #mapStatus { min-height: 18px; font-size: 12px; color: #7fd0ff; }
+  #mapStatus[data-state="ready"] { color: #8ed081; }
+  #mapStatus[data-state="error"] { color: #ff9a4d; }
 
   /* Оверлей консоли разработчика в стиле Valve */
   #console {
@@ -133,6 +136,39 @@
     font-size: 14px;
     padding: 6px 8px 6px 0;
   }
+
+  @media (max-width: 700px) {
+    #blocker {
+      box-sizing: border-box;
+      padding: 16px;
+    }
+    #blocker p {
+      width: calc(100vw - 40px);
+      max-width: 320px;
+      font-size: 10px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+    #hud {
+      left: 8px;
+      right: 8px;
+      bottom: 58px;
+      max-height: 38%;
+      overflow: hidden;
+      box-sizing: border-box;
+      padding: 6px 8px;
+      font-size: 10px;
+      line-height: 1.35;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    #weaponBar {
+      right: 8px;
+      bottom: 8px;
+      padding: 4px 7px;
+      font-size: 10px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -145,11 +181,12 @@
 <div id="blocker">
   <div><span>Source Movement Engine</span></div>
   <p>
-    Нажмите, чтобы захватить курсор и начать движение.<br/>
-    WASD — движение, ПРОБЕЛ — прыжок, ЛКМ — атака/выстрел.<br/>
-    1 / 2 или колесо мыши — смена оружия (монтировка / автомат).<br/>
-    Клавиша ~ (или Ё) — открыть/закрыть консоль разработчика.
+    Нажмите, чтобы захватить курсор<br/>и начать движение.<br/>
+    WASD — движение, ПРОБЕЛ — прыжок,<br/>ЛКМ — атака/выстрел.<br/>
+    1 / 2 или колесо мыши — смена оружия<br/>(монтировка / автомат).<br/>
+    Клавиша ~ (или Ё) — открыть/закрыть<br/>консоль разработчика.
   </p>
+  <div id="mapStatus" role="status">Dust 2: загрузка GLB...</div>
 </div>
 
 <div id="console">
@@ -164,6 +201,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <!-- GLTFLoader (не-модульная UMD-версия из examples/js, совместимая с глобальным THREE r128) -->
 <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<!-- Геометрические примитивы той же версии Three.js для точных коллизий GLB-карты -->
+<script src="https://unpkg.com/three@0.128.0/examples/js/math/Capsule.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/math/Octree.js"></script>
 <script>
 "use strict";
 
@@ -312,6 +352,9 @@ const boxTex = makeDevTexture("#4d4d4d", "#3aa0ff");
    ========================================================================= */
 
 const WORLD_SIZE = 10000;
+const devLevelRoot = new THREE.Group();
+devLevelRoot.name = "procedural_fallback_level";
+scene.add(devLevelRoot);
 
 // Основная плоская платформа с полным коллайдером (проверка коллизии — по Y=0)
 groundTex.repeat.set(WORLD_SIZE / 64, WORLD_SIZE / 64);
@@ -320,7 +363,7 @@ groundGeo.rotateX(-Math.PI / 2);
 const groundMat = new THREE.MeshStandardMaterial({ map: groundTex, roughness: 1 });
 const ground = new THREE.Mesh(groundGeo, groundMat);
 ground.position.set(0, 0, 0);
-scene.add(ground);
+devLevelRoot.add(ground);
 
 // Список коллайдеров-параллелепипедов (для блоков/платформ для бхопа)
 // Каждый элемент: { mesh, box: THREE.Box3, height }
@@ -334,7 +377,7 @@ function addBoxCollider(w, h, d, x, y, z, tex = boxTex, repeat = 1) {
   const mat = new THREE.MeshStandardMaterial({ map: t, roughness: 1 });
   const mesh = new THREE.Mesh(geo, mat);
   mesh.position.set(x, y + h / 2, z);
-  scene.add(mesh);
+  devLevelRoot.add(mesh);
   const box = new THREE.Box3().setFromObject(mesh);
   worldColliders.push({ mesh, box, height: h });
   return mesh;
@@ -354,6 +397,21 @@ addBoxCollider(160, 48, 800, -900, 0, -300);
 addBoxCollider(120, 24, 120, 200, 0, -450);
 addBoxCollider(120, 24, 120, 500, 0, -650);
 addBoxCollider(120, 24, 120, 850, 0, -850);
+
+// Основная карта. GLB экспортирован в метрах, а физика этого демо работает в
+// Source-юнитах (1 unit = 1 inch), поэтому переводим метры в дюймы.
+const DUST2_GLB_URL =
+  "https://raw.githubusercontent.com/lambda1224/lambda1224.github.io/refs/heads/main/websource/de_dust_2_with_real_light.glb";
+const METERS_TO_SOURCE_UNITS = 39.37007874;
+const RESPAWN_POINT = new THREE.Vector3(0, 0, 500);
+const dust2Map = {
+  root: null,
+  meshes: [],
+  octree: null,
+  bounds: new THREE.Box3(),
+  ready: false,
+  label: "Dust 2: загрузка GLB...",
+};
 
 
 /* =========================================================================
@@ -398,7 +456,7 @@ const JUMP_BUFFER_TICKS = 3;
    ========================================================================= */
 
 const player = {
-  position: new THREE.Vector3(0, 0, 500),  // позиция НОГ игрока
+  position: RESPAWN_POINT.clone(),  // позиция НОГ игрока
   velocity: new THREE.Vector3(0, 0, 0),
   radius: 16,
   height: 72,
@@ -411,6 +469,14 @@ const player = {
   god: false,
   stuck: false, // застревание в геометрии при выключении noclip внутри блока (см. Source)
 };
+
+function respawnPlayer() {
+  player.position.copy(RESPAWN_POINT);
+  player.velocity.set(0, 0, 0);
+  player.stuck = false;
+  player.noclip = false;
+  player.onGround = false;
+}
 
 // Свободная камера-наблюдатель (freecam): полностью отделена от тела игрока —
 // физика игрока (в т.ч. sv_gravity/friction/accelerate) продолжает считаться как обычно,
@@ -435,6 +501,7 @@ let consoleOpen = false;
 
 const blocker = document.getElementById("blocker");
 const crosshair = document.getElementById("crosshair");
+const mapStatusEl = document.getElementById("mapStatus");
 
 blocker.addEventListener("click", () => {
   if (!consoleOpen) renderer.domElement.requestPointerLock();
@@ -653,6 +720,11 @@ function physicsTick(dt) {
   player.position.z += player.velocity.z * dt;
 
   resolveCollisions(prevY);
+
+  if (dust2Map.ready && player.position.y < dust2Map.bounds.min.y - 512) {
+    respawnPlayer();
+    consolePrint("Игрок возвращён на точку возрождения после падения за пределы Dust 2.", "warn");
+  }
 }
 
 // Полёт без коллизий (noclip) — свободное перемещение по направлению камеры
@@ -711,9 +783,96 @@ function getPlayerBox() {
   );
 }
 
+function getPlayerCapsule(position = player.position) {
+  const r = player.radius;
+  return new THREE.Capsule(
+    new THREE.Vector3(position.x, position.y + r, position.z),
+    new THREE.Vector3(position.x, position.y + player.height - r, position.z),
+    r
+  );
+}
+
+function tryDust2Step(capsule, collision) {
+  if (!player.onGround || CFG.sv_stepsize <= 0 || collision.normal.y > 0.5) return null;
+
+  const raised = capsule.clone();
+  raised.translate(new THREE.Vector3(0, CFG.sv_stepsize, 0));
+  if (dust2Map.octree.capsuleIntersect(raised)) return null;
+
+  const maxDrop = Math.ceil(CFG.sv_stepsize + GROUND_TOLERANCE);
+  for (let drop = 1; drop <= maxDrop; drop++) {
+    const candidate = raised.clone();
+    candidate.translate(new THREE.Vector3(0, -drop, 0));
+    const floorHit = dust2Map.octree.capsuleIntersect(candidate);
+    if (!floorHit) continue;
+    if (floorHit.normal.y <= 0.55) return null;
+
+    candidate.translate(
+      floorHit.normal.clone().multiplyScalar(floorHit.depth + 0.001)
+    );
+    return candidate;
+  }
+
+  return null;
+}
+
+function resolveDust2Collisions() {
+  let capsule = getPlayerCapsule();
+  const firstHit = dust2Map.octree.capsuleIntersect(capsule);
+  const steppedCapsule = firstHit ? tryDust2Step(capsule, firstHit) : null;
+  let onWalkableGround = false;
+
+  if (steppedCapsule) {
+    capsule = steppedCapsule;
+    player.velocity.y = 0;
+    onWalkableGround = true;
+  } else {
+    for (let pass = 0; pass < 4; pass++) {
+      const hit = dust2Map.octree.capsuleIntersect(capsule);
+      if (!hit || !Number.isFinite(hit.depth) || hit.depth <= 0) break;
+
+      if (hit.normal.y > 0.55 && player.velocity.y <= 0) {
+        onWalkableGround = true;
+      }
+
+      const velocityIntoSurface = player.velocity.dot(hit.normal);
+      if (velocityIntoSurface < 0) {
+        player.velocity.addScaledVector(hit.normal, -velocityIntoSurface);
+      }
+
+      capsule.translate(hit.normal.clone().multiplyScalar(hit.depth + 0.001));
+    }
+  }
+
+  player.position.set(
+    capsule.start.x,
+    capsule.start.y - player.radius,
+    capsule.start.z
+  );
+
+  // Небольшой пробник вниз удерживает onGround между физическими тиками, когда
+  // капсула уже касается пола, но больше не проникает в его треугольники.
+  if (!onWalkableGround && player.velocity.y <= 0) {
+    const groundProbe = capsule.clone();
+    groundProbe.translate(new THREE.Vector3(0, -GROUND_TOLERANCE, 0));
+    const floorHit = dust2Map.octree.capsuleIntersect(groundProbe);
+    if (floorHit && floorHit.normal.y > 0.55) {
+      player.velocity.y = 0;
+      onWalkableGround = true;
+    }
+  }
+
+  player.onGround = onWalkableGround;
+}
+
 // Проверяет, пересекается ли текущий хитбокс игрока с твёрдой геометрией уровня —
 // используется при выключении noclip, чтобы решить, застрял игрок или нет.
 function isPlayerStuckInGeometry() {
+  if (dust2Map.ready) {
+    const hit = dust2Map.octree.capsuleIntersect(getPlayerCapsule());
+    return Boolean(hit && hit.depth > 1);
+  }
+
   if (player.position.y < 0) return true; // провалился под платформу
   const box = getPlayerBox();
   for (const collider of worldColliders) {
@@ -760,6 +919,11 @@ const GROUND_TOLERANCE = 3;
 //          Игрок плавно скользит вдоль препятствия вместо микро-телепортаций/дрожания.
 // -------------------------------------------------------------------------
 function resolveCollisions(prevY) {
+  if (dust2Map.ready) {
+    resolveDust2Collisions();
+    return;
+  }
+
   // Коллизия с землёй платформы 10000x10000 (с допуском GROUND_TOLERANCE)
   if (player.position.y <= GROUND_TOLERANCE) {
     if (player.velocity.y <= 0) {
@@ -885,6 +1049,10 @@ function setViewmodelLayer(object) {
       obj.layers.enableAll();
     } else {
       obj.layers.set(VIEWMODEL_LAYER);
+      // Viewmodel всегда должен рисоваться, пока активно текущее оружие — отсечение
+      // по фрустуму здесь не нужно и может ошибочно скрывать модель (особенно
+      // анимированные SkinnedMesh, см. подробный комментарий у загрузки GLB монтировки).
+      if (obj.isMesh) obj.frustumCulled = false;
     }
   });
 }
@@ -1045,6 +1213,14 @@ if (typeof THREE.GLTFLoader === "function") {
         if (obj.isMesh) {
           obj.castShadow = false;
           obj.receiveShadow = false;
+          // КРИТИЧЕСКИЙ ФИКС: модель анимирована через скелет (SkinnedMesh). Three.js
+          // по умолчанию считает bounding sphere для отсечения по фрустуму ОДИН РАЗ,
+          // по бинд-позе, и не обновляет его при движении костей анимацией/AnimationMixer.
+          // Из-за этого при смещении viewmodel_z (или во время самой анимации взмаха)
+          // объект мог ошибочно считаться "вне камеры" и полностью пропадать, хотя
+          // на самом деле оставался в кадре. Отключаем автоматическое отсечение —
+          // для одной маленькой viewmodel-модели это не создаёт заметной нагрузки.
+          obj.frustumCulled = false;
         }
       });
 
@@ -1081,8 +1257,20 @@ const WEAPONS = [
     group: crowbarPivot,
     type: "melee",
     range: 80,           // короткая дистанция ближнего боя
-    restPos: crowbarPivot.position.clone(),
-    restRot: new THREE.Euler(0, 0, 0),
+    // Базовое положение/поворот подобраны вручную через консоль (viewmodel_x/y/z,
+    // viewmodel_rot_x/y/z) и запечены сюда как дефолт, чтобы не вводить их заново
+    // при каждом запуске: offset был (0.10, -0.10, -0.89), rot(deg) был (90, 0, -180).
+    // История калибровки (запекается кумулятивно, чтобы каждый новый найденный offset
+    // просто прибавлялся к прошлому, а не заменял его):
+    //   итерация 1: offset (0.10, -0.10, -0.89), rot(deg) (90, 0, -180)
+    //   итерация 2: offset (-0.20, 0.20, 1.40), rot(deg) (0, 0, 0) — доп. поворот не нужен
+    //   суммарно от исходной базы (0.16, -0.2, -0.3): дельта (-0.10, 0.10, 0.51)
+    restPos: crowbarPivot.position.clone().add(new THREE.Vector3(-0.10, 0.10, 0.51)),
+    restRot: new THREE.Euler(
+      THREE.MathUtils.degToRad(90),
+      THREE.MathUtils.degToRad(0),
+      THREE.MathUtils.degToRad(-180)
+    ),
     swing: { active: false, t: 0, duration: 0.28 },
   },
   {
@@ -1097,6 +1285,8 @@ const WEAPONS = [
 ];
 
 let currentWeaponIndex = 1; // по умолчанию — автомат
+crowbarPivot.visible = false;
+riflePivot.visible = true;
 
 function selectWeapon(index) {
   if (index === currentWeaponIndex) return;
@@ -1117,7 +1307,6 @@ function selectWeapon(index) {
 
   updateWeaponBarHUD();
 }
-selectWeapon(1); // инициализация видимости (автомат виден, монтировка скрыта)
 
 function updateWeaponBarHUD() {
   const el = document.getElementById("weaponBar");
@@ -1135,6 +1324,31 @@ function triggerAttack() {
     meleeAttack(w);
   } else {
     fireWeapon(w);
+  }
+}
+
+// Интервал между автоматическими выстрелами автомата при удержании ЛКМ (авто-огонь).
+const RIFLE_FIRE_INTERVAL = 0.12; // ~500 выстрелов/мин
+let rifleFireCooldown = 0;
+
+// Вызывается КАЖДЫЙ КАДР, пока зажата ЛКМ. Для монтировки — как только текущий взмах
+// (GLTF-анимация или процедурный swing) завершился, сразу запускается следующий, поэтому
+// удержание кнопки атаки даёт НЕОГРАНИЧЕННУЮ серию ударов подряд, без повторных кликов.
+// Для автомата — то же самое, но с ограничением скорострельности по таймеру.
+function handleHeldAttackInput(dt) {
+  if (!mouseHeld || consoleOpen || !pointerLocked) return;
+
+  const w = WEAPONS[currentWeaponIndex];
+
+  if (w.type === "melee") {
+    const busy = crowbarUsesGLTFAnim ? crowbarAttackBusy : w.swing.active;
+    if (!busy) triggerAttack();
+  } else {
+    rifleFireCooldown -= dt;
+    if (rifleFireCooldown <= 0) {
+      triggerAttack();
+      rifleFireCooldown = RIFLE_FIRE_INTERVAL;
+    }
   }
 }
 
@@ -1222,7 +1436,9 @@ const tracers = [];  // активные трассирующие линии {li
 const shells = [];   // активные гильзы {mesh, vel, life}
 
 function getShootTargets() {
-  return [ground, ...worldColliders.map(c => c.mesh)];
+  return dust2Map.ready
+    ? dust2Map.meshes
+    : [ground, ...worldColliders.map(c => c.mesh)];
 }
 
 function fireWeapon(weapon) {
@@ -1339,7 +1555,12 @@ function meleeAttackGLTF(weapon) {
     consolePrint(`Удар монтировкой (${chosenKey || "?"}): промах.`, "info");
   }
 
-  setTimeout(() => { crowbarAttackBusy = false; }, clipDuration * 1000);
+  // Разрешаем следующий взмах уже на 3/4 (75%) длительности текущего клипа, а не после
+  // его полного завершения — при удержании ЛКМ удары идут внахлёст, следующая анимация
+  // подхватывается чуть раньше (mixer.stopAllAction() в playCrowbarAnim корректно обрывает
+  // текущий клип), из-за чего серия ударов ощущается быстрее и плавнее, без "залипания"
+  // в ожидании последних кадров возврата оружия в состояние покоя.
+  setTimeout(() => { crowbarAttackBusy = false; }, clipDuration * 0.75 * 1000);
 }
 
 // Старая процедурная анимация взмаха — используется только как fallback,
@@ -1548,11 +1769,7 @@ function execCommand(raw) {
     }
 
     case "kill": {
-      player.position.set(0, 0, 500);
-      player.velocity.set(0, 0, 0);
-      player.stuck = false;
-      player.noclip = false;
-      player.onGround = false;
+      respawnPlayer();
       consolePrint("Игрок возрождён в точке спавна.", "info");
       break;
     }
@@ -1638,6 +1855,137 @@ consolePrint("Доступные команды: sv_gravity <val>, sv_stepsize <
 
 
 /* =========================================================================
+   8.1. ЗАГРУЗКА DE_DUST_2 И ПОСТРОЕНИЕ ТРЕУГОЛЬНЫХ КОЛЛИЗИЙ
+   ========================================================================= */
+
+function setMapStatus(label, state) {
+  dust2Map.label = label;
+  mapStatusEl.textContent = label;
+  mapStatusEl.dataset.state = state;
+}
+
+function findDust2Spawn() {
+  const center = dust2Map.bounds.getCenter(new THREE.Vector3());
+  const probes = [
+    new THREE.Vector3(-1050, 0, 550),
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(center.x, 0, center.z),
+  ];
+  const spawnRaycaster = new THREE.Raycaster();
+  const rayTop = dust2Map.bounds.max.y + player.height + 128;
+  const rayLength = dust2Map.bounds.getSize(new THREE.Vector3()).y + player.height + 256;
+
+  for (const probe of probes) {
+    spawnRaycaster.set(
+      new THREE.Vector3(probe.x, rayTop, probe.z),
+      new THREE.Vector3(0, -1, 0)
+    );
+    spawnRaycaster.far = rayLength;
+
+    const walkableHits = spawnRaycaster
+      .intersectObjects(dust2Map.meshes, false)
+      .filter((hit) => {
+        if (!hit.face) return false;
+        const normal = hit.face.normal.clone().transformDirection(hit.object.matrixWorld);
+        return normal.y > 0.55;
+      })
+      .sort((a, b) => Math.abs(a.point.y) - Math.abs(b.point.y));
+
+    for (const hit of walkableHits) {
+      const candidate = new THREE.Vector3(probe.x, hit.point.y + 1, probe.z);
+      const overlap = dust2Map.octree.capsuleIntersect(getPlayerCapsule(candidate));
+      if (!overlap || overlap.depth < 1) return candidate;
+    }
+  }
+
+  // Если возле ожидаемой точки нет пола, оставляем игрока над центром карты:
+  // он упадёт на ближайшую верхнюю поверхность, а не окажется внутри меша.
+  return new THREE.Vector3(center.x, dust2Map.bounds.max.y + player.height, center.z);
+}
+
+function loadDust2Map() {
+  if (
+    typeof THREE.GLTFLoader !== "function" ||
+    typeof THREE.Capsule !== "function" ||
+    typeof THREE.Octree !== "function"
+  ) {
+    setMapStatus("Dust 2: загрузчики недоступны, включён dev-уровень", "error");
+    consolePrint("Не удалось подключить GLB/Octree — используется процедурный уровень.", "warn");
+    return;
+  }
+
+  const loader = new THREE.GLTFLoader();
+  loader.load(
+    DUST2_GLB_URL,
+    (gltf) => {
+      const root = gltf.scene;
+
+      try {
+        root.name = "de_dust_2_with_real_light";
+        root.scale.multiplyScalar(METERS_TO_SOURCE_UNITS);
+
+        const meshes = [];
+        root.traverse((obj) => {
+          if (!obj.isMesh) return;
+          obj.layers.set(0);
+          obj.castShadow = false;
+          obj.receiveShadow = false;
+          meshes.push(obj);
+        });
+
+        if (meshes.length === 0) throw new Error("GLB не содержит мешей карты");
+
+        scene.add(root);
+        root.updateMatrixWorld(true);
+
+        dust2Map.root = root;
+        dust2Map.meshes = meshes;
+        dust2Map.bounds.setFromObject(root);
+        dust2Map.octree = new THREE.Octree().fromGraphNode(root);
+        dust2Map.ready = true;
+
+        devLevelRoot.visible = false;
+        RESPAWN_POINT.copy(findDust2Spawn());
+        respawnPlayer();
+
+        const size = dust2Map.bounds.getSize(new THREE.Vector3());
+        mapStatusEl.dataset.meshes = String(meshes.length);
+        mapStatusEl.dataset.bounds = `${size.x.toFixed(0)}x${size.y.toFixed(0)}x${size.z.toFixed(0)}`;
+        setMapStatus("Dust 2: GLB загружен", "ready");
+        consolePrint(
+          `Карта de_dust_2 загружена: ${meshes.length} мешей, ` +
+          `${size.x.toFixed(0)} x ${size.y.toFixed(0)} x ${size.z.toFixed(0)} Source units.`,
+          "info"
+        );
+      } catch (err) {
+        scene.remove(root);
+        dust2Map.root = null;
+        dust2Map.meshes = [];
+        dust2Map.octree = null;
+        dust2Map.ready = false;
+        devLevelRoot.visible = true;
+        setMapStatus("Dust 2: ошибка подготовки, включён dev-уровень", "error");
+        consolePrint("GLB карты загружен, но не удалось построить уровень и коллизии.", "err");
+        console.error("Dust 2 setup error:", err);
+      }
+    },
+    (progress) => {
+      if (!progress.lengthComputable || progress.total <= 0) return;
+      const percent = Math.min(100, Math.round(progress.loaded / progress.total * 100));
+      setMapStatus(`Dust 2: загрузка GLB ${percent}%`, "loading");
+    },
+    (err) => {
+      setMapStatus("Dust 2: ошибка загрузки, включён dev-уровень", "error");
+      consolePrint("Не удалось загрузить GLB-карту Dust 2 — используется процедурный уровень.", "warn");
+      console.warn("Dust 2 GLTFLoader error:", err);
+    }
+  );
+}
+
+loadDust2Map();
+
+
+/* =========================================================================
    9. ГЛАВНЫЙ ЦИКЛ: ФИКСИРОВАННЫЙ ШАГ ФИЗИКИ (66.67 Гц) + РЕНДЕР
    ========================================================================= */
 
@@ -1675,6 +2023,7 @@ function updateHUD() {
   const speed = Math.hypot(player.velocity.x, player.velocity.z);
   const weaponName = WEAPONS[currentWeaponIndex].name;
   hudEl.textContent =
+    `map: ${dust2Map.label}\n` +
     `speed: ${speed.toFixed(1)} u/s\n` +
     `pos: ${player.position.x.toFixed(0)}, ${player.position.y.toFixed(0)}, ${player.position.z.toFixed(0)}\n` +
     `onGround: ${player.onGround}   noclip: ${player.noclip}   god: ${player.god}   freecam: ${freecamState.active}\n` +
@@ -1700,6 +2049,7 @@ function animate() {
       accumulator -= FIXED_DT;
     }
     if (freecamState.active) freecamTick(frameTime);
+    handleHeldAttackInput(frameTime);
     updateWeapon(frameTime);
   }
 
