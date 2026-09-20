@@ -1,331 +1,450 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>~*~ lambda1224 ~*~ Официальная Страничка ~*~</title>
-<style>
-  body {
-    background-color: #1a0d3d;
-    background-image: repeating-linear-gradient(45deg, #1a0d3d 0px, #1a0d3d 40px, #241350 40px, #241350 80px);
-    color: #C9B8FF;
-    font-family: "Comic Sans MS", "Verdana", sans-serif;
-    margin: 0;
-    padding: 0;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#273844">
+  <title>LAMBDA1224 — Bio</title>
+  <meta name="description" content="Ссылки и контакты">
+  <meta property="og:title" content="AKA LAMBDA1224">
+  <meta property="og:description" content="Ссылки и контакты">
 
-  .wrapper {
-    max-width: 800px;
-    margin: 20px auto;
-    background-color: #2b1a5e;
-    border: 6px ridge #8a5cf6;
-    padding: 4px;
-  }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  .titlebar {
-    background: linear-gradient(to right, #2e1065, #4c1d95, #6d28d9, #3730a3);
-    color: #F3E8FF;
-    text-align: center;
-    font-size: 28px;
-    font-weight: bold;
-    padding: 10px;
-    text-shadow: 2px 2px 2px #00000080;
-    border-bottom: 4px double #A78BFA;
-  }
+  <style>
+    :root {
+      --bg: #273844;
+      --bg-dot: rgba(255, 255, 255, 0.07);
+      --orange: #e35433;
+      --ink: #101214;
+      --text: #eef1f4;
+      --text-muted: #8b98a6;
+      --surface: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.09);
+      --border-hover: rgba(227, 84, 51, 0.55);
+      --accent-bg-hover: rgba(227, 84, 51, 0.08);
+      --ease: cubic-bezier(.16, 1, .3, 1);
+    }
 
-  marquee {
-    background-color: #150826;
-    color: #C4B5FD;
-    font-size: 18px;
-    padding: 6px;
-    border-top: 2px solid #8B5CF6;
-    border-bottom: 2px solid #8B5CF6;
-  }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    html, body { margin: 0; padding: 0; }
+    h1, p { margin: 0; }
 
-  .content {
-    background-color: #F5F3FF;
-    color: #241350;
-    padding: 15px;
-    border: 3px inset #7C3AED;
-    margin: 10px;
-  }
+    body {
+      min-height: 100vh;
+      background-color: var(--bg);
+      background-image: radial-gradient(var(--bg-dot) 1.4px, transparent 1.4px);
+      background-size: 42px 42px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      justify-content: center;
+      padding: 64px 20px;
+    }
 
-  .section {
-    border: 2px dashed #7C3AED;
-    background-color: #EDE9FE;
-    padding: 10px;
-    margin-bottom: 15px;
-  }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: var(--orange); color: var(--ink); }
 
-  .section h2 {
-    background-color: #4C1D95;
-    color: #E9D5FF;
-    padding: 4px 8px;
-    margin: -10px -10px 10px -10px;
-    font-size: 20px;
-    text-shadow: 1px 1px 0px #00000060;
-  }
+    /* ---------- общая сетка страницы ---------- */
+    .main-column {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-  .blink {
-    animation: blinker 1s step-start infinite;
-    color: #6D28D9;
-    font-weight: bold;
-  }
+    .profile,
+    .meta {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-  @keyframes blinker {
-    50% { opacity: 0; }
-  }
+    .meta { margin-top: 28px; }
 
-  .avatar-box {
-    float: left;
-    margin-right: 15px;
-    border: 4px groove #7C3AED;
-    padding: 3px;
-    background: #DDD6FE;
-  }
+    .content-row {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 40px;
+    }
 
-  .avatar-box img {
-    display: block;
-    width: 130px;
-    height: 130px;
-    object-fit: cover;
-  }
+    /* на широких экранах панель проектов плавно "отъезжает" вправо
+       (анимируется ширина), на мобильных остаётся под ссылками */
+    @media (min-width: 900px) {
+      .main-column { width: auto; max-width: none; align-items: flex-start; }
+      .profile, .meta { max-width: 420px; }
+      .content-row { flex-direction: row; align-items: flex-start; gap: 32px; width: auto; }
+      .links { width: 420px; flex: 0 0 420px; }
 
-  .counter-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #1a0d3d;
-    color: #C4B5FD;
-    font-family: "Courier New", monospace;
-    font-size: 15px;
-  }
+      .projects-panel {
+        flex: 0 0 0px;
+        width: 0;
+        min-width: 0;
+        overflow: hidden;
+        transition: flex-basis .45s var(--ease), width .45s var(--ease);
+      }
+      .projects-panel.is-open { flex: 0 0 420px; width: 420px; }
+      .projects-panel .reveal,
+      .projects-panel .rows { width: 420px; }
+    }
 
-  .counter-table td {
-    border: 1px solid #7C3AED;
-    padding: 6px;
-    text-align: center;
-  }
+    /* ---------- аватар / логотип ---------- */
+    .avatar {
+      --cut: 26px;
+      width: 128px;
+      height: 128px;
+      background: var(--orange);
+      clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+      transition: clip-path .16s ease;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 14px 16px 0 0;
+      box-shadow: 0 20px 32px -16px rgba(0, 0, 0, 0.5);
+      margin-bottom: 26px;
+      overflow: hidden;
+    }
 
-  .counter-table th {
-    background-color: #3B0764;
-    color: #E9D5FF;
-    padding: 6px;
-    border: 1px solid #7C3AED;
-  }
+    .avatar span {
+      font-weight: 800;
+      font-size: 34px;
+      color: var(--ink);
+    }
 
-  ul.linklist {
-    list-style-type: square;
-    padding-left: 25px;
-  }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-  ul.linklist li {
-    margin-bottom: 8px;
-    font-size: 16px;
-  }
+    .name {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: center;
+    }
 
-  a {
-    color: #4338CA;
-    font-weight: bold;
-  }
+    .tagline {
+      margin-top: 10px;
+      max-width: 100%;
+      color: var(--text-muted);
+      font-size: 14px;
+      text-align: center;
+    }
 
-  a:visited {
-    color: #6D28D9;
-  }
+    .tagline .prompt {
+      color: var(--orange);
+      margin-right: 6px;
+    }
 
-  a:hover {
-    color: #F5F3FF;
-    background-color: #7C3AED;
-  }
+    .cursor {
+      display: inline-block;
+      width: 7px;
+      height: 15px;
+      vertical-align: -2px;
+      margin-left: 2px;
+      background: var(--orange);
+      animation: blink 1.1s steps(1) infinite;
+    }
 
-  .button89 {
-    display: inline-block;
-    background-color: #DDD6FE;
-    border: 2px outset #C4B5FD;
-    padding: 6px 12px;
-    margin: 4px;
-    text-decoration: none;
-    color: #3B0764;
-    font-weight: bold;
-    font-family: "Verdana", sans-serif;
-  }
+    @keyframes blink { 50% { opacity: 0; } }
 
-  .button89:hover {
-    border-style: inset;
-    background-color: #A78BFA;
-  }
+    /* ---------- ссылки ---------- */
+    .links {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
-  .footer {
-    text-align: center;
-    background-color: #150826;
-    color: #C4B5FD;
-    padding: 10px;
-    font-size: 13px;
-    border-top: 4px double #7C3AED;
-  }
+    /* единый класс формы для ВСЕХ строк: обычных ссылок, кнопки
+       "Проекты" и заглушек в панели — форме больше неоткуда
+       "слипаться" в прямоугольник, она всегда описана здесь одним
+       и тем же способом через --cut */
+    .link-item {
+      --cut: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      padding: 16px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+      font-family: inherit;
+      font-size: 14.5px;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      transition: border-color .2s ease, background-color .2s ease, transform .2s ease, clip-path .16s ease;
+    }
 
-  .badge-row {
-    text-align: center;
-    padding: 8px;
-    background-color: #F5F3FF;
-  }
+    a.link-item:hover, a.link-item:focus-visible,
+    button.link-item:hover, button.link-item:focus-visible {
+      border-color: var(--border-hover);
+      background-color: var(--accent-bg-hover);
+      transform: translateY(-2px);
+    }
 
-  .badge-row img {
-    border: 1px solid #4C1D95;
-  }
+    /* нажатие: срезанные уголки "схлопываются" в прямой угол —
+       цвет при этом не меняется, меняется именно форма */
+    a.link-item:active, button.link-item:active,
+    .social-item:active, .avatar:active {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 100% 100%, 0 100%, 0 0);
+    }
 
-  .stamp {
-    color: #6D28D9;
-    font-size: 12px;
-  }
+    /* подсветка кнопки "Проекты", пока панель открыта */
+    .link-item.is-open {
+      border-color: var(--border-hover);
+      background-color: var(--accent-bg-hover);
+    }
 
-  hr.rainbow {
-    border: 0;
-    height: 4px;
-    background: linear-gradient(to right, #3730A3, #6D28D9, #A855F7, #4C1D95, #312E81);
-  }
-</style>
+    /* строки-заглушки в панели проектов: не кликабельны, приглушены */
+    .link-item.is-placeholder {
+      opacity: .28;
+      cursor: default;
+    }
+
+    .link-mark {
+      --cut: 3px;
+      width: 10px;
+      height: 10px;
+      flex-shrink: 0;
+      background: var(--orange);
+      clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+    }
+
+    /* ---------- панель проектов: "выезжает из невидимой линии" ---------- */
+    .projects-panel {
+      width: 100%;
+    }
+
+    .projects-panel .reveal {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows .5s var(--ease);
+    }
+
+    .projects-panel.is-open .reveal {
+      grid-template-rows: 1fr;
+    }
+
+    .projects-panel .rows {
+      overflow: hidden;
+      min-height: 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .rows > .link-item {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .35s ease, transform .35s ease,
+                  border-color .2s ease, background-color .2s ease, clip-path .16s ease;
+    }
+
+    .projects-panel.is-open .rows > .link-item {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .rows > .link-item:nth-child(1) { transition-delay: .10s, .10s, 0s, 0s, 0s; }
+    .rows > .link-item:nth-child(2) { transition-delay: .15s, .15s, 0s, 0s, 0s; }
+    .rows > .link-item:nth-child(3) { transition-delay: .20s, .20s, 0s, 0s, 0s; }
+    .rows > .link-item:nth-child(4) { transition-delay: .25s, .25s, 0s, 0s, 0s; }
+    .rows > .link-item:nth-child(5) { transition-delay: .30s, .30s, 0s, 0s, 0s; }
+
+    /* ---------- соцсети ---------- */
+    .socials {
+      display: flex;
+      gap: 12px;
+    }
+
+    .banners {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .banner-88x31 {
+      display: block;
+      width: 176px;
+    }
+
+    .banner-88x31 img {
+      display: block;
+      width: 100%;
+      height: auto;
+      opacity: .85;
+      transition: opacity .2s ease;
+    }
+
+    .banner-88x31:hover img { opacity: 1; }
+
+    .social-item {
+      --cut: 10px;
+      width: 46px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+      transition: clip-path .16s ease, border-color .2s ease, color .2s ease, background-color .2s ease;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .social-item:hover {
+      border-color: var(--border-hover);
+      color: var(--orange);
+      background-color: var(--accent-bg-hover);
+    }
+
+    footer {
+      margin-top: 40px;
+      color: var(--text-muted);
+      font-size: 12px;
+      text-align: center;
+      opacity: .7;
+    }
+
+    @media (max-width: 380px) {
+      .avatar { width: 108px; height: 108px; }
+      .avatar span { font-size: 28px; }
+      .name { font-size: 23px; }
+      .link-item { padding: 14px 18px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition-duration: .001ms !important; animation-duration: .001ms !important; }
+    }
+  </style>
 </head>
 <body>
+  <!--
+    КАК РЕДАКТИРОВАТЬ ЭТОТ ШАБЛОН
 
-<div class="wrapper">
+    1. Аватар / имя / тэглайн — правьте текст прямо внутри .profile.
+    2. .links — обычные пункты вида <a class="link-item">.
+    3. Кнопка "Проекты" — <button>, не <a href="...">, клик никуда
+       не ведёт: он добавляет/убирает класс "is-open" у панели и
+       у самой кнопки, всё остальное — чистый CSS-transition
+       (см. .reveal / .rows / .projects-panel в стилях).
+    4. .projects-panel .rows — сюда добавляйте реальные проекты
+       такими же <a class="link-item" href="...">. Строки с классом
+       "is-placeholder" — приглушённые нередактируемые заглушки
+       ("временно нет проектов"), не ссылки. Если добавляете/убираете
+       пункты — поправьте цифры в блоке ":nth-child" в стилях, чтобы
+       анимация появления пунктов по очереди осталась плавной.
+    5. Соцсети — .social-item, меняйте href и подписи (GH/TG/...).
+    6. При нажатии на любую кнопку/ссылку срезанные уголки на секунду
+       "схлопываются" в прямой угол — это .link-item:active в стилях.
+  -->
+  <div class="main-column">
 
-  <div class="titlebar">
-    ★彡 ДОБРО ПОЖАЛОВАТЬ НА СТРАНИЧКУ lambda1224 彡★
-  </div>
-
-  <marquee behavior="scroll" direction="left" scrollamount="6">
-    ПРИВЕТ ЛИМОНАДНЫЙ КИОСК | ПОДПИШИСЬ НА LINUX SYSTEM DATAMINES | Дарова Доготриггер | MaybeLev помог с оформлением LSD | ratogramX best tg client
-  </marquee>
-
-  <div class="content">
-
-    <div class="section" style="overflow: auto;">
-      <h2>♦ О СЕБЕ ♦</h2>
-      <div class="avatar-box">
-        <img src="https://raw.githubusercontent.com/lambda1224/lambda1224.github.io/8690aae21d000e1500f4c656d84970fbb08b1824/websource/photo_2026-09-11_21-42-12.jpg" alt="lambda1224">
+    <div class="profile">
+      <div class="avatar">
+        <span>λ</span>
+        <!-- <img src="your-photo.jpg" alt="Avatar"> -->
       </div>
-      <p>
-        Привет! Меня зовут <b>lambda1224</b>.<br>
-        Я — <span class="blink">неумелый вайбкодер</span>, но это меня не останавливает :)<br><br>
-        Люблю кодить, ломать и чинить разные штуки, копаться в системах и запускать
-        проекты, о которых никто не просил. Эта страничка сделана в стиле старого доброго
-        рунета начала 2000-х — потому что ностальгия наше всё.
+
+      <h1 class="name">AKA LAMBDA1224</h1>
+
+      <p class="tagline">
+        <span class="prompt">&gt;</span>неумелый вайбкодер, живу уже 14 полных лет<span class="cursor"></span>
       </p>
     </div>
 
-    <hr class="rainbow">
+    <div class="content-row">
+      <nav class="links">
+        <a class="link-item" href="https://t.me/lambda1224" target="_blank" rel="noopener">
+          <span class="link-mark"></span>
+          <span>Telegram</span>
+        </a>
+        <button class="link-item" type="button" id="projectsToggle" aria-expanded="false" aria-controls="projectsPanel">
+          <span class="link-mark"></span>
+          <span>Проекты</span>
+        </button>
+      </nav>
 
-    <div class="section">
-      <h2>⏳ СЧЁТЧИК ЖИЗНИ ⏳</h2>
-      <p style="text-align:center;">Тикает с <b>29 января 2012 года</b>...</p>
-      <table class="counter-table" id="lifeCounterTable">
-        <tr>
-          <th>Лет</th>
-          <th>Месяцев</th>
-          <th>Дней</th>
-          <th>Часов</th>
-          <th>Минут</th>
-          <th>Секунд</th>
-        </tr>
-        <tr>
-          <td id="c-years">--</td>
-          <td id="c-months">--</td>
-          <td id="c-days">--</td>
-          <td id="c-hours">--</td>
-          <td id="c-minutes">--</td>
-          <td id="c-seconds">--</td>
-        </tr>
-      </table>
-      <p style="text-align:center; font-family: 'Courier New', monospace;">
-        Всего дней прожито: <span id="c-totaldays" style="color:#FF0000; font-weight:bold;">--</span> |
-        Всего секунд: <span id="c-totalseconds" style="color:#FF0000; font-weight:bold;">--</span>
-      </p>
+      <aside class="projects-panel" id="projectsPanel">
+        <div class="reveal">
+          <div class="rows">
+            <a class="link-item" href="https://t.me/kupisochiminet" target="_blank" rel="noopener">
+              <span class="link-mark"></span>
+              <span>Linux System Datamines</span>
+            </a>
+            <a class="link-item" href="https://lambda1224.cyou/websource" target="_blank" rel="noopener">
+              <span class="link-mark"></span>
+              <span>Websource (Заброшен)</span>
+            </a>
+            <div class="link-item is-placeholder">
+              <span class="link-mark"></span>
+              <span>Временно нет проектов</span>
+            </div>
+            <div class="link-item is-placeholder">
+              <span class="link-mark"></span>
+              <span>Временно нет проектов</span>
+            </div>
+            <div class="link-item is-placeholder">
+              <span class="link-mark"></span>
+              <span>Временно нет проектов</span>
+            </div>
+          </div>
+        </div>
+      </aside>
     </div>
 
-    <hr class="rainbow">
-
-    <div class="section">
-      <h2>💾 МОИ ПРОЕКТЫ 💾</h2>
-      <ul class="linklist">
-        <li>
-          🔧 <b>WebSource</b> —
-          <a href="http://lambda1224.cyou/websource/" target="_blank">lambda1224.cyou/websource</a>
-        </li>
-        <li>
-          🐧 <b>Linux System Datamines</b> —
-          <a href="https://t.me/kupisochiminet" target="_blank">t.me/kupisochiminet</a>
-        </li>
-      </ul>
-    </div>
-
-    <hr class="rainbow">
-
-    <div class="section">
-      <h2>🔗 МОИ РЕСУРСЫ 🔗</h2>
-      <div style="text-align:center;">
-        <a class="button89" href="https://www.youtube.com/@%D0%BB%D1%8F%D0%BC%D0%B1%D0%B4%D0%B0" target="_blank">▶ YouTube: lambda1224</a>
-        <a class="button89" href="https://t.me/lambda1224" target="_blank">✈ Telegram: lambda1224</a>
-        <a class="button89" href="https://github.com/lambda1224" target="_blank">🐱 GitHub: lambda1224</a>
+    <div class="meta">
+      <div class="socials">
+        <a class="social-item" href="https://github.com/lambda1224" target="_blank" rel="noopener" aria-label="GitHub">GH</a>
       </div>
-    </div>
 
-    <div class="badge-row">
-      <a href="https://mynickname.com/id1846477" target="_blank">
-        <img src="https://mynickname.com/forum1t5/lambda1224.gif" alt="mynickname lambda1224">
-      </a>
-      <img src="https://raw.githubusercontent.com/lambda1224/lambda1224.github.io/7a07d2fd4f433ec651f6fc38026784ccab3e2003/websource/ntvmir.gif" alt="ntv mir" width="90" height="33">
+      <div class="banners">
+        <a href="https://t.me/ratogramx" target="_blank" rel="noopener" class="banner-88x31">
+          <img src="https://raw.githubusercontent.com/lambda1224/lambda1224.github.io/refs/heads/main/ratogram.png" alt="ratogram" loading="lazy">
+        </a>
+      </div>
+
+      <footer>© Lambda1224</footer>
     </div>
 
   </div>
 
-  <div class="footer">
-    © lambda1224, 2026 г.
-  </div>
+  <script>
+    (function () {
+      var toggle = document.getElementById('projectsToggle');
+      var panel = document.getElementById('projectsPanel');
+      var isOpen = false;
 
-</div>
+      panel.inert = true;
 
-<script>
-  // ---- Life counter from 29 January 2012 ----
-  const startDate = new Date(2012, 0, 29, 0, 0, 0); // month is 0-indexed: 0 = January
-
-  function updateCounter() {
-    const now = new Date();
-    let diffMs = now - startDate;
-
-    const totalSeconds = Math.floor(diffMs / 1000);
-    const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    // Calendar-accurate breakdown
-    let years = now.getFullYear() - startDate.getFullYear();
-    let months = now.getMonth() - startDate.getMonth();
-    let days = now.getDate() - startDate.getDate();
-    let hours = now.getHours() - startDate.getHours();
-    let minutes = now.getMinutes() - startDate.getMinutes();
-    let seconds = now.getSeconds() - startDate.getSeconds();
-
-    if (seconds < 0) { seconds += 60; minutes--; }
-    if (minutes < 0) { minutes += 60; hours--; }
-    if (hours < 0) { hours += 24; days--; }
-    if (days < 0) {
-      const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-      days += prevMonth.getDate();
-      months--;
-    }
-    if (months < 0) { months += 12; years--; }
-
-    document.getElementById('c-years').textContent = years;
-    document.getElementById('c-months').textContent = months;
-    document.getElementById('c-days').textContent = days;
-    document.getElementById('c-hours').textContent = hours;
-    document.getElementById('c-minutes').textContent = minutes;
-    document.getElementById('c-seconds').textContent = seconds;
-
-    document.getElementById('c-totaldays').textContent = totalDays.toLocaleString('ru-RU');
-    document.getElementById('c-totalseconds').textContent = totalSeconds.toLocaleString('ru-RU');
-  }
-
-  updateCounter();
-  setInterval(updateCounter, 1000);
-</script>
-
+      toggle.addEventListener('click', function () {
+        isOpen = !isOpen;
+        panel.classList.toggle('is-open', isOpen);
+        toggle.classList.toggle('is-open', isOpen);
+        toggle.setAttribute('aria-expanded', String(isOpen));
+        panel.inert = !isOpen;
+      });
+    })();
+  </script>
 </body>
 </html>
