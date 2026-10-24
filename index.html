@@ -349,9 +349,7 @@
        у самой кнопки, всё остальное — чистый CSS-transition
        (см. .reveal / .rows / .projects-panel в стилях).
     4. .projects-panel .rows — сюда добавляйте реальные проекты
-       такими же <a class="link-item" href="...">. Строки с классом
-       "is-placeholder" — приглушённые нередактируемые заглушки
-       ("временно нет проектов"), не ссылки. Если добавляете/убираете
+       такими же <a class="link-item" href="...">. Если добавляете/убираете
        пункты — поправьте цифры в блоке ":nth-child" в стилях, чтобы
        анимация появления пунктов по очереди осталась плавной.
     5. Соцсети — .social-item, меняйте href и подписи (GH/TG/...).
@@ -388,6 +386,10 @@
       <aside class="projects-panel" id="projectsPanel">
         <div class="reveal">
           <div class="rows">
+            <a class="link-item" href="https://t.me/syntaxmod" target="_blank" rel="noopener">
+              <span class="link-mark"></span>
+              <span>SyntaxMod</span>
+            </a>
             <a class="link-item" href="https://t.me/kanal_linux" target="_blank" rel="noopener">
               <span class="link-mark"></span>
               <span>bLAZE TV</span>
@@ -396,18 +398,6 @@
               <span class="link-mark"></span>
               <span>Websource (Заброшен)</span>
             </a>
-            <div class="link-item is-placeholder">
-              <span class="link-mark"></span>
-              <span>Временно нет проектов</span>
-            </div>
-            <div class="link-item is-placeholder">
-              <span class="link-mark"></span>
-              <span>Временно нет проектов</span>
-            </div>
-            <div class="link-item is-placeholder">
-              <span class="link-mark"></span>
-              <span>Временно нет проектов</span>
-            </div>
           </div>
         </div>
       </aside>
